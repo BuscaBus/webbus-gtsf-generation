@@ -1,0 +1,397 @@
+@charset "UTF-8";
+
+/*-- Variaveis de cores CSS*/
+:root{
+    --color0: #F3F4F0;
+    --color1: #CED8D0;
+    --color2: #96A5A0;
+    --color3: #4F5C55;
+    --color4: #517709;
+}
+
+/*Configurações da página list.php*/
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #CED8D0;  
+}
+
+section{
+    text-align: center;   
+    background-color: var(--color1);    
+    height: 580px;
+    padding-top: 20px;
+    padding-left: 30px; 
+}
+
+.a-btn-cad{
+     font-weight: bold;                      
+}
+
+.btn-cadastrar{
+    background-color: var(--color4);
+    color: var(--color0);
+    font-size: 11px;
+    font-weight: bold;
+    padding: 5px 10px 5px 10px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    cursor: pointer;
+}
+
+.impt-buscar{
+    background-color: #F3F4F0;
+    width: 250px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.btn-buscar{
+    background-color: var(--color4);
+    color: var(--color0);
+    font-size: 11px;
+    font-weight: bold;
+    padding: 5px 10px 5px 10px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    cursor: pointer;
+}
+
+.a-editar{
+    background-color: var(--color4);
+    color: var(--color0);
+    font-size: 10px;
+    font-weight: bold;
+    padding: 3px 6px 3px 6px;
+    border-radius: 5px;
+    margin-right: 1px;
+    cursor: pointer;
+}
+
+.btn-excluir{
+    background-color: red;
+    color: var(--color0);
+    font-size: 10px;
+    font-weight: bold;
+    padding: 3px;
+    padding: 2px 4px 2px 4px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/*Configuração da navegação da página list.php*/
+.nav-pag {
+    color: black;
+    font-weight: bold;           
+} 
+.nav-pag a:hover {
+    color: green; 
+    font-weight: bold;            
+}
+
+/*Configurações da tabela da página list.php*/
+
+table{
+    margin: auto;
+}
+
+.th-cod{
+    padding-right: 12px;
+}
+
+.th-pont{
+    padding-right: 400px;
+}
+
+.th-bair{
+    padding-right: 150px;
+}
+
+.th-cid{
+    padding-right: 100px;
+}
+
+.th-loc{
+    padding-right: 30px;
+}
+
+.th-box{
+    padding-right: 10px;
+}
+
+.th-atual{
+    padding-right: 15px;
+}
+
+.th-acoes{
+    padding-right: 75px; 
+}
+
+.paginacao .active {    
+    text-decoration: underline;
+}
+
+/*Configurações da tela register.php*/
+
+.p-estilo{
+    text-align: center;    
+}
+    
+.lb-reg-cod{
+    margin-right: 50px;
+}
+
+.lb-reg-pont{
+    margin-right: 60px;
+}
+
+.lb-reg-cid{
+    margin-right: 53px;
+}
+
+.lb-reg-bair{
+    margin-right: 60px;
+}
+
+.lb-reg-loc{
+    margin-right: 13px;
+}
+
+.lb-reg-term{
+    margin-right: 43px;
+}
+
+.lb-reg-box{
+    margin-right: 75px;
+}
+
+.lb-reg-lat{
+    margin-right: 45px;
+}
+
+.lb-reg-lng{
+    margin-right: 32px;
+}
+
+.inpt-reg-cod{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-reg-pont{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.selc-reg-cid{
+    background-color: #F3F4F0;
+    width: 320px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.selc-reg-bair{
+    background-color: #F3F4F0;
+    width: 320px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.selc-reg-loc{
+    background-color: #F3F4F0;
+    width: 320px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.selc-reg-term{
+    background-color: #F3F4F0;
+    width: 320px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-reg-box{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-reg-lat{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-reg-lng{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.btn-reg-cad{
+    background-color: #4F5C55;
+    color: white;
+    font-weight: bold;
+    border-radius: 6px;
+    padding: 3px 30px 3px 30px;
+    cursor: pointer;
+}
+
+.nav-reg-btn{
+    display: flex;
+    justify-content: center;
+}
+
+.btn-reg-cad{
+    background-color: var(--color4);
+    color: var(--color0);
+    font-weight: bold;
+    border-radius: 6px;
+    margin-right: 5px;
+    padding: 3px 15px 3px 15px;
+    cursor: pointer;
+}
+
+.btn-reg-canc{
+    background-color: red;
+    color: var(--color0);
+    font-weight: bold;
+    border-radius: 6px;
+    margin-right: 5px;
+    padding: 3px 15px 3px 15px;
+    cursor: pointer;
+}
+
+.a-btn-canc{
+    text-decoration: none;
+    color: inherit;
+}
+
+/*Configurações da tela edit.php*/
+
+.p-estilo{
+    text-align: center;    
+}
+    
+.lb-edt-cod{
+    margin-right: 50px;
+}
+
+.lb-edt-pont{
+    margin-right: 60px;
+}
+
+.lb-edt-cid{
+    margin-right: 53px;
+}
+
+.lb-edt-bair{
+    margin-right: 60px;
+}
+
+.lb-edt-loc{
+    margin-right: 10px;
+}
+
+.lb-edt-term{
+    margin-right: 45px;
+}
+
+.lb-edt-box{
+    margin-right: 73px;
+}
+
+.inpt-edt-cod{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-edt-pont{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-edt-cid{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-edt-bair{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-edt-loc{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-edt-term{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-edt-box{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.nav-edt-btn{
+    display: flex;
+    justify-content: center;
+}
+
+.btn-edt{
+    background-color: var(--color4);
+    color: var(--color0);
+    font-weight: bold;
+    border-radius: 6px;
+    margin-right: 5px;
+    padding: 3px 30px 3px 30px;
+    cursor: pointer;
+}
+
+.btn-edt-canc{
+    background-color: red;
+    color: var(--color0);
+    font-weight: bold;
+    border-radius: 6px;
+    margin-right: 5px;
+    padding: 3px 15px 3px 15px;
+    cursor: pointer;
+}
+
+.a-btn-canc{
+    text-decoration: none;
+    color: inherit;
+}
+
+/*Configurações da tela stop_maps.php*/
+#div-map{
+    height: 600px;
+    width: 1300px;
+    margin: auto; 
+    border: solid 1px black;
+}
+

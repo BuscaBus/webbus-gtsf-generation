@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de calendário</title>
+    <link rel="stylesheet" href="../css/calendar.css?v=1.2">  
+</head>
+
+<body>
+    <section id="section-iframe">
+        <h1>Cadastrar calendário</h1>
+        <form action="register.php" method="POST" autocomplete="off">
+            <hr>
+            <p class="p-estilo">
+                <label for="id-servico" class="lb-reg-serv">Serviço:</label>
+                <input type="text" name="servico" class="inpt-reg-serv" id="id-servico" placeholder="insira um serviço..." required>
+            </p>
+            <p class="p-estilo">
+                <label for="id-inicio-vig" class="lb-reg-inic">Inicio da vigência:</label>
+                <input type="date" name="inic_vig" class="inpt-reg-inic" id="id-inicio-vig" required>            
+            </p>
+            <p class="p-estilo">
+                <label for="id-term-vig" class="lb-reg-term">Término da vigência:</label>
+                <input type="date" name="term_vig" class="inpt-reg-term" id="id-term-vig" required>            
+            </p>            
+            <br>
+            <hr>
+            <nav class="nav-reg-btn">
+                <p>
+                    <Button class="btn-reg-cad">CADASTRAR</Button>
+                </p>
+                <p>
+                    <Button class="btn-reg-canc">
+                        <a href="list.php" class="a-btn-canc">CANCELAR</a> 
+                    </Button>
+                </p>
+            </nav>
+        </form>
+    </section>
+</body>
+
+</html>

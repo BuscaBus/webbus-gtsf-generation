@@ -1,0 +1,299 @@
+@charset "UTF-8";
+
+/*-- Variaveis de cores CSS*/
+:root{
+    --color0: #F3F4F0;
+    --color1: #CED8D0;
+    --color2: #96A5A0;
+    --color3: #4F5C55;
+    --color4: #517709;
+}
+
+/*Configurações da página list.php*/
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #CED8D0;  
+}
+
+section{
+    text-align: center;   
+    background-color: var(--color1);    
+    height: 580px;
+    padding-top: 20px;
+    padding-left: 30px; 
+}
+
+.btn-a-cad{
+     font-weight: bold;                      
+}
+
+.btn-cadastrar{
+    background-color: var(--color4);
+    color: var(--color0);
+    font-size: 11px;
+    font-weight: bold;
+    padding: 5px 10px 5px 10px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    cursor: pointer;
+}
+
+.btn-pesq{
+    background-color: var(--color4);
+    color: var(--color0);
+    font-size: 11px;
+    font-weight: bold;
+    padding: 5px 10px 5px 10px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    cursor: pointer;
+}
+
+.selec-pesq{
+    background-color: #F3F4F0;
+    margin-left: 30px;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.a-editar{
+    background-color: var(--color4);
+    color: var(--color0);
+    font-size: 10px;
+    font-weight: bold;
+    padding: 3px 6px 3px 6px;
+    border-radius: 5px;
+    margin-right: 1px;
+    cursor: pointer;
+}
+
+.btn-excluir{
+    background-color: red;
+    color: var(--color0);
+    font-size: 10px;
+    font-weight: bold;
+    padding: 3px;
+    padding: 2px 4px 2px 4px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/*Configuração da navegação da página list.php*/
+.nav-pag {
+    color: black;
+    font-weight: bold;           
+} 
+.nav-pag a:hover {
+    color: green; 
+    font-weight: bold;            
+}
+
+/*Configurações da tabela da página list.php*/
+table{
+    margin: auto;
+}
+
+.th-cod{
+    padding-right: 30px;
+}
+
+.th-tarifa{
+    padding-right: 25px;
+}
+
+.th-tipo{
+    padding-right: 375px;
+}
+
+.th-atual{
+    padding-right: 20px; 
+}
+.th-acoes{
+    padding-right: 75px; 
+}
+
+.scroll-area {
+   width: 2000px; 
+   height: 580px;
+   max-height: 580px; /* ou height: 400px; */
+   overflow-y: auto; /* mostra rolagem só quando precisar */
+   overflow-x: hidden; /* evita rolagem horizontal */
+   padding: 1rem;
+   border: 1px solid #ddd;
+   border-radius: 8px;
+}
+
+/*Configurações da tela register.php*/
+
+.p-estilo{
+    text-align: center;    
+}
+    
+.lb-reg-cod{
+    margin-right: 100px;
+    margin-left: 15px;
+    text-align: left;
+}
+
+.lb-reg-tar{
+    margin-right: 110px;
+    margin-left: 15px;
+    text-align: left;
+}
+
+.lb-reg-tipo{
+    margin-right: 120px;
+    margin-left: 15px;
+    text-align: left;
+}
+
+.lb-reg-data{
+    margin-right: 7px;
+    margin-left: 20px;
+    text-align: left;
+}
+
+.inpt-reg-cod{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-reg-tar{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-reg-tipo{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+.inpt-reg-data{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.nav-reg-btn{
+    display: flex;
+    justify-content: center;
+}
+
+.btn-reg-cad{
+    background-color: var(--color4);
+    color: var(--color0);
+    font-weight: bold;
+    border-radius: 6px;
+    margin-right: 5px;
+    padding: 3px 15px 3px 15px;
+    cursor: pointer;
+}
+
+.btn-reg-canc{
+    background-color: red;
+    color: var(--color0);
+    font-weight: bold;
+    border-radius: 6px;
+    margin-right: 5px;
+    padding: 3px 15px 3px 15px;
+    cursor: pointer;
+}
+
+.a-btn-canc{
+    text-decoration: none;
+    color: inherit;
+}
+
+/*Configurações da tela edit.php*/
+
+.p-estilo{
+    text-align: center;    
+}
+    
+.lb-edt-cod{
+    margin-right: 100px;
+    margin-left: 15px;
+    text-align: left;
+}
+
+.lb-edt-tar{
+    margin-right: 110px;
+    margin-left: 15px;
+    text-align: left;
+}
+
+.lb-edt-tipo{
+    margin-right: 120px;
+    margin-left: 15px;
+    text-align: left;
+}
+
+.lb-edt-data{
+    margin-right: 7px;
+    margin-left: 20px;
+    text-align: left;
+}
+
+.inpt-edt-cod{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-edt-tar{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-edt-tipo{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+.inpt-edt-data{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.nav-edt-btn{
+    display: flex;
+    justify-content: center;
+}
+
+.btn-edt{
+    background-color: var(--color4);
+    color: var(--color0);
+    font-weight: bold;
+    border-radius: 6px;
+    margin-right: 5px;
+    padding: 3px 30px 3px 30px;
+    cursor: pointer;
+}
+
+.btn-edt-canc{
+    background-color: red;
+    color: var(--color0);
+    font-weight: bold;
+    border-radius: 6px;
+    margin-right: 5px;
+    padding: 3px 15px 3px 15px;
+    cursor: pointer;
+}
+
+.a-btn-canc{
+    text-decoration: none;
+    color: inherit;
+}

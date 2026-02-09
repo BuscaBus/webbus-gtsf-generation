@@ -1,0 +1,95 @@
+@charset "UTF-8";
+
+/*-- Variaveis de cores CSS*/
+:root{
+    --color0: #F3F4F0;
+    --color1: #CED8D0;
+    --color2: #96A5A0;
+    --color3: #4F5C55;
+    --color4: #517709;
+}
+
+/*Configurações da página*/
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #CED8D0;  
+}
+
+section{
+    text-align: center;   
+    background-color: var(--color1);    
+    height: 580px;
+    padding-top: 20px;
+    padding-left: 30px; 
+}
+
+#div-map {
+    height: 570px;
+    width: 1460px;
+    margin-top: 1px;
+    border: solid 1px black;
+}
+
+.selc-op{
+    background-color: #F3F4F0;
+    width: 250px;
+    border-radius: 5px;
+    padding: 4px;
+    margin-right: 10px;
+}
+
+.selc-linh{
+    background-color: #F3F4F0;
+    width: 320px;
+    border-radius: 5px;
+    padding: 4px;
+    margin-right: 10px;
+}
+
+.selc-viag{
+    background-color: #F3F4F0;
+    width: 400px;
+    border-radius: 5px;
+    padding: 4px;
+    margin-right: 5px;
+}
+
+.btn-selec{
+    background-color: var(--color4);
+    color: var(--color0);
+    font-size: 11px;
+    font-weight: bold;
+    padding: 5px 10px 5px 10px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    cursor: pointer;
+}
+
+.btn-reg-cad{
+    background-color: var(--color4);
+    color: var(--color0);
+    font-weight: bold;
+    border-radius: 6px;
+    margin-right: 5px;
+    padding: 3px 15px 3px 15px;
+    cursor: pointer;
+}
+
+.a-btn-canc{
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Popup do Leaflet */
+.popup-ponto {
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+/* Área com scroll das linhas */
+.popup-linhas {
+    max-height: 200px; /* ~10 linhas */
+    overflow-y: auto;
+    margin-top: 5px;
+    padding-right: 5px;
+}

@@ -1,0 +1,360 @@
+@charset "UTF-8";
+
+/*-- Variaveis de cores CSS*/
+:root{
+    --color0: #F3F4F0;
+    --color1: #CED8D0;
+    --color2: #96A5A0;
+    --color3: #4F5C55;
+    --color4: #517709;
+}
+
+/*Configurações gerais da página register.php*/
+
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #CED8D0;  
+}
+
+.main-cont {
+    display: flex;
+    justify-content: left;
+    width: 1536px;
+    height:600px;    
+}
+
+.h1-cad-vig{
+    color: black;
+    font-size: 20px;
+}
+
+.cap-list-vig{
+    color: black;
+    font-size: 20px;
+}
+
+.sect-reg-viag {
+    text-align: center;
+    background-color: var(--color2); 
+    width: 500px;
+    height: 580px;
+}
+.sect-list-viag {    
+    background-color: var(--color1);
+    width: 1100px;
+    height: 580px;
+}
+
+.a-mapa{
+    background-color: orchid;
+    color: var(--color0);
+    font-size: 10px;
+    font-weight: bold;
+    padding: 3px 6px 3px 6px;
+    border-radius: 5px;
+    margin-right: 2px;
+    cursor: pointer;
+}
+
+.a-trajeto{
+    background-color: var(--color4);
+    color: var(--color0);
+    font-size: 12px;
+    font-weight: bold;
+    padding: 5px 7px 5px 7px;
+    border-radius: 5px;
+    margin-left: 15px;
+    cursor: pointer;
+}
+
+.a-horario{
+    background-color: blue;
+    color: var(--color0);
+    font-size: 10px;
+    font-weight: bold;
+    padding: 3px 6px 3px 6px;
+    border-radius: 5px;
+    margin-right: 2px;
+    cursor: pointer;
+}
+
+.a-editar{
+    background-color: var(--color4);
+    color: var(--color0);
+    font-size: 10px;
+    font-weight: bold;
+    padding: 3px 6px 3px 6px;
+    border-radius: 5px;
+    margin-right: 2px;
+    cursor: pointer;
+}
+
+.btn-excluir{
+    background-color: red;
+    color: var(--color0);
+    font-size: 10px;
+    font-weight: bold;
+    padding: 3px;
+    padding: 2px 4px 2px 4px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/*Configurações da section de cadastro*/
+
+.form-cad-vig {
+  display: flex;
+  flex-direction: column;
+  gap: 16px; 
+}
+
+.p-estilo{
+    text-align: center;    
+}
+    
+.lb-reg-cod{
+    margin-right: 75px;
+}
+
+.lb-reg-linha{
+    margin-right: 85px;
+}
+
+.lb-reg-serv{
+    margin-right: 73px;
+}
+
+.lb-reg-orig{
+    margin-right: 73px;
+}
+
+.lb-reg-dest{
+    margin-right: 73px;
+}
+
+.lb-reg-sent{
+    margin-right: 73px;
+}
+
+.lb-reg-part{
+    margin-right: 10px;
+}
+
+.inpt-reg-cod{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-reg-linha{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-reg-orig{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-reg-dest{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-reg-part{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.selc-reg-serv{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.selc-reg-sent{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.nav-reg-btn{
+    display: flex;
+    justify-content: center;
+}
+
+.btn-reg-cad{
+    background-color: var(--color4);
+    color: var(--color0);
+    font-weight: bold;
+    border-radius: 6px;
+    margin-right: 5px;
+    padding: 3px 15px 3px 15px;
+    cursor: pointer;
+}
+
+.btn-reg-canc{
+    background-color: red;
+    color: var(--color0);
+    font-weight: bold;
+    border-radius: 6px;
+    margin-right: 5px;
+    padding: 3px 15px 3px 15px;
+    cursor: pointer;
+}
+
+.a-btn-canc{
+    text-decoration: none;
+    color: inherit;
+}
+
+/*Configurações da tabela de listagem das viagens*/
+
+.selc-serv{
+    background-color: #F3F4F0;
+    width: 200px;
+    height: 27px;
+    border-radius: 5px;
+    padding: 2px;   
+    margin-left: 15px;
+    margin-right: 5px;
+}
+
+.btn-pesq-serv{
+    background-color: var(--color4);
+    color: var(--color0);
+    font-size: 11px;
+    font-weight: bold;
+    padding: 5px 10px 5px 10px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    margin-right: 20px;
+    cursor: pointer;
+}
+
+table{
+    margin: auto;
+}
+
+.th-viag{
+    padding-right: 400px;
+}
+
+.th-serv{
+    padding-right: 70px;
+}
+
+.th-sent{
+    padding-right: 5px;
+}
+
+.th-part{
+    padding-right: 65px;
+}
+
+.th-acoes{
+    padding-right: 200px;    
+}
+
+/*Configurações da tela edit.php*/
+
+.sect-edt{
+    text-align: center;
+}
+    
+.lb-edt-serv{
+    margin-right: 73px;
+}
+
+.lb-edt-orig{
+    margin-right: 73px;
+}
+
+.lb-edt-dest{
+    margin-right: 73px;
+}
+
+.lb-edt-sent{
+    margin-right: 73px;
+}
+
+.lb-edt-part{
+    margin-right: 10px;
+}
+
+.inpt-edt-serv{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-edt-sent{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-edt-orig{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-edt-dest{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-edt-part{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.nav-edt-btn{
+    display: flex;
+    justify-content: center;
+}
+
+.btn-edt{
+    background-color: var(--color4);
+    color: var(--color0);
+    font-weight: bold;
+    border-radius: 6px;
+    margin-right: 5px;
+    padding: 3px 30px 3px 30px;
+    cursor: pointer;
+}
+
+.btn-edt-canc{
+    background-color: red;
+    color: var(--color0);
+    font-weight: bold;
+    border-radius: 6px;
+    margin-right: 5px;
+    padding: 3px 15px 3px 15px;
+    cursor: pointer;
+}
+
+.a-btn-canc{
+    text-decoration: none;
+    color: inherit;
+}
+

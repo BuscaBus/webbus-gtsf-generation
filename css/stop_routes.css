@@ -1,0 +1,276 @@
+@charset "UTF-8";
+
+/*-- Variaveis de cores CSS*/
+:root{
+    --color0: #F3F4F0;
+    --color1: #CED8D0;
+    --color2: #96A5A0;
+    --color3: #4F5C55;
+    --color4: #517709;
+}
+
+/*Configurações gerais da página register.php*/
+
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #CED8D0;  
+}
+
+section{
+    text-align: center;
+    background-color: var(--color1);    
+    height: 580px;
+    padding-top: 20px;
+    padding-left: 30px;
+}
+
+.main-cont {
+    display: flex;
+    justify-content: left;
+    width: 1536px;
+    height:600px;    
+}
+
+.h1-cad-pont{
+    color: black;
+    font-size: 20px;
+}
+
+.cap-list-hor{
+    color: black;
+    font-size: 20px;
+}
+
+.sect-reg-pont {
+    text-align: center;
+    background-color: var(--color2); 
+    width: 600px;
+}
+.sect-list-hor {    
+    background-color: var(--color1);
+    width: 1100px;
+    max-height: 575px; /* ou height: 575px; */
+    overflow-y: auto; /* mostra rolagem só quando precisar */
+    overflow-x: hidden;/* evita rolagem horizontal */
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.a-trajeto{
+    background-color: lightsalmon;
+    color: var(--color0);
+    font-size: 10px;
+    font-weight: bold;
+    padding: 3px 6px 3px 6px;
+    border-radius: 5px;
+    margin-right: 2px;
+    cursor: pointer;
+}
+
+.a-horario{
+    background-color: blue;
+    color: var(--color0);
+    font-size: 10px;
+    font-weight: bold;
+    padding: 3px 6px 3px 6px;
+    border-radius: 5px;
+    margin-right: 2px;
+    cursor: pointer;
+}
+
+.a-editar{
+    background-color: var(--color4);
+    color: var(--color0);
+    font-size: 10px;
+    font-weight: bold;
+    padding: 3px 6px 3px 6px;
+    border-radius: 5px;
+    margin-right: 2px;
+    cursor: pointer;
+}
+
+.btn-excluir{
+    background-color: red;
+    color: var(--color0);
+    font-size: 10px;
+    font-weight: bold;
+    padding: 3px;
+    padding: 2px 4px 2px 4px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/*Configurações da section para cadastrar os horários*/
+
+.form-cad-vig {
+  display: flex;
+  flex-direction: column;
+  gap: 16px; 
+}
+
+.p-estilo{
+    text-align: center;    
+}   
+
+.lb-reg-viag{
+    margin-right: 70px;
+}
+
+.lb-reg-pont{
+    margin-right: 80px;
+}
+
+.lb-reg-sequ{
+    margin-right: 45px;
+}
+
+.selc-reg-viag{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-reg-pont{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-reg-sequ{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.nav-reg-btn{
+    display: flex;
+    justify-content: center;
+}
+
+.btn-reg-cad{
+    background-color: var(--color4);
+    color: var(--color0);
+    font-weight: bold;
+    border-radius: 6px;
+    margin-right: 5px;
+    padding: 3px 15px 3px 15px;
+    cursor: pointer;
+}
+
+.btn-reg-canc{
+    background-color: red;
+    color: var(--color0);
+    font-weight: bold;
+    border-radius: 6px;
+    margin-right: 5px;
+    padding: 3px 15px 3px 15px;
+    cursor: pointer;
+}
+
+.a-btn-canc{
+    text-decoration: none;
+    color: inherit;
+}
+
+/*Configurações da tabela de listagem de horários*/
+
+table{
+    margin: auto;
+}
+
+.th-sequ{
+    padding-right: 5px;
+}
+
+.th-cod{
+    padding-right: 5px;
+}
+
+.th-ponto{
+    padding-right: 300px;
+}
+
+.th-bairr{
+    padding-right: 150px;
+}
+
+.th-cida{
+    padding-right: 100px;
+}
+
+.th-acoes{
+    padding-right: 30px;    
+}
+
+/*Configurações da tabela da página trips.php*/
+
+h3{
+    color: #517709;
+}
+
+caption{
+    font-size: 18px;
+}
+
+table{
+    margin: auto;
+}
+
+.th-seq{
+    padding-right: 10px;          
+}
+
+.th-pont{
+    padding-right: 300px;
+}
+
+.th-bair{
+    padding-right: 150px;
+}
+
+.th-cid{
+    padding-right: 150px;
+}
+
+.scroll-area {
+   width: 1600px; 
+   height: 580px;
+   max-height: 580px; /* ou height: 400px; */
+   overflow-y: auto; /* mostra rolagem só quando precisar */
+   overflow-x: hidden; /* evita rolagem horizontal */
+   padding: 1rem;
+   border: 1px solid #ddd;
+   border-radius: 8px;
+}
+
+/*Configurações da tela maps_trips.php*/
+#div-map{
+    height: 470px;
+    width: 1000px;
+    margin: 20px auto; 
+    border: solid 1px black;
+}
+
+.selc-viag{
+    background-color: #F3F4F0;
+    width: 350px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.btn-salv{
+    background-color: var(--color4);
+    color: var(--color0);
+    font-weight: bold;
+    border-radius: 6px;
+    margin-right: 5px;
+    padding: 3px 15px 3px 15px;
+    cursor: pointer;
+}
+
+
+

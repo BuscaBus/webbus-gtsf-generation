@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de operadoras</title>
+    <link rel="stylesheet" href="../css/agency.css?v=1.0"> 
+</head>
+
+<body>
+    <section>
+        <h1>Cadastrar operadora</h1>
+        <form action="register.php" method="POST" autocomplete="off">
+            <hr>
+            <p class="p-estilo">
+                <label for="id-nome" class="lb-reg-op">Nome:</label>
+                <input type="text" name="nome" class="inpt-reg-op" id="id-nome" placeholder="insira o nome da operadora..." required>
+            </p>
+            <p class="p-estilo">
+                <label for="id-cid" class="lb-reg-cid">Cidade:</label>
+                <select name="cidade" class="selc-reg-cid" id="id-cid">
+                    <option value="select">Selecione uma cidade..</option>
+                    <option value="Águas Mornas">Águas Mornas</option>
+                    <option value="Antônio Carlos">Antônio Carlos</option>
+                    <option value="Biguaçu">Biguaçu</option>
+                    <option value="Florianópolis">Florianópolis</option>
+                    <option value="Governador Celso Ramos">Governador Celso Ramos</option>
+                    <option value="Palhoça">Palhoça</option>
+                    <option value="Santo Amaro da Imperatriz">Santo Amaro da Imperatriz</option>
+                    <option value="São José">São José</option>
+                    <option value="São Pedro de Alcântara">São Pedro de Alcântara</option>
+                </select>                
+            </p>            
+            <p class="p-estilo">
+                <label for="id-url" class="lb-reg-site">Site:</label>
+                <input type="text" name="url" class="inpt-reg-site" id="id-url" placeholder="insira o site da operadora..." required>
+            </p>
+            <hr>
+            <nav class="nav-reg-btn">
+                <p>
+                    <Button class="btn-reg-cad">CADASTRAR</Button>
+                </p>
+                <p>
+                    <Button class="btn-reg-canc">
+                        <a href="list.php" class="a-btn-canc">CANCELAR</a> 
+                    </Button>
+                </p>
+            </nav>
+
+        </form>
+    </section>
+    
+</body>
+
+</html>

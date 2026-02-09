@@ -1,0 +1,59 @@
+@charset "UTF-8";
+
+/*-- Variaveis de cores CSS*/
+:root{
+    --color0: #F3F4F0;
+    --color1: #CED8D0;
+    --color2: #96A5A0;
+    --color3: #4F5C55;
+    --color4: #517709;
+}
+
+/*Configurações gerais das tabelas*/
+table {
+    width: 400px;
+    border-collapse: collapse;
+    font-size: 13px;     
+}        
+
+caption {
+    font-size: 20px;
+    font-weight: bold;
+    padding-bottom: 10px;
+}
+
+thead {
+    background-color: gray;
+    color: var(--color1);
+    font-size: 14px;
+}
+
+th {
+    border: 1px solid;
+    border-color: black;
+    padding: 4px 3px 4px 7px;
+    text-align: left; 
+
+}
+
+td {
+    background-color: var(--color1);
+    border: 1px solid;
+    border-color: black;
+    padding: 4px 3px 4px 7px;
+    text-align: left;    
+}
+
+/* Container dos botões dentro da célula */
+.acoes-container {
+    display: flex;
+    gap: 6px;    
+    justify-content: flex-start;
+}
+
+/*Efeito zebrado na tabela*/
+tbody > tr:nth-child(2n) {
+    background-color: whitesmoke;
+}
+
+

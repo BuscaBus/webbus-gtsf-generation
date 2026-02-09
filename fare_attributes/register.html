@@ -1,0 +1,50 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de tarifas</title>
+    <link rel="stylesheet" href="../css/fare_attributes.css?v=1.6">     
+</head>
+
+<body>
+    <section>
+        <h1>Cadastrar tarifas</h1>
+        <form action="register.php" method="POST" autocomplete="off">
+            <hr>
+            <p class="p-estilo">
+                <label for="id-codigo" class="lb-reg-cod">Código:</label>
+                <input type="text" name="codigo" class="inpt-reg-cod" id="id-codigo" placeholder="insira o código da tarifa..." required>
+            </p>
+             <p class="p-estilo">
+                <label for="id-tarifa" class="lb-reg-tar">Tarifa:</label>
+                <input type="text" name="tarifa" class="inpt-reg-tar" id="id-tarifa" placeholder="insira o valor da tarifa..." required>
+            </p>
+             <p class="p-estilo">
+                <label for="id-tipo" class="lb-reg-tipo">Tipo:</label>
+                <input type="text" name="tipo" class="inpt-reg-tipo" id="id-tipo" placeholder="insira o tipo da linha..." required>
+            </p>            
+            <p class="p-estilo">
+                <label for="id-data" class="lb-reg-data">Data de Atualização:</label>
+                <input type="date" name="data" class="inpt-reg-data" id="id-data" placeholder="insira a data de atualização..." required>
+            </p>
+            <hr>
+            <nav class="nav-reg-btn">
+                <p>
+                    <Button class="btn-reg-cad">CADASTRAR</Button>
+                </p>
+                <p>
+                    <Button class="btn-reg-canc">
+                        <a href="list.php" class="a-btn-canc">CANCELAR</a> 
+                    </Button>
+                </p>
+            </nav>
+
+        </form>
+    </section>
+    
+</body>
+
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema WebBus</title>
+    <link rel="shortcut icon" href="../img/logo.ico" type="image/x-icon">
+    <link rel="stylesheet" href="../css/style.css?v=1.2">  
+    <link rel="stylesheet" href="../css/table.css?v=1.1">
+    <link rel="stylesheet" href="../css/user.css?v=1.1">
+</head>
+<body>
+    <div>
+        <header>
+            <h1>Usuários</h1>
+        </header>
+        <main>
+            <section>
+                <button class="btn-cadastrar" id="btn-cad">
+                    <a href="register.html" class="link" target="frame">+ CADASTRAR</a>
+                </button>
+                <table>
+                    <caption>Relação de usuários</caption>
+                    <thead>
+                        <th class="th1">Usuário</th>
+                        <th class="th2">Senha</th>
+                        <th class="th3">Email</th>
+                        <th class="th4">Ações</th>
+                    </thead>
+                    <tbody>                     
+                        <tr>
+                            <td>teste4</td>
+                            <td>123</td>
+                            <td>teste4@teste4.com</td>
+                            <td>
+                                <a href="edit.html" class="a-editar" id="a-edit">EDITAR</a>
+                                <button class="btn-excluir">EXCLUIR</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <br>
+                <p>Total de usuários cadastrados: 00</p>
+                <br>
+                <dialog>
+                    <iframe src="register.html" name="frame"></iframe>
+                    <br>
+                    <button class="btn-fechar">FECHAR</button>
+                </dialog>
+            </section>
+        </main>
+        <footer>
+            <p><a href="../index.html">Voltar</a></p>
+        </footer>
+    </div>
+</body>
+<script src="../js/modal-user.js"></script>
+</html>
