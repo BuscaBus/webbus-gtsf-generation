@@ -53,7 +53,7 @@ $total_itens = mysqli_num_rows($result_itens);
 <body>
     <div>
         <header>
-            <h1>Operadoras</h1>
+            <h1>Operadoras cadastradas</h1>
         </header>
         <main>
             <section>
