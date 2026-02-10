@@ -98,16 +98,28 @@ table{
     padding-right: 125px;
 }
 
-.th-cid{
+.th-site{
     padding-right: 150px;
 }
 
-.th-site{
-    padding-right: 250px;
+.th-fuso{
+    padding-right: 100px;
+}
+
+.th-tel{
+    padding-right: 50px;
+}
+
+.th-cred{
+    padding-right: 150px;
+}
+
+.th-email{
+    padding-right: 150px;
 }
 
 .th-acoes{
-    padding-right: 75px; 
+    padding-right: 90px; 
 }
 
 /*Configurações da tela register.html*/
@@ -117,15 +129,27 @@ table{
 }
     
 .lb-reg-op{
-    margin-right: 10px;
-}
-
-.lb-reg-cid{
-    margin-right: 5px;
+    margin-right: 115px;
 }
 
 .lb-reg-site{
-    margin-right: 25px;
+    margin-right: 125px;
+}
+
+.lb-reg-fuso{
+    margin-right: 60px;
+}
+
+.lb-reg-tel{
+    margin-right: 95px;
+}
+
+.lb-reg-site-cred{
+    margin-right: 15px;
+}
+
+.lb-reg-email{
+    margin-right: 105px;
 }
 
 .inpt-reg-op{
@@ -142,9 +166,30 @@ table{
     padding: 4px;
 }
 
-.selc-reg-cid{
+.selc-reg-fuso{
     background-color: #F3F4F0;
     width: 323px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-reg-tel{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-reg-site-cred{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-reg-email{
+    background-color: #F3F4F0;
+    width: 310px;
     border-radius: 5px;
     padding: 4px;
 }
@@ -195,15 +240,27 @@ table{
 }
     
 .lb-edt-op{
-    margin-right: 10px;
-}
-
-.lb-edt-cid{
-    margin-right: 5px;
+    margin-right: 110px;
 }
 
 .lb-edt-site{
-    margin-right: 25px;
+    margin-right: 120px;
+}
+
+.lb-edt-fuso{
+    margin-right: 55px;
+}
+
+.lb-edt-tel{
+    margin-right: 90px;
+}
+
+.lb-edt-cred{
+    margin-right: 15px;
+}
+
+.lb-edt-email{
+    margin-right: 100px;
 }
 
 .inpt-edt-op{
@@ -220,7 +277,28 @@ table{
     padding: 4px;
 }
 
-.inpt-edt-cid{
+.inpt-edt-fuso{
+    background-color: #F3F4F0;
+    width: 315px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-edt-tel{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-edt-cred{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-edt-email{
     background-color: #F3F4F0;
     width: 310px;
     border-radius: 5px;

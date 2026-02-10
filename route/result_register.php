@@ -7,7 +7,10 @@
     $linha = $_POST['linha'];
     $descricao = $_POST['descricao'];
     $tipo = $_POST['tipo'];
-    $tarifa = $_POST['tarifa'];
+    $corLinha = $_POST['cor-linha'];
+    $corTexto = $_POST['cor-texto'];
+    $ordem = $_POST['ordem'];
+    $grupo = $_POST['grupo'];
     
     // Altera no banco de dados
     $sql = "INSERT INTO routes (
@@ -15,8 +18,11 @@
                 route_short_name, 
                 route_long_name,
                 route_desc,
-                route_group,
-                price                
+                route_type,
+                route_color,
+                route_text_color,
+                route_sort_order,
+                network_id                
             ) 
             VALUES (
                 '$operadora', 
@@ -24,7 +30,10 @@
                 '$linha',
                 '$descricao',
                 '$tipo',
-                '$tarifa'                
+                '$corLinha', 
+                '$corTexto',  
+                '$ordem',
+                '$grupo'             
             )";
     $query = mysqli_query($conexao, $sql);
 

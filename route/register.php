@@ -9,7 +9,7 @@ include("../connection.php");
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de linhas</title>
-    <link rel="stylesheet" href="../css/route.css?v=1.7">
+    <link rel="stylesheet" href="../css/route.css?v=1.8">
 </head>
 
 <body>
@@ -19,7 +19,7 @@ include("../connection.php");
             <hr>
             <p class="p-estilo">
                 <label for="id-grp" class="lb-reg-op">Operadora:</label>
-                <select name="operadora" id="id-grp" class="selc-reg">
+                <select name="operadora" id="id-grp" class="selc-reg-op">
                     <option>Selecione uma operadora</option>;
                     <?php
                     $sql_select = "SELECT agency_id, agency_name FROM agency ORDER BY agency_name ASC";
@@ -35,52 +35,45 @@ include("../connection.php");
             </p>
             <p class="p-estilo">
                 <label for="id-cod" class="lb-reg-cod">Código:</label>
-                <input type="text" name="codigo" class="inpt-reg" id="id-cod" placeholder="insira o código da linha..." required>
+                <input type="text" name="codigo" class="inpt-reg-cod" id="id-cod" placeholder="insira o código da linha..." required>
             </p>
             <p class="p-estilo">
                 <label for="id-linha" class="lb-reg-linha">Linha:</label>
-                <input type="text" name="linha" class="inpt-reg" id="id-linha" placeholder="insira o nome da linha..." required>
+                <input type="text" name="linha" class="inpt-reg-linha" id="id-linha" placeholder="insira o nome da linha..." required>
             </p>
             <p class="p-estilo">
                 <label for="id-desc" class="lb-reg-desc">Descrição:</label>
-                <textarea name="descricao" id="id-desc" class="txt-reg" placeholder="insira uma descrição..."></textarea>
+                <textarea name="descricao" id="id-desc" class="txt-reg-desc" placeholder="insira uma descrição..."></textarea>
+            </p>            
+            <p class="p-estilo">
+                <label for="id-tipo" class="lb-reg-tipo">Tipo:</label>
+                <select name="tipo" class="selc-reg-tipo" id="id-tipo" required>
+                    <option value="select">Selecione um tipo..</option>
+                    <option value="0">Bonde, VLT</option>
+                    <option value="1">Metrô</option>
+                    <option value="2">Trem</option>
+                    <option value="3">Ônibus</option>                    
+                </select>                
+            <p class="p-estilo">
+                <label for="id-cor">Cor da linha:</label>
+                <input type="color" name="cor-linha"  class="inpt-reg-cor" id="id-cor-linha">              
             </p>
             <p class="p-estilo">
-                <label for="id-grp" class="lb-reg-grup">Grupo:</label>
-                <select name="tipo" id="select-grupo" class="selc-reg">
-                    <option>Selecione um grupo de linha</option>;
-                    <?php
-                    $sql_select = "SELECT fare_id, route_group FROM fare_attributes ORDER BY route_group ASC";
-                    $result_selec = mysqli_query($conexao, $sql_select);
-
-                    while ($dados = mysqli_fetch_array($result_selec)) {
-                        $id = $dados['fare_id'];
-                        $tipo = $dados['route_group'];
-                        echo "<option value='$id'>$tipo</option>";
-                    }
-                    ?>
-                </select>
+                <label for="id-cor">Cor do texto:</label>
+                <input type="color" name="cor-texto"  class="inpt-reg-cor" id="id-cor-texto" value="#FFFFFF">              
             </p>
             <p class="p-estilo">
-                <label for="id-tarifa" class="lb-reg-tarifa">Tarifa:</label>
-                <select name="tarifa" id="select-tarifa" class="selc-reg" disabled>
-                    <option>Aguardando ...</option>;
-                    <?php
-                    $sql_select = "SELECT fare_id, price, FORMAT(fare_attributes.price, 2) AS price_format FROM fare_attributes  ORDER BY price ASC";
-                    $result_selec = mysqli_query($conexao, $sql_select);
-
-                    while ($dados = mysqli_fetch_array($result_selec)) {
-                        $id = $dados['fare_id'];
-                        $tarifa = $dados['price_format'];
-                        echo "<option value='$tarifa'>R$ $tarifa</option>";
-                    }
-                    ?>
-                </select>
+                <label for="id-ordem" class="lb-reg-ordem">Ordem:</label>
+                <input type="text" name="ordem" class="inpt-reg-ordem" id="id-ordem" placeholder="insira a ordem da linha...">
             </p>
-            <hr>
+            <p class="p-estilo">
+                <label for="id-grupo" class="lb-reg-grupo">Grupo:</label>
+                <input type="text" name="grupo" class="inpt-reg-grupo" id="id-grupo" placeholder="insira o grupo da linha...">
+            </p>            
+            <hr>            
             <nav class="nav-reg-btn">
                 <p>
-                    <Button class="btn-reg-cad">CADASTRAR</Button>
+                    <Button type="submit" class="btn-reg-cad">CADASTRAR</Button>
                 </p>
                 <p>
                     <Button class="btn-reg-canc">
@@ -95,23 +88,3 @@ include("../connection.php");
 </body>
 
 </html>
-<!-- JS para tratar a tarifa com base no tipo de linha escolhido-->
-<script>
-    document.getElementById('select-grupo').addEventListener('change', function() {
-        const grupoId = this.value;
-        const tarifaSelect = document.getElementById('select-tarifa');
-
-        // Limpa o select de tarifa enquanto carrega
-        tarifaSelect.innerHTML = '<option>Carregando...</option>';
-
-        fetch('get_tarifas.php?fare_id=' + grupoId)
-            .then(response => response.text())
-            .then(data => {
-                tarifaSelect.innerHTML = data;
-            })
-            .catch(error => {
-                tarifaSelect.innerHTML = '<option>Erro ao carregar</option>';
-                console.error('Erro:', error);
-            });
-    });
-</script>

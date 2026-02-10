@@ -10,6 +10,12 @@
 }
 
 /*Configurações da página list.php*/
+
+html, body {
+    height: auto;
+    margin: 0;
+}
+
 body{
     font-family: Arial, Helvetica, sans-serif;
     background-color: #CED8D0;
@@ -18,7 +24,7 @@ body{
 section{
     text-align: center; 
     background-color: var(--color1);    
-    height: 580px;
+    min-height: 580px;
     padding-top: 20px;
     padding-left: 30px;
 }
@@ -190,30 +196,37 @@ table{
 }
 
 .lb-reg-desc{
-    margin-right: 13px;    
+    margin-right: 13px; 
+    vertical-align: top;   
 }
 
-.lb-reg-grup{
-    margin-right: 40px;   
+.lb-reg-tipo{
+    margin-right: 55px;   
 }
 
-.lb-reg-tarifa{
-    margin-right: 45px;    
+.lb-reg-ordem{
+    margin-right: 38px;   
 }
 
-.lb-reg-status{
-    margin-right: 15px;
-    margin-left: 10px;
+.lb-reg-grupo{
+    margin-right: 38px;   
 }
 
-.inpt-reg{
+.inpt-reg-cod{
     background-color: #F3F4F0;
     width: 370px;
     border-radius: 5px;
     padding: 4px;
 }
 
-.txt-reg{
+.inpt-reg-linha{
+    background-color: #F3F4F0;
+    width: 370px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.txt-reg-desc{
     font-family: Arial, Helvetica, sans-serif;
     background-color: #F3F4F0;    
     width: 370px;
@@ -222,16 +235,44 @@ table{
     padding: 3px 5px 3px 5px;
 }
 
-.selc-reg{
+.selc-reg-op{
     background-color: #F3F4F0;
     width: 380px;
     border-radius: 5px;
     padding: 4px;
 }
 
+.selc-reg-tipo{
+    background-color: #F3F4F0;
+    width: 380px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-reg-cor{
+    background-color: #F3F4F0;
+    width: 380px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-reg-ordem{
+    background-color: #F3F4F0;
+    width: 370px;   
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-reg-grupo{
+    background-color: #F3F4F0;
+    width: 370px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
 .nav-reg-btn{
     display: flex;
-    justify-content: center;
+    justify-content: center;   
 }
 
 .btn-reg-cad{
@@ -255,8 +296,14 @@ table{
 }
 
 .a-btn-canc{
-    text-decoration: none;
-    color: inherit;
+    text-decoration: none;   
+    background-color: red;
+    color: var(--color0);
+    font-weight: bold;
+    border-radius: 6px;
+    margin-right: 5px;
+    padding: 3px 15px 3px 15px;
+    cursor: pointer;
 }
 
 /*Configurações da tela edit.php*/

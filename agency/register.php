@@ -3,11 +3,15 @@
 
     // Declaração das variaveis
     $nome = $_POST['nome'];
-    $cidade = $_POST['cidade'];
     $url = $_POST['url'];
+    $fuso = $_POST['fuso'];
+    $tel = $_POST['tel'];
+    $sitecred = $_POST['site-cred'];
+    $email = $_POST['email'];
+    
 
     // Consulta no banco de dados
-    $sql = "INSERT INTO agency (agency_name, agency_city, agency_url) VALUES ('$nome', '$cidade', '$url')";
+    $sql = "INSERT INTO agency (agency_name, agency_url, agency_timezone, agency_phone, agency_fare_url, agency_email) VALUES ('$nome', '$url', '$fuso', '$tel', '$sitecred', '$email')";
     $query = mysqli_query($conexao, $sql);
 
     //if(mysqli_query($conexao, $sql)){

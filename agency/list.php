@@ -47,13 +47,13 @@ $total_itens = mysqli_num_rows($result_itens);
     <link rel="shortcut icon" href="../img/logo.ico" type="image/x-icon">
     <link rel="stylesheet" href="../css/style.css?v=1.2">
     <link rel="stylesheet" href="../css/table.css?v=1.2">
-    <link rel="stylesheet" href="../css/agency.css?v=1.6">
+    <link rel="stylesheet" href="../css/agency.css?v=1.7">
 </head>
 
 <body>
     <div>
         <header>
-            <h1>Operadoras cadastradas</h1>
+            <h1>Operadoras</h1>
         </header>
         <main>
             <section>
@@ -85,23 +85,33 @@ $total_itens = mysqli_num_rows($result_itens);
                     <caption>Relação de operadoras</caption>
                     <thead>
                         <th class="th-op">Operadora</th>
-                        <th class="th-cid">Cidade</th>
                         <th class="th-site">Site</th>
-                        <th class="th-acoes">Ações</th>
+                        <th class="th-fuso">Fuso</th>
+                        <th class="th-tel">Telefone</th>
+                        <th class="th-cred">Créditos</th>
+                        <th class="th-email">Email</th>
+                        <th class="th-acoes">Ação</th>
                     </thead>
                     <?php
                     // Laço de repetição para trazer dados do banco
                     while ($sql_result = mysqli_fetch_array($result)) {
                         $id = $sql_result['agency_id'];
                         $nome = $sql_result['agency_name'];
-                        $cidade = $sql_result['agency_city'];
                         $url = $sql_result['agency_url'];
+                        $fuso = $sql_result['agency_timezone'];
+                        $tel = $sql_result['agency_phone'];
+                        $cred = $sql_result['agency_fare_url'];
+                        $email = $sql_result['agency_email'];
+                        
                     ?>
                         <tbody>
                             <tr>
                                 <td><?php echo $nome ?></td>
-                                <td><?php echo $cidade ?></td>
                                 <td><?php echo $url ?></td>
+                                <td><?php echo $fuso ?></td>
+                                <td><?php echo $tel ?></td>
+                                <td><?php echo $cred ?></td>
+                                <td><?php echo $email ?></td>
                                 <td>
                                     <form action="delete.php" method="POST">
                                         <input type="hidden" name="id" value="<?php echo $id ?>">

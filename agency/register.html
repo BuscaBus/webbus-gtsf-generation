@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de operadoras</title>
-    <link rel="stylesheet" href="../css/agency.css?v=1.0"> 
+    <link rel="stylesheet" href="../css/agency.css?v=1.1"> 
 </head>
 
 <body>
@@ -18,28 +18,33 @@
                 <input type="text" name="nome" class="inpt-reg-op" id="id-nome" placeholder="insira o nome da operadora..." required>
             </p>
             <p class="p-estilo">
-                <label for="id-cid" class="lb-reg-cid">Cidade:</label>
-                <select name="cidade" class="selc-reg-cid" id="id-cid">
-                    <option value="select">Selecione uma cidade..</option>
-                    <option value="Águas Mornas">Águas Mornas</option>
-                    <option value="Antônio Carlos">Antônio Carlos</option>
-                    <option value="Biguaçu">Biguaçu</option>
-                    <option value="Florianópolis">Florianópolis</option>
-                    <option value="Governador Celso Ramos">Governador Celso Ramos</option>
-                    <option value="Palhoça">Palhoça</option>
-                    <option value="Santo Amaro da Imperatriz">Santo Amaro da Imperatriz</option>
-                    <option value="São José">São José</option>
-                    <option value="São Pedro de Alcântara">São Pedro de Alcântara</option>
-                </select>                
-            </p>            
-            <p class="p-estilo">
                 <label for="id-url" class="lb-reg-site">Site:</label>
                 <input type="text" name="url" class="inpt-reg-site" id="id-url" placeholder="insira o site da operadora..." required>
             </p>
+            <p class="p-estilo">
+                <label for="id-fuso" class="lb-reg-fuso">Fuso Horário:</label>
+                <select name="fuso" class="selc-reg-fuso" id="id-fuso" required>
+                    <option value="">Selecione fuso horário</option>
+                    <option value="America/Sao_Paulo">America/Sao_Paulo</option>
+                </select>                
+            </p>  
+            <p class="p-estilo">
+                <label for="id-tel" class="lb-reg-tel" maxlength="15" inputmode="numeric">Telefone:</label>
+                <input type="tel" name="tel" class="inpt-reg-tel" id="id-tel" placeholder="insira o telefone da operadora...">
+            </p> 
+            <p class="p-estilo">
+                <label for="id-site-cred" class="lb-reg-site-cred">Compra de créditos:</label>
+                <input type="text" name="site-cred" class="inpt-reg-site-cred" id="id-site-cred" placeholder="insira o site para compra de créditos...">
+            </p>  
+             <p class="p-estilo">
+                <label for="id-email" class="lb-reg-email">E-mail:</label>
+                <input type="email" name="email" class="inpt-reg-email" id="id-email" placeholder="insira o E-mail da operadora...">
+            </p>       
+            
             <hr>
             <nav class="nav-reg-btn">
                 <p>
-                    <Button class="btn-reg-cad">CADASTRAR</Button>
+                    <Button type="submit" class="btn-reg-cad">CADASTRAR</Button>
                 </p>
                 <p>
                     <Button class="btn-reg-canc">
@@ -50,7 +55,20 @@
 
         </form>
     </section>
-    
+
+    <!-- Script para formadar o numero do telefone no imput tel-->
+    <script>
+        document.getElementById('id-tel').addEventListener('input', function (e) {
+
+        let valor = e.target.value.replace(/\D/g, '');
+
+        valor = valor.replace(/^(\d{2})(\d)/g, '($1) $2');
+        valor = valor.replace(/(\d)(\d{4})$/, '$1-$2');
+
+        e.target.value = valor;
+    });
+    </script>
+
 </body>
 
 </html>

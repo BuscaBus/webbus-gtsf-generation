@@ -4,11 +4,21 @@
     // Recebe as variaveis
     $id = $_POST['id'];
     $nome = $_POST['nome'];
-    $cidade = $_POST['cidade'];
     $url = $_POST['url'];
+    $fuso = $_POST['fuso'];
+    $tel = $_POST['tel'];
+    $sitecred = $_POST['cred'];
+    $email = $_POST['email'];
 
     // Altera no banco de dados
-    $sql = "UPDATE agency SET agency_name = '$nome', agency_city = '$cidade', agency_url = '$url' WHERE agency_id = '$id'";
+    $sql = "UPDATE agency SET 
+               agency_name = '$nome', 
+               agency_url = '$url', 
+               agency_timezone = '$fuso',  
+               agency_phone = '$tel', 
+               agency_fare_url = '$sitecred', 
+               agency_email = '$email' 
+            WHERE agency_id = '$id'";
     $query = mysqli_query($conexao, $sql);
 
     //if(mysqli_query($conexao, $sql)){
