@@ -138,12 +138,8 @@ table{
 .th-linha{
     padding-right: 350px;
 }
-.th-grup{
-    padding-right: 230px;
-}
-
-.th-tarifa{
-    padding-right: 25px;
+.th-grupo{
+    padding-right: 100px;
 }
 
 .th-status{
@@ -202,6 +198,10 @@ table{
 
 .lb-reg-tipo{
     margin-right: 55px;   
+}
+
+.lb-reg-cor{
+    margin-right: 5px;
 }
 
 .lb-reg-ordem{
@@ -323,15 +323,24 @@ table{
 }
 
 .lb-edt-desc{
-    margin-right: 13px;       
+    margin-right: 13px;
+    vertical-align: top;       
 }
 
-.lb-edt-grup{
+.lb-edt-tipo{
+    margin-right: 60px;
+}
+
+.lb-edt-cor{
+    margin-right: 5px;
+}
+
+.lb-edt-ordem{
+    margin-right: 38px;   
+}
+
+.lb-edt-grupo{
     margin-right: 40px;   
-}
-
-.lb-edt-tarifa{
-    margin-right: 45px;    
 }
 
 .lb-edt-status{
@@ -339,14 +348,21 @@ table{
     margin-left: 10px;
 }
 
-.inpt-edt{
+.inpt-edt-cod{
     background-color: #F3F4F0;
     width: 370px;
     border-radius: 5px;
     padding: 4px;
 }
 
-.txt-edt{
+.inpt-edt-linha{
+    background-color: #F3F4F0;
+    width: 370px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.txt-edt-desc{
     font-family: Arial, Helvetica, sans-serif;
     background-color: #F3F4F0;    
     width: 372px;
@@ -355,9 +371,31 @@ table{
     padding: 3px 5px 3px 5px;
 }
 
-.selc-edt{
+.inpt-edt-tipo{
     background-color: #F3F4F0;
     width: 370px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-edt-cor{
+    background-color: #F3F4F0;
+    width: 370px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-edt-ordem{
+    background-color: #F3F4F0;
+    width: 370px;   
+    border-radius: 5px;
+    padding: 4px;
+}
+
+
+.inpt-edt-grupo{
+    background-color: #F3F4F0;
+    width: 370px;   
     border-radius: 5px;
     padding: 4px;
 }

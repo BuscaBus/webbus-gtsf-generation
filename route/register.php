@@ -55,11 +55,11 @@ include("../connection.php");
                     <option value="3">Ônibus</option>                    
                 </select>                
             <p class="p-estilo">
-                <label for="id-cor">Cor da linha:</label>
+                <label for="id-cor" class="lb-reg-cor">Cor da linha:</label>
                 <input type="color" name="cor-linha"  class="inpt-reg-cor" id="id-cor-linha">              
             </p>
             <p class="p-estilo">
-                <label for="id-cor">Cor do texto:</label>
+                <label for="id-cor" class="lb-reg-cor">Cor do texto:</label>
                 <input type="color" name="cor-texto"  class="inpt-reg-cor" id="id-cor-texto" value="#FFFFFF">              
             </p>
             <p class="p-estilo">

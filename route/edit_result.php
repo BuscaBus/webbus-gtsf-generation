@@ -2,17 +2,23 @@
    include("../connection.php");
 
     // Recebe as variaveis
-    $id = $_POST['id'];
+    $id = $_POST['id'];   
     $linha = $_POST['linha'];
-    $descricao = $_POST['descricao'];
-    $tipo = $_POST['tipo'];
+    $descricao = $_POST['descricao'];    
+    $corLinha = str_replace('#', '', $_POST['cor_linha']);
+    $corTexto = str_replace('#', '', $_POST['cor_texto']);
+    $ordem = $_POST['ordem'];
+    $grupo = $_POST['grupo'];
     $status = $_POST['status'];
 
     // Altera no banco de dados
     $sql = "UPDATE routes SET 
                route_long_name = '$linha', 
                route_desc = '$descricao', 
-               route_group = '$tipo',                
+               route_color = '$corLinha', 
+               route_text_color = '$corTexto',
+               route_sort_order = '$ordem',
+               network_id = '$grupo',
                route_status = '$status',
                update_date = NOW()
             WHERE 

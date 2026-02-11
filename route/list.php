@@ -35,14 +35,11 @@ if (isset($_GET['sit_linha']) && $_GET['sit_linha'] != "" && $_GET['sit_linha'] 
 
 // Consulta principal
 $sql = "SELECT 
-            agency.agency_name,
-            fare_attributes.price,
-            FORMAT(fare_attributes.price, 2) AS price_format,
-            fare_attributes.route_group,
+            agency.agency_name,            
             routes.route_id,
             routes.route_short_name,
-            routes.route_long_name,
-            routes.route_desc,
+            routes.route_long_name, 
+            routes.network_id,           
             routes.route_status,
             CASE 
                 WHEN routes.route_status = 'A' THEN 'Ativa'
@@ -51,8 +48,7 @@ $sql = "SELECT
             routes.update_date,
             DATE_FORMAT(routes.update_date, '%d/%m/%Y') AS data_format
         FROM routes
-        JOIN agency ON agency.agency_id = routes.agency_id
-        JOIN fare_attributes ON fare_attributes.fare_id = routes.route_group   
+        JOIN agency ON agency.agency_id = routes.agency_id           
         $filtro_sql
         ORDER BY agency.agency_name ASC, routes.route_short_name ASC";
 
@@ -79,7 +75,7 @@ $result = mysqli_query($conexao, $sql);
     <title>Sistema WebBus</title>
     <link rel="shortcut icon" href="../img/logo.ico" type="image/x-icon">
     <link rel="stylesheet" href="../css/style.css?v=1.2">
-    <link rel="stylesheet" href="../css/route.css?v=2.0">
+    <link rel="stylesheet" href="../css/route.css?v=2.1">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
 </head>
 
@@ -141,8 +137,7 @@ $result = mysqli_query($conexao, $sql);
                         <th class="th-op">Operadora</th>
                         <th class="th-cod">Código</th>
                         <th class="th-linha">Linha</th>
-                        <th class="th-grup">Grupo</th>
-                        <th class="th-tarifa">Tarifa</th>
+                        <th class="th-grupo">Grupo</th>
                         <th class="th-status">Status</th>
                         <th class="th-atual">Atualização</th>
                         <th class="th-acoes">Ações</th>
@@ -154,9 +149,7 @@ $result = mysqli_query($conexao, $sql);
                         $id_op = $sql_result['agency_name'];
                         $codigo = $sql_result['route_short_name'];
                         $linha = $sql_result['route_long_name'];
-                        $desc = $sql_result['route_desc'];
-                        $id_tipo = $sql_result['route_group'];
-                        $id_tarifa = $sql_result['price_format'];
+                        $id_grupo = $sql_result['network_id'];
                         $status = $sql_result['status_format'];
                         $data = $sql_result['data_format'];
                     ?>
@@ -165,8 +158,7 @@ $result = mysqli_query($conexao, $sql);
                                 <td><?php echo $id_op ?></td>
                                 <td><?php echo $codigo ?></td>
                                 <td><?php echo $linha ?></td>
-                                <td><?php echo $id_tipo ?></td>
-                                <td>R$ <?php echo $id_tarifa ?></td>
+                                <td><?php echo $id_grupo ?></td>                                
                                 <td><?php echo $status ?></td>
                                 <td><?php echo $data ?></td>
                                 <td>

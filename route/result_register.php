@@ -1,6 +1,6 @@
 <?php
    include("../connection.php");
-
+   
     // Recebe as variaveis
     $operadora = $_POST['operadora'];
     $codigo = $_POST['codigo'];
