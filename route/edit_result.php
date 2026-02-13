@@ -5,11 +5,11 @@
     $id = $_POST['id'];   
     $linha = $_POST['linha'];
     $descricao = $_POST['descricao'];    
-    $corLinha = str_replace('#', '', $_POST['cor_linha']);
-    $corTexto = str_replace('#', '', $_POST['cor_texto']);
+    $corLinha = strtoupper($_POST['cor-linha']);
+    $corTexto = strtoupper($_POST['cor-texto']);
     $ordem = $_POST['ordem'];
     $grupo = $_POST['grupo'];
-    $status = $_POST['status'];
+    $status = $_POST['status'] ?? 'A';
 
     // Altera no banco de dados
     $sql = "UPDATE routes SET 

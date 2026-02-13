@@ -140,8 +140,16 @@ table{
     margin-right: 60px;
 }
 
+.lb-reg-lang{
+    margin-right: 105px;
+}
+
 .lb-reg-tel{
     margin-right: 95px;
+}
+
+.lb-reg-cid{
+    margin-right: 105px;
 }
 
 .lb-reg-site-cred{
@@ -173,7 +181,21 @@ table{
     padding: 4px;
 }
 
+.selc-reg-lang{
+    background-color: #F3F4F0;
+    width: 323px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
 .inpt-reg-tel{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-reg-cid{
     background-color: #F3F4F0;
     width: 310px;
     border-radius: 5px;
@@ -251,7 +273,15 @@ table{
     margin-right: 55px;
 }
 
+.lb-edt-lang{
+    margin-right: 95px;
+}
+
 .lb-edt-tel{
+    margin-right: 90px;
+}
+
+.lb-edt-cid{
     margin-right: 90px;
 }
 
@@ -265,7 +295,7 @@ table{
 
 .inpt-edt-op{
     background-color: #F3F4F0;
-    width: 310px;
+    width: 315px;
     border-radius: 5px;
     padding: 4px;
 }
@@ -284,9 +314,23 @@ table{
     padding: 4px;
 }
 
+.inpt-edt-lang{
+    background-color: #F3F4F0;
+    width: 315px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
 .inpt-edt-tel{
     background-color: #F3F4F0;
-    width: 310px;
+    width: 315px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-edt-cid{
+    background-color: #F3F4F0;
+    width: 315px;
     border-radius: 5px;
     padding: 4px;
 }

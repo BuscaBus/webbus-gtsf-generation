@@ -22,7 +22,6 @@ if (isset($_GET['buscar']) && !empty($_GET['buscar'])) {
     routes.route_long_name LIKE '%$pesquisa%' 
     OR routes.route_short_name LIKE '%$pesquisa%'
 )";
-
 }
 
 // Filtro por Status (Todas como padrão)
@@ -38,7 +37,9 @@ $sql = "SELECT
             agency.agency_name,            
             routes.route_id,
             routes.route_short_name,
-            routes.route_long_name, 
+            routes.route_long_name,
+            routes.route_color,
+            routes.route_text_color,
             routes.network_id,           
             routes.route_status,
             CASE 
@@ -142,13 +143,16 @@ $result = mysqli_query($conexao, $sql);
                         <th class="th-atual">Atualização</th>
                         <th class="th-acoes">Ações</th>
                     </thead>
-                    <?php
+                    <?php                  
+
                     // Laço de repetição para trazer dados do banco
                     while ($sql_result = mysqli_fetch_array($result)) {
                         $id = $sql_result['route_id'];
                         $id_op = $sql_result['agency_name'];
                         $codigo = $sql_result['route_short_name'];
                         $linha = $sql_result['route_long_name'];
+                        $corLinha = $sql_result['route_color'];
+                        $corTexto = $sql_result['route_text_color'];
                         $id_grupo = $sql_result['network_id'];
                         $status = $sql_result['status_format'];
                         $data = $sql_result['data_format'];
@@ -156,9 +160,23 @@ $result = mysqli_query($conexao, $sql);
                         <tbody>
                             <tr>
                                 <td><?php echo $id_op ?></td>
-                                <td><?php echo $codigo ?></td>
+                                <td>
+                                    <span style="
+                                        background-color: <?= $corLinha ?>;
+                                        color: <?= $corTexto ?>;
+                                        padding: 4px 10px;
+                                        border-radius: 6px;
+                                        font-weight: bold;
+                                        display: inline-block;
+                                        min-width: 50px;
+                                        text-align: center;
+                                        ">
+                                        <?= $codigo ?>
+                                    </span>
+                                </td>
+
                                 <td><?php echo $linha ?></td>
-                                <td><?php echo $id_grupo ?></td>                                
+                                <td><?php echo $id_grupo ?></td>
                                 <td><?php echo $status ?></td>
                                 <td><?php echo $data ?></td>
                                 <td>

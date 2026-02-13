@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de operadoras</title>
-    <link rel="stylesheet" href="../css/agency.css?v=1.1"> 
+    <link rel="stylesheet" href="../css/agency.css?v=1.2"> 
 </head>
 
 <body>
@@ -24,13 +24,26 @@
             <p class="p-estilo">
                 <label for="id-fuso" class="lb-reg-fuso">Fuso Horário:</label>
                 <select name="fuso" class="selc-reg-fuso" id="id-fuso" required>
-                    <option value="">Selecione fuso horário</option>
-                    <option value="America/Sao_Paulo">America/Sao_Paulo</option>
+                    <option value="">Selecione fuso horário</option>                    
+                    <option value="America/Sao_Paulo">America/Sao_Paulo</option>                    
+                </select>                
+            </p>  
+            <p class="p-estilo">
+                <label for="id-lang" class="lb-reg-lang">Idioma:</label>
+                <select name="lang" class="selc-reg-lang" id="id-lang" required>
+                    <option value="">Selecione um idioma</option>
+                    <option value="pt">Português</option>
+                    <option value="eng">Inglês</option>
+                    <option value="esp">Espanhol</option>
                 </select>                
             </p>  
             <p class="p-estilo">
                 <label for="id-tel" class="lb-reg-tel" maxlength="15" inputmode="numeric">Telefone:</label>
                 <input type="tel" name="tel" class="inpt-reg-tel" id="id-tel" placeholder="insira o telefone da operadora...">
+            </p> 
+             <p class="p-estilo">
+                <label for="id-cid" class="lb-reg-cid">Cidade:</label>
+                <input type="text" name="cidade" class="inpt-reg-cid" id="id-cid" placeholder="insira a cidade da operadora...">
             </p> 
             <p class="p-estilo">
                 <label for="id-site-cred" class="lb-reg-site-cred">Compra de créditos:</label>

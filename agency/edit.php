@@ -5,7 +5,14 @@
     $id = $_GET['id'];
     
     // Consulta o ID no banco de dados
-    $sql = "SELECT * FROM agency WHERE agency_id = $id";
+    $sql = "SELECT *, 
+            CASE 
+                WHEN agency.agency_lang = 'pt' THEN 'Português'
+                WHEN agency.agency_lang = 'eng' THEN 'Inglês'
+                WHEN agency.agency_lang = 'esp' THEN 'Espanhol'                    
+            END AS lang_format
+            FROM agency
+            WHERE agency_id = $id";
     $result = mysqli_query($conexao, $sql);
 
     // Variavel que recebe o ID do banco de dados    
@@ -28,7 +35,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastrar operadoras</title>
-    <link rel="stylesheet" href="../css/agency.css?v=1.1">      
+    <link rel="stylesheet" href="../css/agency.css?v=1.2">      
 </head>
 
 <body>
@@ -50,8 +57,16 @@
                 <input type="text" name="fuso" class="inpt-edt-fuso" id="id-fuso" value="<?=$result_id['agency_timezone']?>">                 
             </p>  
             <p class="p-estilo">
+                <label for="id-lang" class="lb-edt-lang">Idioma:</label>
+                <input type="text" name="lang" class="inpt-edt-lang" id="id-lang" value="<?=$result_id['lang_format']?> " disabled>                 
+            </p>  
+            <p class="p-estilo">
                 <label for="id-tel" class="lb-edt-tel">Telefone:</label>
                 <input type="text" name="tel" class="inpt-edt-tel" id="id-tel" axlength="15" inputmode="numeric" value="<?=$result_id['agency_phone']?>">                 
+            </p>
+            <p class="p-estilo">
+                <label for="id-cid" class="lb-edt-cid">Cidade:</label>
+                <input type="text" name="cid" class="inpt-edt-cid" id="id-cid" value="<?=$result_id['agency_city']?>" disabled>                 
             </p>
             <p class="p-estilo">
                 <label for="id-cred" class="lb-edt-cred">Compra de crédito:</label>
