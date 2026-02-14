@@ -53,7 +53,9 @@ include("../connection.php");
                     <option value="1">Metrô</option>
                     <option value="2">Trem</option>
                     <option value="3">Ônibus</option>                    
-                </select>                
+                </select> 
+            </p>  
+               
             <p class="p-estilo">
                 <label for="id-cor" class="lb-reg-cor">Cor da linha:</label>
                 <input type="color" name="cor-linha"  class="inpt-reg-cor" id="id-cor-linha">              

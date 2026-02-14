@@ -5,7 +5,12 @@
     $id = $_GET['id'];
     
     // Consulta o ID no banco de dados
-    $sql = "SELECT *, FORMAT(price, 2) AS price_format, DATE_FORMAT(update_date, '%d/%m/%Y') AS data_format FROM fare_attributes WHERE fare_id = '$id'";
+    $sql = "SELECT *, FORMAT(price, 2) AS price_format, DATE_FORMAT(update_date, '%d/%m/%Y') AS data_format, payment_method,
+            CASE 
+                WHEN fare_attributes.payment_method = '0' THEN 'Dinheiro'
+                WHEN fare_attributes.payment_method = '1' THEN 'Cartão'                    
+            END AS method_format 
+            FROM fare_attributes WHERE fare_id = '$id'";
     $result = mysqli_query($conexao, $sql);
 
     // Variavel que recebe o ID do banco de dados    
@@ -27,25 +32,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de tarifas</title>
-    <link rel="stylesheet" href="../css/fare_attributes.css?v=1.6"> 
+    <link rel="stylesheet" href="../css/fare_attributes.css?v=1.7"> 
 </head>
 
 <body>
-    <section>
+    <section>        
         <h1>Editar tarifa</h1>
         <form action="edit_result.php" method="POST" autocomplete="off">
             <hr>
             <p class="p-estilo">
-                <label for="id-codigo" class="lb-edt-cod">Código:</label>
-                <input type="text" name="codigo" class="inpt-edt-cod" id="id-codigo" value="<?=$result_id['fare_id']?>">
+                <label for="id-codigo" class="lb-edt-cod">Nome:</label>
+                <input type="text" name="codigo" class="inpt-edt-cod" id="id-codigo" value="<?=$result_id['fare_id']?>" disabled>
             </p>
             <p class="p-estilo">
                 <label for="id-tarifa" class="lb-edt-tar">Tarifa:</label>
+                <select name="tp-moeda" class="selc-edt-tp-moeda" id="id-tp-moeda">                    
+                    <option value="R$">R$</option>                                        
+                </select>  
                 <input type="text" name="tarifa" class="inpt-edt-tar" id="id-tarifa" value="<?=$result_id['price_format']?>">
             </p>
             <p class="p-estilo">
-                <label for="id-tipo" class="lb-edt-tipo">Tipo:</label>
-                <input type="text" name="tipo" class="inpt-edt-tipo" id="id-tipo" value="<?=$result_id['route_group']?>">
+                <label for="id-meio-pag" class="lb-edt-meio-pag">Meio de Pagamento:</label>
+                <select name="meio-pag" class="selc-edt-meio-pag" id="id-meio-pag" disabled>
+                    <option value=""><?=$result_id['method_format']?></option>                                                         
+                </select>    
             </p>            
             <p class="p-estilo">
                 <label for="id-data" class="lb-edt-data">Data de Atualização:</label>

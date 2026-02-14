@@ -4,11 +4,11 @@
     // Recebe as variaveis
     $codigo = $_POST['codigo'];
     $tarifa = $_POST['tarifa'];
-    $tipo = $_POST['tipo'];
+    $meio_pag = $_POST['meio-pag'];
     $data = $_POST['data'];
 
     // Altera no banco de dados
-    $sql = "UPDATE fare_attributes SET price = '$tarifa', route_group = '$tipo', update_date = '$data' WHERE fare_id = '$codigo'";
+    $sql = "UPDATE fare_attributes SET price = '$tarifa', payment_method = '$meio_pag', update_date = '$data' WHERE fare_id = '$codigo'";
     $query = mysqli_query($conexao, $sql);
 
    //if(mysqli_query($conexao, $sql)){

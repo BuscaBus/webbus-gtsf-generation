@@ -5,13 +5,16 @@
     $filtro_sql = "";
     if($_POST != NULL){
         $filtro = $_POST["pesquisar"];
-        $filtro_sql = "WHERE route_group ='$filtro'";
-    }    
-
-   
+        $filtro_sql = "WHERE fare_id ='$filtro'";
+    }   
 
     // Consulta no banco de dados para exibir na tabela
-    $sql = "SELECT *, FORMAT(price, 2) AS price_format, DATE_FORMAT(update_date, '%d/%m/%Y') AS data_format FROM fare_attributes $filtro_sql ORDER BY route_group ASC";
+    $sql = "SELECT *, FORMAT(price, 2) AS price_format, DATE_FORMAT(update_date, '%d/%m/%Y') AS data_format, payment_method,
+            CASE 
+                WHEN fare_attributes.payment_method = '0' THEN 'Dinheiro'
+                WHEN fare_attributes.payment_method = '1' THEN 'Cartão'                    
+            END AS method_format
+            FROM fare_attributes $filtro_sql ORDER BY fare_id ASC";
     $result = mysqli_query($conexao, $sql);    
     
     ?>
@@ -36,7 +39,7 @@
     <link rel="shortcut icon" href="../img/logo.ico" type="image/x-icon">
     <link rel="stylesheet" href="../css/style.css?v=1.2">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
-    <link rel="stylesheet" href="../css/fare_attributes.css?v=1.6">    
+    <link rel="stylesheet" href="../css/fare_attributes.css?v=1.7">    
 </head>
 
 <body>
@@ -55,13 +58,12 @@
                     <select name="pesquisar" class="selec-pesq">
                         <option>Selecione um tipo de tarifa</option>;
                         <?php
-                            $sql_select = "SELECT * FROM fare_attributes ORDER BY route_group ASC";
+                            $sql_select = "SELECT DISTINCT fare_id FROM fare_attributes ORDER BY fare_id ASC";
                             $result_selec = mysqli_query($conexao, $sql_select);
 
                             while($dados = mysqli_fetch_array($result_selec)){
-                                $id = $dados['route_group']; 
-                                $tipo = $dados['route_group'];                            
-                                echo "<option value='$tipo'>$tipo</option>";
+                                $id = $dados['fare_id'];                                                            
+                                echo "<option value='$id'>$id</option>";
                             }
                         ?>                          
                     </select> 
@@ -72,9 +74,9 @@
                 <table>
                     <caption>Relação de tarifas vigentes</caption>
                     <thead>
-                        <th class="th-cod">Código</th>
+                        <th class="th-cod">Nome</th>
                         <th class="th-tarifa">Tarifa</th>
-                        <th class="th-tipo">Tipo</th>
+                        <th class="th-meio-pag">Pagamento</th>
                         <th class="th-atual">Atualização</th>
                         <th class="th-acoes">Ações</th>
                     </thead>
@@ -83,14 +85,14 @@
                         while($sql_result = mysqli_fetch_array($result)){
                             $id = $sql_result['fare_id'];
                             $preco = $sql_result['price_format'];
-                            $grupo = $sql_result['route_group'];
+                            $meio_pag = $sql_result['method_format'];
                             $data = $sql_result['data_format'];                         
                     ?>
                     <tbody>
                         <tr>
                             <td><?php echo $id ?></td>
-                            <td><?php echo $preco ?></td>
-                            <td><?php echo $grupo ?></td>
+                            <td>R$ <?php echo $preco ?></td>
+                            <td><?php echo $meio_pag ?></td>
                             <td><?php echo $data ?></td>
                             <td>                                
                                 <form action="delete.php" method ="POST">

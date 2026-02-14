@@ -95,15 +95,15 @@ table{
 }
 
 .th-cod{
-    padding-right: 30px;
+    padding-right: 250px;
 }
 
 .th-tarifa{
     padding-right: 25px;
 }
 
-.th-tipo{
-    padding-right: 375px;
+.th-meio-pag{
+    padding-right: 15px;
 }
 
 .th-atual{
@@ -131,19 +131,19 @@ table{
 }
     
 .lb-reg-cod{
-    margin-right: 100px;
-    margin-left: 15px;
-    text-align: left;
-}
-
-.lb-reg-tar{
     margin-right: 110px;
     margin-left: 15px;
     text-align: left;
 }
 
-.lb-reg-tipo{
-    margin-right: 120px;
+.lb-reg-tar{
+    margin-right: 115px;
+    margin-left: 15px;
+    text-align: left;
+}
+
+.lb-reg-meio-pag{
+    margin-right: 8px;
     margin-left: 15px;
     text-align: left;
 }
@@ -161,16 +161,23 @@ table{
     padding: 4px;
 }
 
-.inpt-reg-tar{
+.selc-reg-tp-moeda{
     background-color: #F3F4F0;
-    width: 310px;
+    width: 45px;
     border-radius: 5px;
     padding: 4px;
 }
 
-.inpt-reg-tipo{
+.inpt-reg-tar{
     background-color: #F3F4F0;
-    width: 310px;
+    width: 260px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.selc-reg-meio-pag{
+    background-color: #F3F4F0;
+    width: 320px;
     border-radius: 5px;
     padding: 4px;
 }
@@ -218,19 +225,19 @@ table{
 }
     
 .lb-edt-cod{
-    margin-right: 100px;
-    margin-left: 15px;
-    text-align: left;
-}
-
-.lb-edt-tar{
     margin-right: 110px;
     margin-left: 15px;
     text-align: left;
 }
 
-.lb-edt-tipo{
-    margin-right: 120px;
+.lb-edt-tar{
+    margin-right: 115px;
+    margin-left: 15px;
+    text-align: left;
+}
+
+.lb-edt-meio-pag{
+    margin-right: 8px;
     margin-left: 15px;
     text-align: left;
 }
@@ -248,19 +255,27 @@ table{
     padding: 4px;
 }
 
+.selc-edt-tp-moeda{
+    background-color: #F3F4F0;
+    width: 45px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
 .inpt-edt-tar{
+    background-color: #F3F4F0;
+    width: 260px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.selc-edt-meio-pag{
     background-color: #F3F4F0;
     width: 310px;
     border-radius: 5px;
     padding: 4px;
 }
 
-.inpt-edt-tipo{
-    background-color: #F3F4F0;
-    width: 310px;
-    border-radius: 5px;
-    padding: 4px;
-}
 .inpt-edt-data{
     background-color: #F3F4F0;
     width: 310px;

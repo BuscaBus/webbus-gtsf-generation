@@ -164,7 +164,7 @@ $result = mysqli_query($conexao, $sql);
                                     <span style="
                                         background-color: <?= $corLinha ?>;
                                         color: <?= $corTexto ?>;
-                                        padding: 4px 10px;
+                                        padding: 2px 5px;
                                         border-radius: 6px;
                                         font-weight: bold;
                                         display: inline-block;

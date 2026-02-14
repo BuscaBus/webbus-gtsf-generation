@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de tarifas</title>
-    <link rel="stylesheet" href="../css/fare_attributes.css?v=1.6">     
+    <link rel="stylesheet" href="../css/fare_attributes.css?v=1.8">     
 </head>
 
 <body>
@@ -15,16 +15,23 @@
         <form action="register.php" method="POST" autocomplete="off">
             <hr>
             <p class="p-estilo">
-                <label for="id-codigo" class="lb-reg-cod">Código:</label>
-                <input type="text" name="codigo" class="inpt-reg-cod" id="id-codigo" placeholder="insira o código da tarifa..." required>
+                <label for="id-codigo" class="lb-reg-cod">Nome:</label>
+                <input type="text" name="codigo" class="inpt-reg-cod" id="id-codigo" placeholder="Insira um nome para a tarifa..." required>
             </p>
              <p class="p-estilo">
                 <label for="id-tarifa" class="lb-reg-tar">Tarifa:</label>
-                <input type="text" name="tarifa" class="inpt-reg-tar" id="id-tarifa" placeholder="insira o valor da tarifa..." required>
+                <select name="tp-moeda" class="selc-reg-tp-moeda" id="id-tp-moeda">                    
+                    <option value="R$">R$</option>                                        
+                </select>  
+                <input type="text" name="tarifa" class="inpt-reg-tar" id="id-tarifa" placeholder="Insira o valor da tarifa..." required>
             </p>
              <p class="p-estilo">
-                <label for="id-tipo" class="lb-reg-tipo">Tipo:</label>
-                <input type="text" name="tipo" class="inpt-reg-tipo" id="id-tipo" placeholder="insira o tipo da linha..." required>
+                <label for="id-meio-pag" class="lb-reg-meio-pag">Meio de Pagamento:</label>
+                <select name="meio-pag" class="selc-reg-meio-pag" id="id-meio-pag" required>
+                    <option value="select">Selecione um meio de pagamento</option>
+                    <option value="0">Dinheiro</option>
+                    <option value="1">Cartão</option>                                      
+                </select>    
             </p>            
             <p class="p-estilo">
                 <label for="id-data" class="lb-reg-data">Data de Atualização:</label>
