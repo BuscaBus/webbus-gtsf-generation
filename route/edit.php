@@ -35,7 +35,7 @@ $result_id = mysqli_fetch_assoc($result);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar linha</title>
-    <link rel="stylesheet" href="../css/route.css?v=1.4">
+    <link rel="stylesheet" href="../css/route.css?v=1.6">
 
 </head>
 

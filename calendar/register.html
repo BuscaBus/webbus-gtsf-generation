@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
+    
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de calendário</title>
-    <link rel="stylesheet" href="../css/calendar.css?v=1.2">  
+    <link rel="stylesheet" href="../css/calendar.css?v=1.3">  
 </head>
 
 <body>
@@ -15,8 +15,9 @@
             <hr>
             <p class="p-estilo">
                 <label for="id-servico" class="lb-reg-serv">Serviço:</label>
-                <input type="text" name="servico" class="inpt-reg-serv" id="id-servico" placeholder="insira um serviço..." required>
+                <input type="text" name="servico" class="inpt-reg-serv" id="id-servico" placeholder="insira nome do serviço..." required>
             </p>
+               
             <p class="p-estilo">
                 <label for="id-inicio-vig" class="lb-reg-inic">Inicio da vigência:</label>
                 <input type="date" name="inic_vig" class="inpt-reg-inic" id="id-inicio-vig" required>            
@@ -24,7 +25,18 @@
             <p class="p-estilo">
                 <label for="id-term-vig" class="lb-reg-term">Término da vigência:</label>
                 <input type="date" name="term_vig" class="inpt-reg-term" id="id-term-vig" required>            
-            </p>            
+            </p> 
+            <p class="p-estilo">
+                <label class="lb-reg-dias">Dias da Semana:</label><br>
+                <br>    
+                <label><input type="checkbox" name="monday" value="1"> Segunda</label>
+                <label><input type="checkbox" name="tuesday" value="1"> Terça</label>
+                <label><input type="checkbox" name="wednesday" value="1"> Quarta</label>
+                <label><input type="checkbox" name="thursday" value="1"> Quinta</label>
+                <label><input type="checkbox" name="friday" value="1"> Sexta</label>
+                <label><input type="checkbox" name="saturday" value="1"> Sábado</label>
+                <label><input type="checkbox" name="sunday" value="1"> Domingo</label>
+            </p>                    
             <br>
             <hr>
             <nav class="nav-reg-btn">

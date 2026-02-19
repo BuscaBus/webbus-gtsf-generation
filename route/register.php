@@ -9,11 +9,11 @@ include("../connection.php");
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de linhas</title>
-    <link rel="stylesheet" href="../css/route.css?v=1.8">
+    <link rel="stylesheet" href="../css/route.css?v=2.0">
 </head>
 
 <body>
-    <section>
+    <section class="scroll-area-reg">
         <h1>Cadastrar linha</h1>
         <form action="result_register.php" method="POST" autocomplete="off">
             <hr>
@@ -54,8 +54,7 @@ include("../connection.php");
                     <option value="2">Trem</option>
                     <option value="3">Ônibus</option>                    
                 </select> 
-            </p>  
-               
+            </p>             
             <p class="p-estilo">
                 <label for="id-cor" class="lb-reg-cor">Cor da linha:</label>
                 <input type="color" name="cor-linha"  class="inpt-reg-cor" id="id-cor-linha">              
@@ -90,3 +89,5 @@ include("../connection.php");
 </body>
 
 </html>
+
+

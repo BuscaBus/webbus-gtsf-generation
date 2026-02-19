@@ -73,7 +73,10 @@
                         <?php }; ?>                       
                     </tbody>
                 </table>
-                <br>                
+                <br>  
+                <button class="btn-cadastrar" id="btn-cad">
+                    <a href="register.html" class="link">CADASTRAR DATAS ESPECIAIS</a>
+                </button>              
                  <!--Consulta no banco de dados a quantidade de registros-->
                 <?php
                     $sql = "SELECT COUNT(*) AS total FROM calendar";
