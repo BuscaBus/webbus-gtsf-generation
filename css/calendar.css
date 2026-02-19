@@ -219,3 +219,103 @@ table{
     text-decoration: none;
     color: inherit;
 }
+
+/*Configurações da tela de register_date.php*/
+
+.p-estilo{
+    text-align: center;    
+}
+   
+.lb-reg-serv{
+    margin-right: 40px;
+}
+
+.lb-reg-data{
+    margin-right: 60px;
+}
+
+.lb-reg-status{
+    margin-right: 50px;   
+}
+
+.selc-reg-serv{
+    background-color: #F3F4F0;
+    width: 300px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-reg-data{
+    background-color: #F3F4F0;
+    width: 290px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.selc-reg-status{
+    background-color: #F3F4F0;
+    width: 300px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.nav-edt-btn{
+    display: flex;
+    justify-content: center;
+}
+
+.btn-edt{
+    background-color: var(--color4);
+    color: var(--color0);
+    font-weight: bold;
+    border-radius: 6px;
+    margin-right: 5px;
+    padding: 3px 30px 3px 30px;
+    cursor: pointer;
+}
+
+.btn-edt-canc{
+    background-color: red;
+    color: var(--color0);
+    font-weight: bold;
+    border-radius: 6px;
+    margin-right: 5px;
+    padding: 3px 15px 3px 15px;
+    cursor: pointer;
+}
+
+.a-btn-canc{
+    text-decoration: none;
+    color: inherit;
+}
+
+/*Configurações da tabela da página register_date.php*/
+table{
+    margin: auto;
+}
+
+.th-serv{
+    padding-right: 200px;          
+}
+
+.th-data{
+    padding-right: 80px;
+}
+
+.th-status{
+    padding-right: 90px;
+}
+
+.th-acoes{
+    padding-right: 30px;
+}
+
+.status-verde {
+    color: #2e7d32;        
+    font-weight: bold;
+}
+
+.status-vermelho {
+    color: #c62828;        
+    font-weight: bold;
+}
