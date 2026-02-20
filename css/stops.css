@@ -144,16 +144,12 @@ table{
     margin-right: 60px;
 }
 
-.lb-reg-cid{
-    margin-right: 53px;
-}
-
-.lb-reg-bair{
-    margin-right: 60px;
+.lb-reg-desc{
+    margin-right: 35px;
 }
 
 .lb-reg-loc{
-    margin-right: 13px;
+    margin-right: 15px;
 }
 
 .lb-reg-term{
@@ -186,20 +182,12 @@ table{
     padding: 4px;
 }
 
-.selc-reg-cid{
+.inpt-reg-desc{
     background-color: #F3F4F0;
-    width: 320px;
+    width: 310px;
     border-radius: 5px;
     padding: 4px;
 }
-
-.selc-reg-bair{
-    background-color: #F3F4F0;
-    width: 320px;
-    border-radius: 5px;
-    padding: 4px;
-}
-
 .selc-reg-loc{
     background-color: #F3F4F0;
     width: 320px;
