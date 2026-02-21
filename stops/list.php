@@ -26,13 +26,14 @@ $inicio = ($quant_paginas * $pagina) - $quant_paginas;
 $sql = "SELECT stop_id,
                stop_code, 
                stop_name, 
-               stop_district, 
-               stop_city,
+               stop_desc,               
                location_type, 
                CASE 
-                    WHEN location_type = 0 THEN 'Ponto'
-                    WHEN location_type = 1 THEN 'Terminal'
-                    ELSE 'Desconhecido'
+                    WHEN location_type = 0 THEN 'Parada (Ponto)'
+                    WHEN location_type = 1 THEN 'Estação (Terminal)'
+                    WHEN location_type = 2 THEN 'Entrada/Saída'
+                    WHEN location_type = 3 THEN 'Nó Genérico'
+                    WHEN location_type = 4 THEN 'Box da plataforma'                    
                END AS tipo_local,
                platform_code,                  
                stops.update_date,
@@ -64,7 +65,7 @@ $result = mysqli_query($conexao, $sql);
     <link rel="shortcut icon" href="../img/logo.ico" type="image/x-icon">
     <link rel="stylesheet" href="../css/style.css?v=1.2">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
-    <link rel="stylesheet" href="../css/stops.css?v=1.4">
+    <link rel="stylesheet" href="../css/stops.css?v=1.5">
 </head>
 
 <body>
@@ -89,9 +90,8 @@ $result = mysqli_query($conexao, $sql);
                     <caption>Relação de pontos</caption>
                     <thead>
                         <th class="th-cod">Código</th>
-                        <th class="th-pont">Ponto</th>
-                        <th class="th-bair">Bairro</th>
-                        <th class="th-cid">Cidade</th>
+                        <th class="th-pont">Ponto</th>  
+                        <th class="th-desc">Descrição</th>                      
                         <th class="th-loc">Local</th>
                         <th class="th-box">Box</th>
                         <th class="th-atual">Atualização</th>
@@ -103,17 +103,15 @@ $result = mysqli_query($conexao, $sql);
                             $id = $sql_result['stop_id'];
                             $codigo = $sql_result['stop_code'];
                             $ponto = $sql_result['stop_name'];
-                            $bairro = $sql_result['stop_district'];
-                            $cidade = $sql_result['stop_city'];
+                            $desc = $sql_result['stop_desc'];                           
                             $local = $sql_result['tipo_local'];
                             $box = $sql_result['platform_code'];
                             $atual = $sql_result['data_format'];
                         ?>
                             <tr>
                                 <td><?php echo $codigo ?></td>
-                                <td><?php echo $ponto ?></td>
-                                <td><?php echo $bairro ?></td>
-                                <td><?php echo $cidade ?></td>
+                                <td><?php echo $ponto ?></tddesc>
+                                <td><?php echo $desc ?></td>                                
                                 <td><?php echo $local ?></td>
                                 <td><?php echo $box ?></td>
                                 <td><?php echo $atual ?></td>

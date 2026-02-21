@@ -31,11 +31,11 @@ $lng = $_GET['longitude'];*/
             </p>
             <p class="p-estilo">
                 <label for="id-desc" class="lb-reg-desc">Descrição:</label>
-                <input type="text" name="descricao" class="inpt-reg-desc" id="id-desc" placeholder="insira uma descrição..." required>
+                <input type="text" name="descricao" class="inpt-reg-desc" id="id-desc" placeholder="insira uma descrição...">
             </p>
             <p class="p-estilo">
                 <label for="id-loc" class="lb-reg-loc">Tipo de local:</label>
-                <select name="local" class="selc-reg-loc" id="id-loc">
+                <select name="tp-local" class="selc-reg-loc" id="id-loc">
                     <option value="select">Selecione um tipo de local</option>
                     <option value="0">Parada (Ponto)</option>
                     <option value="1">Estação (Terminal)</option>
@@ -49,13 +49,13 @@ $lng = $_GET['longitude'];*/
                 <select name="terminal" id="id-term" class="selc-reg-term">
                     <option>Selecione um terminal</option>;
                     <?php
-                    $sql_select = "SELECT stop_code, stop_name FROM stops WHERE  parent_station IS NOT NULL AND parent_station <> '' ORDER BY stop_name ASC";
+                    $sql_select = "SELECT stop_id, stop_name FROM stops WHERE  parent_station IS NOT NULL AND parent_station <> '' ORDER BY stop_name ASC";
                     $result_selec = mysqli_query($conexao, $sql_select);
 
                     while ($dados = mysqli_fetch_array($result_selec)) {
-                        $codigo = $dados['stop_code'];
+                        $id = $dados['stop_id'];
                         $nome = $dados['stop_name'];
-                        echo "<option value='$codigo'>$nome</option>";
+                        echo "<option value='$id'>$nome</option>";
                     }
                     ?>
                 </select>
@@ -67,12 +67,12 @@ $lng = $_GET['longitude'];*/
             <p class="p-estilo">
                 <label for="id-lat" class="lb-reg-lat">Latitude:</label>
                 <input type="text" name="latitude" class="inpt-reg-lat" id="id-lat"
-                    value="<?php echo isset($_GET['latitude']) ? htmlspecialchars($_GET['latitude']) : ''; ?>" disabled>
+                    value="<?php echo isset($_GET['latitude']) ? htmlspecialchars($_GET['latitude']) : ''; ?>" readonly>
             </p>
             <p class="p-estilo">
                 <label for="id-lng" class="lb-reg-lng">Longitude:</label>
                 <input type="text" name="longitude" class="inpt-reg-lng" id="id-lng"
-                    value="<?php echo isset($_GET['longitude']) ? htmlspecialchars($_GET['longitude']) : ''; ?>" disabled>
+                    value="<?php echo isset($_GET['longitude']) ? htmlspecialchars($_GET['longitude']) : ''; ?>" readonly>
             </p>
 
             <hr>

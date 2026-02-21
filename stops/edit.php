@@ -5,12 +5,26 @@ include("../connection.php");
     $id = $_GET['id'];
     
     // Consulta o ID no banco de dados
-    $sql = "SELECT *, 
-            CASE 
-                WHEN stops.location_type = '0' THEN 'Ponto'
-                WHEN stops.location_type = '1' THEN 'Terminal'                    
-                END AS status_format
-                FROM stops WHERE stop_id = $id";
+    $sql = "SELECT s.*,
+                CASE 
+                    WHEN s.location_type = 0 THEN 'Parada (Ponto)'
+                    WHEN s.location_type = 1 THEN 'Estação (Terminal)'
+                    WHEN s.location_type = 2 THEN 'Entrada/Saída'
+                    WHEN s.location_type = 3 THEN 'Nó Genérico'
+                    WHEN s.location_type = 4 THEN 'Box da plataforma'
+                END AS tipo_local,
+
+                t.stop_id   AS terminal_id,
+                t.stop_code AS terminal_code,
+                t.stop_name AS terminal_name
+
+            FROM stops AS s
+            LEFT JOIN stops AS t
+            ON s.parent_station = t.stop_id
+
+            WHERE s.stop_id = $id
+        ";
+
     $result = mysqli_query($conexao, $sql);
 
     $result_id = mysqli_fetch_assoc($result);
@@ -26,7 +40,7 @@ include("../connection.php");
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar pontos</title>
-    <link rel="stylesheet" href="../css/stops.css?v=1.4">
+    <link rel="stylesheet" href="../css/stops.css?v=1.6">
 </head>
 
 <body>
@@ -42,22 +56,19 @@ include("../connection.php");
             <p class="p-estilo">
                 <label for="id-pont" class="lb-edt-pont">Ponto:</label>
                 <input type="text" name="ponto" class="inpt-edt-pont" id="id-pont" value="<?=$result_id['stop_name']?>">
-            </p>
-            <p class="p-estilo">
-                <label for="id-cid" class="lb-edt-cid">Cidade:</label>
-                <input type="text" name="cidade" class="inpt-edt-cid" id="id-cid" value="<?=$result_id['stop_city']?>" disabled>
-            </p>
-            <p class="p-estilo">
-                <label for="id-bair" class="lb-edt-bair">Bairro:</label>
-                <input type="text" name="bairro" class="inpt-edt-bair" id="id-bair" value="<?=$result_id['stop_district']?>" disabled>
-            </p>   
+            </p> 
+             <p class="p-estilo">
+                <label for="id-desc" class="lb-edt-desc">Descrição:</label>
+                <input type="text" name="descrição" class="inpt-edt-desc" id="id-desc" value="<?=$result_id['stop_desc']?>">
+            </p>           
             <p class="p-estilo">
                 <label for="id-loc" class="lb-edt-loc">Tipo de Local:</label>
-                <input type="text" name="local" class="inpt-edt-loc" id="id-loc" value="<?=$result_id['status_format']?>" disabled>
+                <input type="text" class="inpt-edt-loc" value="<?= $result_id['tipo_local'] ?? '' ?>"  readonly>                
             </p>
             <p class="p-estilo">
                 <label for="id-term" class="lb-edt-term">Terminal:</label>
-                <input type="text" name="terminal" class="inpt-edt-term" id="id-term" value="<?=$result_id['parent_station']?>" disabled>
+                <input type="hidden" name="parent_station" value="<?= $result_id['terminal_id'] ?>"> 
+                <input type="text" class="inpt-edt-term" value="<?= $result_id['terminal_name'] ?? '' ?>"  readonly> 
             </p>            
             <p class="p-estilo">
                 <label for="id-box" class="lb-reg-box">Box:</label>

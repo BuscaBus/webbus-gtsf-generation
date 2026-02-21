@@ -1,23 +1,35 @@
 <?php
-   include("../connection.php");
+   include("../connection.php");   
 
     // Recebe as variaveis
     $codigo = $_POST['codigo'];
     $ponto = $_POST['ponto'];
-    $cidade = $_POST['cidade'];
-    $bairro = $_POST['bairro'];
-    $local = $_POST['local'];
-    $terminal = $_POST['terminal'];
-    $box = $_POST['box'];
+    $descricao = $_POST['descricao'];
     $latitude = $_POST['latitude'];
     $longitude = $_POST['longitude'];
+    $tp_local = $_POST['tp-local'];    
+    $terminal = $_POST['terminal'];
+    $box = $_POST['box']; 
+    
+    
+    // Verifica se o código do ponto já existe
+    $sql_check = "SELECT stop_id FROM stops WHERE stop_code = '$codigo'";
+    $result = mysqli_query($conexao, $sql_check);
+
+    if (mysqli_num_rows($result) > 0) {
+        echo "<script>
+            alert('❌ Código já cadastrado!');
+            history.back();
+        </script>";
+        exit;
+    }
+
     
     // Altera no banco de dados
     $sql = "INSERT INTO stops (
                 stop_code, 
                 stop_name, 
-                stop_city,
-                stop_district,
+                stop_desc,                
                 stop_lat,
                 stop_lon,
                 location_type,
@@ -27,11 +39,10 @@
             VALUES (
                 '$codigo', 
                 '$ponto', 
-                '$cidade',
-                '$bairro',
+                '$descricao',                
                 '$latitude',
                 '$longitude',
-                '$local',
+                '$tp_local',
                 '$terminal',
                 '$box'                
             )";
@@ -44,9 +55,7 @@
       // echo "Erro ao editar".mysqli_connect_error($conexao);
     //}
 
-    // Mantem na mesma página após a exclusão
-    header ('location: list.php');
+    header("Location: list.php");
     
     mysqli_close($conexao);
-    
 ?>

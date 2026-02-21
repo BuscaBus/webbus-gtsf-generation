@@ -99,19 +99,15 @@ table{
 }
 
 .th-pont{
-    padding-right: 400px;
+    padding-right: 300px;
 }
 
-.th-bair{
-    padding-right: 150px;
-}
-
-.th-cid{
+.th-desc{
     padding-right: 100px;
 }
 
 .th-loc{
-    padding-right: 30px;
+    padding-right: 90px;
 }
 
 .th-box{
@@ -276,12 +272,8 @@ table{
     margin-right: 60px;
 }
 
-.lb-edt-cid{
+.lb-edt-desc{
     margin-right: 53px;
-}
-
-.lb-edt-bair{
-    margin-right: 60px;
 }
 
 .lb-edt-loc{
@@ -310,14 +302,7 @@ table{
     padding: 4px;
 }
 
-.inpt-edt-cid{
-    background-color: #F3F4F0;
-    width: 310px;
-    border-radius: 5px;
-    padding: 4px;
-}
-
-.inpt-edt-bair{
+.inpt-edt-desc{
     background-color: #F3F4F0;
     width: 310px;
     border-radius: 5px;
