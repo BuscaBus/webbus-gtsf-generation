@@ -78,14 +78,14 @@ table{
     padding-right: 75px;
 }
 
-/*Configurações da tela de register.php*/
+/*Configurações da tela de register.html*/
 
 .p-estilo{
     text-align: center;    
 }
    
 .lb-reg-serv{
-    margin-right: 94px;
+    margin-right: 95px;
 }
 
 .lb-reg-dias{
@@ -221,12 +221,8 @@ table{
 }
 
 /*Configurações da tela de register_date.php*/
-
-.p-estilo{
-    text-align: center;    
-}
    
-.lb-reg-serv{
+.lb-reg-serv-date{
     margin-right: 40px;
 }
 
@@ -306,8 +302,8 @@ table{
     padding-right: 90px;
 }
 
-.th-acoes{
-    padding-right: 30px;
+.th-acoes-reg{
+    padding-right: 60px;
 }
 
 .status-verde {

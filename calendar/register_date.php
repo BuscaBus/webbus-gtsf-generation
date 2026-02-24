@@ -9,8 +9,8 @@ include("../connection.php");
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de data especial</title>
-    <link rel="stylesheet" href="../css/calendar.css?v=1.1">
-    <link rel="stylesheet" href="../css/table.css?v=1.0">
+    <link rel="stylesheet" href="../css/calendar.css?v=1.4">
+    <link rel="stylesheet" href="../css/table.css?v=1.1">
 </head>
 
 <body>
@@ -19,7 +19,7 @@ include("../connection.php");
         <form action="register_db_date.php" method="POST" autocomplete="off">
             <hr>
             <p class="p-estilo">
-                <label for="id-servico" class="lb-reg-serv">Serviço:</label>
+                <label for="id-servico" class="lb-reg-serv-date">Serviço:</label>
                 <select name="servico" id="id-servico" class="selc-reg-serv">
                     <option>Selecione um serviço</option>;
                     <?php
@@ -66,7 +66,7 @@ include("../connection.php");
                 <th class="th-serv">Serviço</th>
                 <th class="th-data">Data</th>
                 <th class="th-status">Status</th>
-                <th class="th-acoes">Ações</th>
+                <th class="th-acoes-reg">Ações</th>
             </thead>
             <?php
             // Laço de repetição para trazer dados do banco

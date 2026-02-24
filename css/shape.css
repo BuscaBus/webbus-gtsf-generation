@@ -93,3 +93,30 @@ section{
     margin-top: 5px;
     padding-right: 5px;
 }
+
+/* Configurações da página Maps_trips.php */
+
+.p-estilo {
+    text-align: center;
+}    
+.lb-reg-trip-traj{    
+    margin-right: 5px;    
+}
+
+.lb-select{
+    margin-right: 5px;     
+}
+
+.inpt-reg-trip-traj{
+    background-color: #F3F4F0;
+    width: 400px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.trip-select{
+    background-color: #F3F4F0;
+    width: 350px;
+    border-radius: 5px;
+    padding: 4px;    
+}

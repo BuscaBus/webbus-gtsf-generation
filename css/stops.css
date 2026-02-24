@@ -265,27 +265,27 @@ table{
 }
     
 .lb-edt-cod{
-    margin-right: 50px;
-}
-
-.lb-edt-pont{
     margin-right: 60px;
 }
 
+.lb-edt-pont{
+    margin-right: 70px;
+}
+
 .lb-edt-desc{
-    margin-right: 53px;
+    margin-right: 40px;
 }
 
 .lb-edt-loc{
-    margin-right: 10px;
+    margin-right: 15px;
 }
 
 .lb-edt-term{
-    margin-right: 45px;
+    margin-right: 50px;
 }
 
 .lb-edt-box{
-    margin-right: 73px;
+    margin-right: 80px;
 }
 
 .inpt-edt-cod{

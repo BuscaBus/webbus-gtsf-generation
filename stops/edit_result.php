@@ -7,10 +7,11 @@
     $id = $_POST['id'];
     $codigo = $_POST['codigo'];
     $ponto = $_POST['ponto'];
+    $descricao = $_POST['descricao'];
     $box = $_POST['box'];
     
     // Altera no banco de dados
-    $sql = "UPDATE stops SET stop_code = '$codigo', stop_name = '$ponto', platform_code = '$box', update_date = '$data_edicao' WHERE stop_id = '$id'";
+    $sql = "UPDATE stops SET stop_code = '$codigo', stop_name = '$ponto', stop_desc = '$descricao', platform_code = '$box', update_date = '$data_edicao' WHERE stop_id = '$id'";
     $query = mysqli_query($conexao, $sql);
 
     //if(mysqli_query($conexao, $sql)){

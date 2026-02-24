@@ -101,6 +101,17 @@ section{
     cursor: pointer;
 }
 
+.a-trajeto{
+    background-color: purple;
+    color: var(--color0);
+    font-size: 10px;
+    font-weight: bold;
+    padding: 3px 6px 3px 6px;
+    border-radius: 5px;
+    margin-right: 2px;
+    cursor: pointer;
+}
+
 .a-editar{
     background-color: var(--color4);
     color: var(--color0);
@@ -151,7 +162,7 @@ table{
 }
 
 .th-acoes{
-    padding-right: 136px;
+    padding-right: 200px;
 }
 
 .scroll-area {

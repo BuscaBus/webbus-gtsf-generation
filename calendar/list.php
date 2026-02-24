@@ -27,7 +27,7 @@
     <link rel="shortcut icon" href="../img/logo.ico" type="image/x-icon">
     <link rel="stylesheet" href="../css/style.css?v=1.2">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
-    <link rel="stylesheet" href="../css/calendar.css?v=1.3">    
+    <link rel="stylesheet" href="../css/calendar.css?v=1.5">    
 </head>
 
 <body>

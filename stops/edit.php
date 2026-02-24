@@ -40,7 +40,7 @@ include("../connection.php");
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar pontos</title>
-    <link rel="stylesheet" href="../css/stops.css?v=1.6">
+    <link rel="stylesheet" href="../css/stops.css?v=1.8">
 </head>
 
 <body>
@@ -59,19 +59,19 @@ include("../connection.php");
             </p> 
              <p class="p-estilo">
                 <label for="id-desc" class="lb-edt-desc">Descrição:</label>
-                <input type="text" name="descrição" class="inpt-edt-desc" id="id-desc" value="<?=$result_id['stop_desc']?>">
+                <input type="text" name="descricao" class="inpt-edt-desc" id="id-desc" value="<?=$result_id['stop_desc']?>">
             </p>           
             <p class="p-estilo">
                 <label for="id-loc" class="lb-edt-loc">Tipo de Local:</label>
-                <input type="text" class="inpt-edt-loc" value="<?= $result_id['tipo_local'] ?? '' ?>"  readonly>                
+                <input type="text" class="inpt-edt-loc" value="<?= $result_id['tipo_local'] ?? '' ?>"  disabled>                
             </p>
             <p class="p-estilo">
                 <label for="id-term" class="lb-edt-term">Terminal:</label>
                 <input type="hidden" name="parent_station" value="<?= $result_id['terminal_id'] ?>"> 
-                <input type="text" class="inpt-edt-term" value="<?= $result_id['terminal_name'] ?? '' ?>"  readonly> 
+                <input type="text" class="inpt-edt-term" value="<?= $result_id['terminal_name'] ?? '' ?>"  disabled> 
             </p>            
             <p class="p-estilo">
-                <label for="id-box" class="lb-reg-box">Box:</label>
+                <label for="id-box" class="lb-edt-box">Box:</label>
                 <input type="text" name="box" class="inpt-reg-box" id="id-box" value="<?=$result_id['platform_code']?>">
             </p>
             <hr>

@@ -83,8 +83,9 @@ $result_id = mysqli_fetch_assoc($result);
                     <p class="p-estilo">
                         <label for="id-sent" class="lb-reg-sent">Sentido:</label>
                         <select name="sentido" class="selc-reg-sent" id="id-sent">
-                            <option value="Ida">Ida</option>
-                            <option value="Volta">Volta</option>
+                            <option value="select">Selecione um sentido</option>
+                            <option value="0">Ida</option>
+                            <option value="1">Volta</option>
                         </select>
                     </p>
                     <p class="p-estilo">
