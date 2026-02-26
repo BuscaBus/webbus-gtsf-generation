@@ -1,6 +1,12 @@
 <?php
 include("../connection.php");
 
+// Trás o route_id da lista de linhas
+$route_id = $_GET['route_id'] ?? null;
+
+if (!$route_id) {
+    die("Route inválida");
+}
 ?>
 
 <!DOCTYPE html>
@@ -12,8 +18,7 @@ include("../connection.php");
     <title>Mapa das Trips</title>
     <link rel="stylesheet" href="../css/style.css?v=1.2">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
-    <link rel="stylesheet" href="../css/stop_times.css?v=1.7">
-    <link rel="stylesheet" href="../css/shape.css?v=1.0">
+    <link rel="stylesheet" href="../css/shape.css?v=1.1">
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
@@ -39,6 +44,7 @@ include("../connection.php");
                 <p>
                     <label for="id-trip-traj" class="lb-reg-trip-traj">Código:</label>
                     <input type="text" name="trip-trajeto" class="inpt-reg-trip-traj" id="id-trip-traj" placeholder="insira o código do trajeto..." required>
+                    <button type="button" id="btnNovo" class="btn-novo">NOVO</button>
                 </p>
                 <br>
                 <p>
@@ -53,7 +59,15 @@ include("../connection.php");
 
                 <div id="div-map"></div>
 
-                <script>                 
+                <script>
+                    const ROUTE_ID = "<?= $route_id ?>";
+                </script>
+
+                <script>
+                    let modoNovo = false;
+                </script>
+
+                <script>
                     // ===== MAPA =====
                     var map = L.map('div-map').setView([-27.595740, -48.568228], 13);
 
@@ -87,6 +101,66 @@ include("../connection.php");
 
                     map.addControl(drawControl);
 
+                    // Definição de palheta para as cores do traçado
+                    const SHAPE_COLORS = [
+                        "#0066ff", // azul
+                        "#ff0000", // vermelho
+                        "#00aa00", // verde
+                        "#800080", // roxo
+                        "#ff9900", // laranja
+                        "#ffff00", // amarelo
+                        "#8a2be2" // violeta
+                    ];
+
+                    // Carregar shape salvo
+                    function carregarShape() {
+
+                        fetch("get_shape.php?route_id=" + ROUTE_ID)
+                            .then(res => res.json())
+                            .then(shapes => {
+
+                                if (!shapes || Object.keys(shapes).length === 0) return;
+
+                                drawnItems.clearLayers();
+
+                                let bounds = [];
+                                let colorIndex = 0;
+
+                                Object.keys(shapes).forEach(shapeId => {
+
+                                    const color = SHAPE_COLORS[colorIndex % SHAPE_COLORS.length];
+
+                                    const polyline = L.polyline(shapes[shapeId], {
+                                        color: color,
+                                        weight: 5,
+                                        opacity: 0.85
+                                    });
+
+                                    polyline.bindTooltip(
+                                        "Trajeto: " + shapeId, {
+                                            sticky: true
+                                        }
+                                    );
+
+                                    drawnItems.addLayer(polyline);
+                                    bounds.push(...polyline.getLatLngs());
+
+                                    colorIndex++;
+                                });
+
+                                if (bounds.length > 0) {
+                                    map.fitBounds(bounds);
+                                }
+                            })
+                            .catch(err => {
+                                console.error("Erro ao carregar shapes:", err);
+                            });
+                    }
+
+                    if (!modoNovo) {
+                        carregarShape();
+                    }
+
                     // ===== SALVAR SHAPE =====
                     function salvarShape(layer) {
 
@@ -104,7 +178,7 @@ include("../connection.php");
                             return;
                         }
 
-                        var coords = geojson.geometry.coordinates;                       
+                        var coords = geojson.geometry.coordinates;
 
                         fetch("salvar_shape.php", {
                                 method: "POST",
@@ -113,12 +187,25 @@ include("../connection.php");
                                 },
                                 body: JSON.stringify({
                                     shape_id: shapeId,
+                                    route_id: ROUTE_ID,
+                                    direction_id: 0,
                                     coords: coords
                                 })
                             })
                             .then(res => res.json())
                             .then(data => {
-                                alert(data.message);
+
+                                if (data.status === "ok") {
+                                    alert("Trajeto salvo com sucesso!");
+                                } else {
+                                    alert("Erro ao salvar o trajeto");
+                                    console.error(data);
+                                }
+
+                            })
+                            .catch(err => {
+                                alert("Erro de comunicação com o servidor");
+                                console.error(err);
                             });
                     }
 
@@ -152,6 +239,23 @@ include("../connection.php");
                     setTimeout(() => {
                         map.invalidateSize();
                     }, 300);
+                </script>
+
+                <script>
+                    document.getElementById("btnNovo").addEventListener("click", function() {
+
+                        // entra em modo novo
+                        modoNovo = true;
+
+                        // limpa shapes do mapa
+                        drawnItems.clearLayers();
+
+                        // limpa campo de código (opcional, mas recomendado)
+                        document.getElementById("id-trip-traj").value = "";
+
+                        alert("Modo novo trajeto ativado. Desenhe um novo traçado.");
+
+                    });
                 </script>
 
             </section>

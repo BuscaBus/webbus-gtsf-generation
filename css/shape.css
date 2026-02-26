@@ -109,7 +109,7 @@ section{
 
 .inpt-reg-trip-traj{
     background-color: #F3F4F0;
-    width: 400px;
+    width: 395px;
     border-radius: 5px;
     padding: 4px;
 }
@@ -119,4 +119,25 @@ section{
     width: 350px;
     border-radius: 5px;
     padding: 4px;    
+}
+
+.btn-novo{
+    background-color: var(--color4);
+    width: 85px;
+    color: var(--color0);
+    font-weight: bold;
+    border-radius: 6px;
+    margin-right: 5px;
+    padding: 3px 15px 3px 15px;
+    cursor: pointer;
+}
+
+.btn-salv{
+    background-color: var(--color4);
+    color: var(--color0);
+    font-weight: bold;
+    border-radius: 6px;
+    margin-right: 5px;
+    padding: 3px 15px 3px 15px;
+    cursor: pointer;
 }

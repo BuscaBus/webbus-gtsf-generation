@@ -1,94 +1,78 @@
 <?php
-
 include("../connection.php");
-
 header("Content-Type: application/json");
 
-// Lê o JSON enviado pelo fetch
-$raw  = file_get_contents("php://input");
-$data = json_decode($raw, true);
+$data = json_decode(file_get_contents("php://input"), true);
 
-$shape_id = $data['shape_id'] ?? null;
-$coords   = $data['coords'] ?? [];
+$shape_id     = $data['shape_id'] ?? null;
+$route_id     = $data['route_id'] ?? null;
+$coords       = $data['coords'] ?? [];
 
-// Validação básica
-if (!$shape_id || empty($coords)) {
+if (!$shape_id || !$route_id || empty($coords)) {
     echo json_encode([
         "status" => "error",
-        "message" => "Shape inválido"
+        "message" => "Dados inválidos"
     ]);
     exit;
 }
 
-// Garante autocommit (evita problemas silenciosos)
-mysqli_autocommit($conexao, true);
+mysqli_begin_transaction($conexao);
 
-// Remove pontos antigos do shape (edição)
-$stmt = mysqli_prepare(
-    $conexao,
-    "DELETE FROM shapes WHERE shape_id = ?"
-);
+try {
 
-if (!$stmt) {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Erro ao preparar DELETE",
-        "detail" => mysqli_error($conexao)
-    ]);
-    exit;
-}
-
-mysqli_stmt_bind_param($stmt, "s", $shape_id);
-mysqli_stmt_execute($stmt);
-mysqli_stmt_close($stmt);
-
-// Insere novos pontos
-$sql = "INSERT INTO shapes
-        (shape_id, shape_pt_lat, shape_pt_lon, shape_pt_sequence)
-        VALUES (?, ?, ?, ?)";
-
-$stmt = mysqli_prepare($conexao, $sql);
-
-if (!$stmt) {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Erro ao preparar INSERT",
-        "detail" => mysqli_error($conexao)
-    ]);
-    exit;
-}
-
-$seq = 1;
-foreach ($coords as $pt) {
-    $lon = $pt[0];
-    $lat = $pt[1];
-
-    mysqli_stmt_bind_param(
-        $stmt,
-        "sddi",
-        $shape_id,
-        $lat,
-        $lon,
-        $seq
+    /* ===== SHAPES ===== */
+    mysqli_query(
+        $conexao,
+        "DELETE FROM shapes WHERE shape_id = '$shape_id'"
     );
 
-    if (!mysqli_stmt_execute($stmt)) {
-        echo json_encode([
-            "status" => "error",
-            "message" => "Erro ao inserir ponto",
-            "detail" => mysqli_stmt_error($stmt)
-        ]);
-        exit;
+    $seq = 1;
+    foreach ($coords as $pt) {
+        $lon = $pt[0];
+        $lat = $pt[1];
+
+        mysqli_query(
+            $conexao,
+            "INSERT INTO shapes 
+            (shape_id, shape_pt_lat, shape_pt_lon, shape_pt_sequence)
+            VALUES 
+            ('$shape_id', '$lat', '$lon', $seq)"
+        );
+
+        $seq++;
     }
 
-    $seq++;
+    /* ===== MAPS_TRIPS ===== */
+    mysqli_query(
+        $conexao,
+        "DELETE FROM maps_trips 
+         WHERE route_id = '$route_id' 
+           AND shape_id = '$shape_id'"
+          
+    );
+
+    mysqli_query(
+        $conexao,
+        "INSERT INTO maps_trips 
+        (route_id, shape_id)
+        VALUES 
+        ('$route_id', '$shape_id')"
+    );
+
+    mysqli_commit($conexao);
+
+    echo json_encode([
+        "status" => "ok",
+        "message" => "Shape salvo e vinculado à rota com sucesso"
+    ]);
+
+} catch (Exception $e) {
+
+    mysqli_rollback($conexao);
+
+    echo json_encode([
+        "status" => "error",
+        "message" => "Erro ao salvar",
+        "detail" => $e->getMessage()
+    ]);
 }
-
-mysqli_stmt_close($stmt);
-
-// Resposta final
-echo json_encode([
-    "status" => "ok",
-    "message" => "Shape salvo com sucesso",
-    "shape_id" => $shape_id
-]);

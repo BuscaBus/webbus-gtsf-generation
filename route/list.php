@@ -183,7 +183,7 @@ $result = mysqli_query($conexao, $sql);
                                     <form action="delete.php" method="POST">
                                         <input type="hidden" name="id" value="<?php echo $id ?>">
                                         <a href="../trips/register.php?id=<?= $sql_result['route_id'] ?>" class="a-viagem" id="a-viag">VIAGENS</a>
-                                        <a href="../shape/maps_trips.php" class="a-trajeto" id="a-trajeto">TRAJETO</a>
+                                        <a href="../shape/maps_trips.php?route_id=<?= $sql_result['route_id'] ?>" class="a-trajeto" id="a-trajeto">TRAJETO</a>
                                         <a href="edit.php?id=<?= $sql_result['route_id'] ?>" class="a-editar" id="a-edit">EDITAR</a>
                                         <button class="btn-excluir" onclick="return deletar()">EXCLUIR</button>
                                     </form>
