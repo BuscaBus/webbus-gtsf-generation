@@ -241,19 +241,80 @@ if (!$route_id) {
                     }, 300);
                 </script>
 
+                <!-- Script para carregar select Shape -->
                 <script>
-                    document.getElementById("btnNovo").addEventListener("click", function() {
+                    function carregarSelectShapes() {
 
-                        // entra em modo novo
+                        fetch("get_shapes_route.php?route_id=" + ROUTE_ID)
+                            .then(res => res.json())
+                            .then(shapes => {
+
+                                const select = document.getElementById("trip-select");
+                                select.innerHTML = '<option value="">Selecione</option>';
+
+                                shapes.forEach(shapeId => {
+                                    const opt = document.createElement("option");
+                                    opt.value = shapeId;
+                                    opt.textContent = shapeId;
+                                    select.appendChild(opt);
+                                });
+
+                            })
+                            .catch(err => {
+                                console.error("Erro ao carregar shapes:", err);
+                            });
+                    }
+                </script>
+
+                <!-- Script para o botão novo -->
+                <script>
+                    document.getElementById("btnNovo").addEventListener("click", function(e) {
+
+                        e.preventDefault(); // evita abrir nova aba
+
                         modoNovo = true;
 
-                        // limpa shapes do mapa
+                        // limpa mapa
                         drawnItems.clearLayers();
 
-                        // limpa campo de código (opcional, mas recomendado)
+                        // limpa código
                         document.getElementById("id-trip-traj").value = "";
 
-                        alert("Modo novo trajeto ativado. Desenhe um novo traçado.");
+                        // carrega shapes para copiar
+                        carregarSelectShapes();
+
+                        alert("Modo novo trajeto ativado. Selecione um trajeto para copiar ou desenhe um novo.");
+
+                    });
+                </script>
+
+                <!-- Script para selecionar um shape e carregar no mapa -->
+                <script>
+                    document.getElementById("trip-select").addEventListener("change", function() {
+
+                        const shapeId = this.value;
+
+                        if (!shapeId) return;
+
+                        fetch("get_shape_by_id.php?shape_id=" + shapeId)
+                            .then(res => res.json())
+                            .then(coords => {
+
+                                drawnItems.clearLayers();
+
+                                const polyline = L.polyline(coords, {
+                                    color: "#0000ff", // mantém padrão
+                                    weight: 5,
+                                    opacity: 0.8
+                                });
+
+                                drawnItems.addLayer(polyline);
+                                map.fitBounds(polyline.getBounds());
+
+                            })
+                            .catch(err => {
+                                console.error("Erro ao carregar shape:", err);
+                            });
 
                     });
                 </script>
