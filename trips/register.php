@@ -40,7 +40,7 @@ $result_id = mysqli_fetch_assoc($result);
     <link rel="shortcut icon" href="../img/logo.ico" type="image/x-icon">
     <link rel="stylesheet" href="../css/style.css?v=1.2">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
-    <link rel="stylesheet" href="../css/trips.css?v=1.5">
+    <link rel="stylesheet" href="../css/trips.css?v=1.6">
 </head>
 
 <body>
@@ -68,6 +68,7 @@ $result_id = mysqli_fetch_assoc($result);
                     <p class="p-estilo">
                         <label for="id-serv" class="lb-reg-serv">Serviço:</label>
                         <select name="servico" class="selc-reg-serv" id="id-serv">
+                            <option value="">Selecione um serviço</option>
                             <?php
                             $sql_select = "SELECT service_id FROM calendar ORDER BY service_id DESC";
                             $result_selec = mysqli_query($conexao, $sql_select);
@@ -100,6 +101,22 @@ $result_id = mysqli_fetch_assoc($result);
                         <label for="id-part" class="lb-reg-part">Local de Partida:</label>
                         <input type="text" name="partida" class="inpt-reg-part" id="id-part" placeholder="insira o local de partida...">
                     </p>
+                    <p class="p-estilo">
+                        <label for="id-trac" class="lb-reg-trac">Traçado:</label>
+                        <select name="tracado" class="selc-reg-trac" id="id-trac">
+                            <option value="">Selecione um traçado</option>
+                            <?php
+                            $sql_select = "SELECT DISTINCT mt.shape_id FROM maps_trips mt WHERE mt.route_id = $id ORDER BY mt.shape_id ASC";
+
+                            $result_selec = mysqli_query($conexao, $sql_select);
+
+                            while ($dados = mysqli_fetch_assoc($result_selec)) {
+                                $tracado = $dados['shape_id'];
+                                echo "<option value='$tracado'>$tracado</option>";
+                            }
+                            ?>
+                        </select>
+                    </p>
                     <br>
                     <nav class="nav-reg-btn">
                         <p>
@@ -120,19 +137,10 @@ $result_id = mysqli_fetch_assoc($result);
                 <table>
                     <form method="GET">
                         <input type="hidden" name="id" value="<?= $id ?>">
-
-                        <select name="servico" class="selc-serv" id="id-serv">
-                            <option value="Todas" <?= ($servicoSelecionado == "Todas") ? "selected" : "" ?>>Todas</option>
-                            <option value="Segunda a Sexta" <?= ($servicoSelecionado == "Segunda a Sexta") ? "selected" : "" ?>>Segunda a Sexta</option>
-                            <option value="Sábado" <?= ($servicoSelecionado == "Sábado") ? "selected" : "" ?>>Sábado</option>
-                            <option value="Domingo e Feriado" <?= ($servicoSelecionado == "Domingo e Feriado") ? "selected" : "" ?>>Domingo e Feriado</option>
-                        </select>
-                        <button type="submit" class="btn-pesq-serv">FILTRAR</button>
                     </form>
 
                     <caption class="cap-list-vig">Relação de viagens</caption>
                     <thead>
-                        <th class="th-serv">Serviço</th>
                         <th class="th-viag">Viagem</th>
                         <th class="th-sent">Sentido</th>
                         <th class="th-part">Partida</th>
@@ -154,12 +162,17 @@ $result_id = mysqli_fetch_assoc($result);
                         $filtro_servico = "AND service_id = '$servico'";
                     }
 
+                    $sql = "
+                    SELECT 
+                        MIN(trip_id) AS trip_id, route_id, trip_headsign, trip_short_name, direction_id, departure_location,
+                        CASE 
+                            WHEN direction_id = '0' THEN 'Ida'
+                            WHEN direction_id = '1' THEN 'Volta'
+                        END AS direction_format
+                    FROM trips WHERE route_id = $id $filtro_servico
+                    GROUP BY route_id, trip_headsign, trip_short_name, direction_id, departure_location
+                    ORDER BY direction_id ASC";
 
-                    $sql = "SELECT route_id, trip_id, service_id, trip_headsign, trip_short_name, direction_id, departure_location 
-                            FROM trips 
-                            WHERE route_id = $id
-                            $filtro_servico
-                            ORDER BY service_id DESC, direction_id ASC";
                     $result = mysqli_query($conexao, $sql);
 
                     $first_trip_id = null; // salvar a primeira viagem
@@ -171,15 +184,13 @@ $result_id = mysqli_fetch_assoc($result);
 
                         $id_trip   = $sql_result['trip_id'];
                         $id_route  = $sql_result['route_id'];
-                        $servico   = $sql_result['service_id'];
                         $destino   = $sql_result['trip_headsign'];
                         $origem    = $sql_result['trip_short_name'];
-                        $sentido   = $sql_result['direction_id'];
+                        $sentido   = $sql_result['direction_format'];
                         $partida   = $sql_result['departure_location'];
                     ?>
                         <tbody>
                             <tr>
-                                <td><?= $servico ?></td>
                                 <td><?= $origem ?> - <?= $destino ?></td>
                                 <td><?= $sentido ?></td>
                                 <td><?= $partida ?></td>

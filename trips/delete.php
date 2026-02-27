@@ -1,25 +1,17 @@
 <?php
-    include("../connection.php");
+include("../connection.php");
 
-    // Trazendo e declarando a variavel id
-    $id = $_POST['id'];
-    $id_route = $_POST['id-route'];
-   
-    // Exclusão pelo id no banco de dados
-    $sql = "DELETE FROM trips WHERE trip_id = '$id'";
+if (!isset($_POST['id'])) {
+    die("Trip inválida.");
+}
 
-    $result = mysqli_query($conexao,$sql);
+$trip_id = mysqli_real_escape_string($conexao, $_POST['id']);
 
-    //if(mysqli_query($conexao, $sql)){
-             
-    //}
-    //else{
-       //echo "Erro ao excluir".mysqli_connect_error($conexao);
-    //}
-    
-    // Mantem na mesma página após a exclusão
-    header ("location: register.php?id=$id_route");
+$sql = "DELETE FROM trips WHERE trip_id = '$trip_id'";
 
-    mysqli_close($conexao);
-    
-?>
+if (mysqli_query($conexao, $sql)) {
+    header("Location: register.php?id=" . $_POST['id-route']);
+    exit;
+} else {
+    echo "Erro ao excluir a viagem.";
+}

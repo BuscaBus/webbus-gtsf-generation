@@ -140,6 +140,10 @@ body{
     margin-right: 10px;
 }
 
+.lb-reg-trac{
+    margin-right: 65px;
+}
+
 .inpt-reg-cod{
     background-color: #F3F4F0;
     width: 310px;
@@ -183,6 +187,13 @@ body{
 }
 
 .selc-reg-sent{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.selc-reg-trac{
     background-color: #F3F4F0;
     width: 310px;
     border-radius: 5px;

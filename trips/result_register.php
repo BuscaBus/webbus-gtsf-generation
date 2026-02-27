@@ -8,6 +8,7 @@
     $destino = $_POST['destino'];
     $sentido = $_POST['sentido'];
     $partida = $_POST['partida'];
+    $tracado = $_POST['tracado'];
     
     // Altera no banco de dados
     $sql = "INSERT INTO trips (
@@ -16,7 +17,8 @@
                 trip_short_name,
                 trip_headsign,
                 direction_id,
-                departure_location                
+                departure_location, 
+                shape_id               
             ) 
             VALUES (
                 '$route_id', 
@@ -24,7 +26,8 @@
                 '$origem',
                 '$destino',
                 '$sentido',
-                '$partida'                
+                '$partida',  
+                '$tracado'              
             )";
     $query = mysqli_query($conexao, $sql);
 
