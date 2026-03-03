@@ -10,7 +10,7 @@
 }
 
 /*Configurações da página*/
-body{
+body{    
     font-family: Arial, Helvetica, sans-serif;
     background-color: #CED8D0;  
 }
@@ -96,34 +96,64 @@ section{
 
 /* Configurações da página Maps_trips.php */
 
+.h2-rota {
+    margin-bottom: 15px;
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--color4);    
+}
+
+.sect-reg-traj {
+    text-align: center;
+    background-color: var(--color2); 
+    width: 500px;
+    height: 580px;
+}
+
+.sect-reg-map {
+    width: 1100px;
+    height: 580px;    
+}
+
 .p-estilo {
     text-align: center;
 }    
 .lb-reg-trip-traj{    
-    margin-right: 5px;    
+    margin-right: 65px;    
 }
 
 .lb-select{
-    margin-right: 5px;     
+    margin-right: 20px;     
 }
 
 .inpt-reg-trip-traj{
     background-color: #F3F4F0;
-    width: 395px;
+    width: 250px;
     border-radius: 5px;
     padding: 4px;
 }
 
 .trip-select{
     background-color: #F3F4F0;
-    width: 350px;
+    width: 250px;
     border-radius: 5px;
     padding: 4px;    
 }
 
 .btn-novo{
     background-color: var(--color4);
-    width: 85px;
+    width: 150px;
+    color: var(--color0);
+    font-weight: bold;
+    border-radius: 6px;
+    margin-right: 80px;
+    padding: 3px 15px 3px 15px;
+    cursor: pointer;
+}
+
+.btn-copiar{
+    background-color: var(--color4);
+    width: 150px;
     color: var(--color0);
     font-weight: bold;
     border-radius: 6px;
@@ -138,6 +168,103 @@ section{
     font-weight: bold;
     border-radius: 6px;
     margin-right: 5px;
+    padding: 3px 30px 3px 30px;
+    cursor: pointer;
+}
+
+
+.btn-reg-canc{
+    background-color: red;
+    color: var(--color0);
+    font-weight: bold;
+    border-radius: 6px;
+    margin-right: 5px;
     padding: 3px 15px 3px 15px;
+    cursor: pointer;
+}
+
+.a-btn-canc{
+    text-decoration: none;   
+    background-color: red;
+    color: var(--color0);
+    font-weight: bold;
+    border-radius: 6px;
+    margin-right: 5px;
+    padding: 3px 5px 3px 5px;
+    cursor: pointer;
+}
+
+.btn-seq-par{
+    background-color: var(--color4);
+    color: var(--color0);
+    font-size: 15px;
+    font-weight: bold;
+    border-radius: 6px;
+    margin-right: 5px;
+    padding: 3px 20px 3px 20px;
+    cursor: pointer;
+}
+
+.a-btn-seq-par{
+    text-decoration: none;   
+    background-color: var(--color4);
+    color: var(--color0);
+    font-weight: bold;
+    border-radius: 6px;
+    margin-right: 5px;
+    padding: 3px 5px 3px 5px;
+    cursor: pointer;
+}
+
+.input-destaque {
+    border: 2px solid black;
+    box-shadow: 0 0 5px rgba(8, 8, 8, 0.941);
+    outline: none;
+}
+
+/* Configurações da página shape_stops.php */
+
+.sect-tab-traj {
+    text-align: center;
+    background-color: var(--color2); 
+    width: 500px;
+    height: 580px;
+}
+
+.sect-map-seq {
+    width: 1100px;
+    height: 580px;    
+}
+
+
+.btn-seq-cad{
+    background-color: var(--color4);
+    color: var(--color0);
+    font-weight: bold;
+    border-radius: 6px;
+    margin-right: 5px;
+    padding: 3px 20px 3px 20px;
+    cursor: pointer;
+}
+
+
+.btn-seq-canc{
+    background-color: red;
+    color: var(--color0);
+    font-weight: bold;
+    border-radius: 6px;
+    margin-right: 5px;
+    padding: 3px 15px 3px 15px;
+    cursor: pointer;
+}
+
+.a-btn-seq-canc{
+    text-decoration: none;   
+    background-color: red;
+    color: var(--color0);
+    font-weight: bold;
+    border-radius: 6px;
+    margin-right: 5px;
+    padding: 3px 5px 3px 5px;
     cursor: pointer;
 }

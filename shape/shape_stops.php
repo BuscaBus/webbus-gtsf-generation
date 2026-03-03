@@ -1,25 +1,6 @@
 <?php
 include("../connection.php");
 
-// Trás o route_id da lista de linhas
-$route_id = $_GET['route_id'] ?? null;
-
-if (!$route_id) {
-    die("Route inválida");
-}
-
-// Buscar nome da rota/linha
-$sql = " SELECT route_short_name, route_long_name FROM routes WHERE route_id = '$route_id'";
-
-$result = mysqli_query($conexao, $sql);
-
-if (!$result || mysqli_num_rows($result) == 0) {
-    die("Rota não encontrada");
-}
-
-$route = mysqli_fetch_assoc($result);
-
-$nomeRota = $route['route_short_name'] . " - " . $route['route_long_name'];
 ?>
 
 <!DOCTYPE html>
@@ -31,7 +12,7 @@ $nomeRota = $route['route_short_name'] . " - " . $route['route_long_name'];
     <title>Mapa das Trips</title>
     <link rel="stylesheet" href="../css/style.css?v=1.2">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
-    <link rel="stylesheet" href="../css/shape.css?v=1.2">
+    <link rel="stylesheet" href="../css/shape.css?v=1.0">
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
@@ -50,45 +31,20 @@ $nomeRota = $route['route_short_name'] . " - " . $route['route_long_name'];
 <body>
     <div>
         <header>
-            <h1>Trajetos</h1>
+            <h1>Sequencia de paradas</h1>
         </header>
         <main>
-            <!-- Section para cadastrar novo trajeto -->
-            <section class="sect-reg-traj">
-                <h2 class="h2-rota">
-                    <?= htmlspecialchars($nomeRota) ?>
-                </h2>
-                <br>
-                <button type="button" id="btnNovo" class="btn-novo">+ NOVO</button>
-                <button type="button" id="btnCopiar" class="btn-copiar">COPIAR</button>
-                <br><br><br>
-                <p>
-                    <label for="id-trip-traj" class="lb-reg-trip-traj">Código:</label>
-                    <input type="text" name="trip-trajeto" class="inpt-reg-trip-traj" id="id-trip-traj" placeholder="insira o código do trajeto..." required>                    
-                </p>
-                <br>
-                <p>
-                    <label for="tripSelect" class="lb-select">Copiar trajeto:</label>
-                    <select id="trip-select" class="trip-select">
-                        <option value="">Selecione</option>                       
-                    </select>
-                    <br><br><br>
-                    <button type="button" id="btnSalvar" class="btn-salv">SALVAR</button>
-                    <button class="btn-reg-canc">
-                        <a href="../route/list.php" class="a-btn-canc">CANCELAR</a>
-                    </button>
-                </p>
-                <br><br><br>
-                <p>
-                    <button class="btn-seq-par">
-                        <a href="shape_stops.php" class="a-btn-seq-par">SEQUENCIA DE PARADAS</a>
-                    </button>
-                </p>
-                <br>
+            <!-- Section para tabela com o pontos do trajeto -->
+            <section class="sect-tab-traj">
+                <button type="button" id="btnCadastrar" class="btn-seq-cad">CADASTRAR</button>
+                <button class="btn-seq-canc">
+                    <a href="../route/list.php" class="a-btn-seq-canc">CANCELAR</a>
+                </button>
+                </p>                
             </section>
 
-            <!-- Section para o mapa do trajeto -->
-            <section class="sect-reg-map">
+            <!-- Section para o mapa com a sequencia de pontos do trajeto -->
+            <section class="sect-map-seq">
                 <div id="div-map"></div>
             </section>    
 
