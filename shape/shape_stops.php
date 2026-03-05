@@ -12,7 +12,7 @@ include("../connection.php");
     <title>Mapa das Trips</title>
     <link rel="stylesheet" href="../css/style.css?v=1.2">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
-    <link rel="stylesheet" href="../css/shape.css?v=1.0">
+    <link rel="stylesheet" href="../css/shape.css?v=1.3">
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
@@ -22,8 +22,8 @@ include("../connection.php");
     <style>
         #div-map {
             height: 550px;
-            width: 1000px;
-            margin: auto;
+            width: 900px;
+            margin: auto;            
         }
     </style>
 </head>
@@ -35,7 +35,40 @@ include("../connection.php");
         </header>
         <main>
             <!-- Section para tabela com o pontos do trajeto -->
-            <section class="sect-tab-traj">
+            <section class="sect-tab-traj" id="scroll-area">
+                <p>                    
+                    <select id="trip-selec" class="trip-selec">
+                        <option value="">Selecione um trajeto</option>                       
+                    </select>                    
+                    <button type="button" id="btnSelec" class="btn-selec">SELECIONAR</button>
+                </p>
+                <table>
+                    <caption>Pontos do Trajeto</caption>
+                    <thead>
+                        <th class="th-seq">Seq.</th>
+                        <th class="th-cod">Código</th>
+                        <th class="th-ponto">Ponto</th>
+                        <th class="th-inter">Intervalo</th>
+                        <th class="th-acoes">Ação</th>
+                    </thead>
+                    
+                    <tbody>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>
+                                <input type="time" name="interval">
+                            </td>
+                            <td>                                
+                                <form action="delete.php" method ="POST">                                    
+                                    <button class="btn-excluir" onclick="return deletar()">EXCLUIR</button>
+                                </form>
+                            </td>
+                        </tr>                                              
+                    </tbody>
+                </table>
+                <br>
                 <button type="button" id="btnCadastrar" class="btn-seq-cad">CADASTRAR</button>
                 <button class="btn-seq-canc">
                     <a href="../route/list.php" class="a-btn-seq-canc">CANCELAR</a>
