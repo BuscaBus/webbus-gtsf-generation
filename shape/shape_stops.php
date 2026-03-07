@@ -1,6 +1,13 @@
 <?php
 include("../connection.php");
 
+// Trás o route_id da lista de linhas
+$route_id = mysqli_real_escape_string($conexao, $_GET['route_id'] ?? '');
+
+if (!$route_id) {
+    die("Route inválida");
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -12,7 +19,7 @@ include("../connection.php");
     <title>Mapa das Trips</title>
     <link rel="stylesheet" href="../css/style.css?v=1.2">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
-    <link rel="stylesheet" href="../css/shape.css?v=1.3">
+    <link rel="stylesheet" href="../css/shape.css?v=1.5">
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
@@ -21,27 +28,36 @@ include("../connection.php");
 
     <style>
         #div-map {
-            height: 550px;
-            width: 900px;
-            margin: auto;            
+            width: 100%;
+            height: 100%;
         }
     </style>
 </head>
 
-<body>
+<body class="body-shst">
     <div>
         <header>
             <h1>Sequencia de paradas</h1>
         </header>
-        <main>
+        <main class="main-shst">
             <!-- Section para tabela com o pontos do trajeto -->
             <section class="sect-tab-traj" id="scroll-area">
-                <p>                    
-                    <select id="trip-selec" class="trip-selec">
-                        <option value="">Selecione um trajeto</option>                       
+                <p>
+                    <select id="trip-select" class="trip-select">
+                        <option value="">Selecione um trajeto</option>
+                        <?php
+                        $sql_select = "SELECT DISTINCT mt.shape_id FROM maps_trips mt WHERE mt.route_id = '$route_id' ORDER BY mt.shape_id ASC";
+
+                        $result_selec = mysqli_query($conexao, $sql_select);
+
+                        while ($dados = mysqli_fetch_assoc($result_selec)) {
+                            $tracado = $dados['shape_id'];
+                            echo "<option value='$tracado'>$tracado</option>";
+                        }
+                        ?>
                     </select>                    
-                    <button type="button" id="btnSelec" class="btn-selec">SELECIONAR</button>
                 </p>
+                <br>
                 <table>
                     <caption>Pontos do Trajeto</caption>
                     <thead>
@@ -51,7 +67,7 @@ include("../connection.php");
                         <th class="th-inter">Intervalo</th>
                         <th class="th-acoes">Ação</th>
                     </thead>
-                    
+
                     <tbody>
                         <tr>
                             <td></td>
@@ -60,12 +76,12 @@ include("../connection.php");
                             <td>
                                 <input type="time" name="interval">
                             </td>
-                            <td>                                
-                                <form action="delete.php" method ="POST">                                    
+                            <td>
+                                <form action="delete.php" method="POST">
                                     <button class="btn-excluir" onclick="return deletar()">EXCLUIR</button>
                                 </form>
                             </td>
-                        </tr>                                              
+                        </tr>
                     </tbody>
                 </table>
                 <br>
@@ -73,273 +89,287 @@ include("../connection.php");
                 <button class="btn-seq-canc">
                     <a href="../route/list.php" class="a-btn-seq-canc">CANCELAR</a>
                 </button>
-                </p>                
+                </p>
             </section>
 
             <!-- Section para o mapa com a sequencia de pontos do trajeto -->
             <section class="sect-map-seq">
                 <div id="div-map"></div>
-            </section>    
+            </section>
 
-                <script>
-                    const ROUTE_ID = "<?= $route_id ?>";
-                </script>
+            <script>
+                const ROUTE_ID = "<?= $route_id ?>";
+            </script>
 
-                <script>
-                    let modoNovo = false;
-                </script>
+            <script>
+                let modoNovo = false;
+            </script>
 
-                <script>
-                    // ===== MAPA =====
-                    var map = L.map('div-map').setView([-27.595740, -48.568228], 13);
+            <script>
+                // ===== MAPA =====
+                var map = L.map('div-map').setView([-27.595740, -48.568228], 13);
 
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: '&copy; OpenStreetMap'
-                    }).addTo(map);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; OpenStreetMap'
+                }).addTo(map);
 
-                    var drawnItems = new L.FeatureGroup();
-                    map.addLayer(drawnItems);
+                var drawnItems = new L.FeatureGroup();
+                map.addLayer(drawnItems);
 
-                    var drawControl = new L.Control.Draw({
-                        edit: {
-                            featureGroup: drawnItems,
-                            remove: true
-                        },
-                        draw: {
-                            polyline: {
-                                shapeOptions: {
-                                    color: '#0000ff',
-                                    weight: 5,
-                                    opacity: 0.8
-                                }
-                            },
-                            polygon: false,
-                            marker: false,
-                            rectangle: false,
-                            circle: false,
-                            circlemarker: false
-                        }
-                    });
+                var drawControl = new L.Control.Draw({
+                    edit: false,
+                    draw: false
+                });
 
-                    map.addControl(drawControl);
+                map.addControl(drawControl);
 
-                    // Definição de palheta para as cores do traçado
-                    const SHAPE_COLORS = [
-                        "#0066ff", // azul
-                        "#ff0000", // vermelho
-                        "#00aa00", // verde
-                        "#800080", // roxo
-                        "#ff9900", // laranja
-                        "#ffff00", // amarelo
-                        "#8a2be2" // violeta
-                    ];
+                // Carregar trajeto somente quando clicar em SELECIONAR
+                document.getElementById("btnSelec").addEventListener("click", function() {
 
-                    // Carregar shape salvo
-                    function carregarShape() {
+                    const shapeId = document.getElementById("trip-select").value;
 
-                        fetch("get_shape.php?route_id=" + ROUTE_ID)
-                            .then(res => res.json())
-                            .then(shapes => {
+                    if (!shapeId) {
+                        alert("Selecione um trajeto.");
+                        return;
+                    }
 
-                                if (!shapes || Object.keys(shapes).length === 0) return;
+                    fetch("get_shape_by_id.php?shape_id=" + shapeId)
+                        .then(res => res.json())
+                        .then(coords => {
 
-                                drawnItems.clearLayers();
+                            drawnItems.clearLayers();
 
-                                let bounds = [];
-                                let colorIndex = 0;
-
-                                Object.keys(shapes).forEach(shapeId => {
-
-                                    const color = SHAPE_COLORS[colorIndex % SHAPE_COLORS.length];
-
-                                    const polyline = L.polyline(shapes[shapeId], {
-                                        color: color,
-                                        weight: 5,
-                                        opacity: 0.85
-                                    });
-
-                                    polyline.bindTooltip(
-                                        "Trajeto: " + shapeId, {
-                                            sticky: true
-                                        }
-                                    );
-
-                                    drawnItems.addLayer(polyline);
-                                    bounds.push(...polyline.getLatLngs());
-
-                                    colorIndex++;
-                                });
-
-                                if (bounds.length > 0) {
-                                    map.fitBounds(bounds);
-                                }
-                            })
-                            .catch(err => {
-                                console.error("Erro ao carregar shapes:", err);
+                            const polyline = L.polyline(coords, {
+                                color: "#0000ff",
+                                weight: 5,
+                                opacity: 0.6,
+                                interactive: false
                             });
-                    }
 
-                    if (!modoNovo) {
-                        carregarShape();
-                    }
+                            drawnItems.addLayer(polyline);
 
-                    // ===== SALVAR SHAPE =====
-                    function salvarShape(layer) {
+                            map.fitBounds(polyline.getBounds());
 
-                        var shapeId = document.getElementById("id-trip-traj").value.trim();
-
-                        if (!shapeId) {
-                            alert("Informe o código do trajeto antes de desenhar.");
-                            return;
-                        }
-
-                        var geojson = layer.toGeoJSON();
-
-                        if (geojson.geometry.type !== "LineString") {
-                            alert("Somente linhas são permitidas.");
-                            return;
-                        }
-
-                        var coords = geojson.geometry.coordinates;
-
-                        fetch("salvar_shape.php", {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json"
-                                },
-                                body: JSON.stringify({
-                                    shape_id: shapeId,
-                                    route_id: ROUTE_ID,
-                                    direction_id: 0,
-                                    coords: coords
-                                })
-                            })
-                            .then(res => res.json())
-                            .then(data => {
-
-                                if (data.status === "ok") {
-                                    alert("Trajeto salvo com sucesso!");
-                                } else {
-                                    alert("Erro ao salvar o trajeto");
-                                    console.error(data);
-                                }
-
-                            })
-                            .catch(err => {
-                                alert("Erro de comunicação com o servidor");
-                                console.error(err);
-                            });
-                    }
-
-                    // ===== EVENTOS DO DRAW =====
-                    map.on(L.Draw.Event.CREATED, function(e) {
-                        drawnItems.clearLayers();
-                        drawnItems.addLayer(e.layer);
-                        salvarShape(e.layer);
-                    });
-
-                    map.on(L.Draw.Event.EDITED, function(e) {
-                        e.layers.eachLayer(function(layer) {
-                            salvarShape(layer);
+                        })
+                        .catch(err => {
+                            console.error("Erro ao carregar shape:", err);
                         });
-                    });
 
-                    map.on(L.Draw.Event.DELETED, function() {
-                        drawnItems.clearLayers();
-                    });
+                });
 
-                    // ===== BOTÃO SALVAR (regrava shape desenhado) =====
-                    document.getElementById("btnSalvar").addEventListener("click", function() {
-                        if (drawnItems.getLayers().length === 0) {
-                            alert("Desenhe um trajeto no mapa antes de salvar.");
-                            return;
-                        }
-                        salvarShape(drawnItems.getLayers()[0]);
-                    });
+                // Definição de palheta para as cores do traçado
+                const SHAPE_COLORS = [
+                    "#0066ff", // azul
+                    "#ff0000", // vermelho
+                    "#00aa00", // verde
+                    "#800080", // roxo
+                    "#ff9900", // laranja
+                    "#ffff00", // amarelo
+                    "#8a2be2" // violeta
+                ];
 
-                    // correção visual quando layout carrega
-                    setTimeout(() => {
-                        map.invalidateSize();
-                    }, 300);
-                </script>
+                // Carregar shape salvo
+                function carregarShape() {
 
-                <!-- Script para carregar select Shape -->
-                <script>
-                    function carregarSelectShapes() {
+                    fetch("get_shape.php?route_id=" + ROUTE_ID)
+                        .then(res => res.json())
+                        .then(shapes => {
 
-                        fetch("get_shapes_route.php?route_id=" + ROUTE_ID)
-                            .then(res => res.json())
-                            .then(shapes => {
+                            if (!shapes || Object.keys(shapes).length === 0) return;
 
-                                const select = document.getElementById("trip-select");
-                                select.innerHTML = '<option value="">Selecione</option>';
+                            drawnItems.clearLayers();
 
-                                shapes.forEach(shapeId => {
-                                    const opt = document.createElement("option");
-                                    opt.value = shapeId;
-                                    opt.textContent = shapeId;
-                                    select.appendChild(opt);
-                                });
+                            let bounds = [];
+                            let colorIndex = 0;
 
-                            })
-                            .catch(err => {
-                                console.error("Erro ao carregar shapes:", err);
-                            });
-                    }
-                </script>
+                            Object.keys(shapes).forEach(shapeId => {
 
-                <!-- Script para o botão novo -->
-                <script>
-                    document.getElementById("btnNovo").addEventListener("click", function(e) {
+                                const color = SHAPE_COLORS[colorIndex % SHAPE_COLORS.length];
 
-                        e.preventDefault(); // evita abrir nova aba
-
-                        modoNovo = true;
-
-                        // limpa mapa
-                        drawnItems.clearLayers();
-
-                        // limpa código
-                        document.getElementById("id-trip-traj").value = "";
-
-                        // carrega shapes para copiar
-                        carregarSelectShapes();
-
-                        alert("Modo novo trajeto ativado. Selecione um trajeto para copiar ou desenhe um novo.");
-
-                    });
-                </script>
-
-                <!-- Script para selecionar um shape e carregar no mapa -->
-                <script>
-                    document.getElementById("trip-select").addEventListener("change", function() {
-
-                        const shapeId = this.value;
-
-                        if (!shapeId) return;
-
-                        fetch("get_shape_by_id.php?shape_id=" + shapeId)
-                            .then(res => res.json())
-                            .then(coords => {
-
-                                drawnItems.clearLayers();
-
-                                const polyline = L.polyline(coords, {
-                                    color: "#0000ff", // mantém padrão
+                                const polyline = L.polyline(shapes[shapeId], {
+                                    color: color,
                                     weight: 5,
-                                    opacity: 0.8
+                                    opacity: 0.85
                                 });
+
+                                polyline.bindTooltip(
+                                    "Trajeto: " + shapeId, {
+                                        sticky: true
+                                    }
+                                );
 
                                 drawnItems.addLayer(polyline);
-                                map.fitBounds(polyline.getBounds());
+                                bounds.push(...polyline.getLatLngs());
 
-                            })
-                            .catch(err => {
-                                console.error("Erro ao carregar shape:", err);
+                                colorIndex++;
                             });
 
+                            if (bounds.length > 0) {
+                                map.fitBounds(bounds);
+                            }
+                        })
+                        .catch(err => {
+                            console.error("Erro ao carregar shapes:", err);
+                        });
+                }
+
+                // ===== SALVAR SHAPE =====
+                function salvarShape(layer) {
+
+                    var shapeId = document.getElementById("id-trip-traj").value.trim();
+
+                    if (!shapeId) {
+                        alert("Informe o código do trajeto antes de desenhar.");
+                        return;
+                    }
+
+                    var geojson = layer.toGeoJSON();
+
+                    if (geojson.geometry.type !== "LineString") {
+                        alert("Somente linhas são permitidas.");
+                        return;
+                    }
+
+                    var coords = geojson.geometry.coordinates;
+
+                    fetch("salvar_shape.php", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                shape_id: shapeId,
+                                route_id: ROUTE_ID,
+                                direction_id: 0,
+                                coords: coords
+                            })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+
+                            if (data.status === "ok") {
+                                alert("Trajeto salvo com sucesso!");
+                            } else {
+                                alert("Erro ao salvar o trajeto");
+                                console.error(data);
+                            }
+
+                        })
+                        .catch(err => {
+                            alert("Erro de comunicação com o servidor");
+                            console.error(err);
+                        });
+                }
+
+                // ===== EVENTOS DO DRAW =====
+                map.on(L.Draw.Event.CREATED, function(e) {
+                    drawnItems.clearLayers();
+                    drawnItems.addLayer(e.layer);
+                    salvarShape(e.layer);
+                });
+
+                map.on(L.Draw.Event.EDITED, function(e) {
+                    e.layers.eachLayer(function(layer) {
+                        salvarShape(layer);
                     });
-                </script>
+                });
+
+                map.on(L.Draw.Event.DELETED, function() {
+                    drawnItems.clearLayers();
+                });
+
+                // ===== BOTÃO SALVAR (regrava shape desenhado) =====
+                document.getElementById("btnSalvar").addEventListener("click", function() {
+                    if (drawnItems.getLayers().length === 0) {
+                        alert("Desenhe um trajeto no mapa antes de salvar.");
+                        return;
+                    }
+                    salvarShape(drawnItems.getLayers()[0]);
+                });
+
+                // correção visual quando layout carrega
+                setTimeout(() => {
+                    map.invalidateSize();
+                }, 300);
+            </script>
+
+            <!-- Script para carregar select Shape -->
+            <script>
+                function carregarSelectShapes() {
+
+                    fetch("get_shapes_route.php?route_id=" + ROUTE_ID)
+                        .then(res => res.json())
+                        .then(shapes => {
+
+                            const select = document.getElementById("trip-select");
+                            select.innerHTML = '<option value="">Selecione</option>';
+
+                            shapes.forEach(shapeId => {
+                                const opt = document.createElement("option");
+                                opt.value = shapeId;
+                                opt.textContent = shapeId;
+                                select.appendChild(opt);
+                            });
+
+                        })
+                        .catch(err => {
+                            console.error("Erro ao carregar shapes:", err);
+                        });
+                }
+            </script>
+
+            <!-- Script para o botão novo -->
+            <script>
+                document.getElementById("btnNovo").addEventListener("click", function(e) {
+
+                    e.preventDefault(); // evita abrir nova aba
+
+                    modoNovo = true;
+
+                    // limpa mapa
+                    drawnItems.clearLayers();
+
+                    // limpa código
+                    document.getElementById("id-trip-traj").value = "";
+
+                    // carrega shapes para copiar
+                    carregarSelectShapes();
+
+                    alert("Modo novo trajeto ativado. Selecione um trajeto para copiar ou desenhe um novo.");
+
+                });
+            </script>
+
+            <!-- Script para selecionar um shape e carregar no mapa -->
+            <script>
+                document.getElementById("trip-select").addEventListener("change", function() {
+
+                    const shapeId = this.value;
+
+                    if (!shapeId) return;
+
+                    fetch("get_shape_by_id.php?shape_id=" + shapeId)
+                        .then(res => res.json())
+                        .then(coords => {
+
+                            drawnItems.clearLayers();
+
+                            const polyline = L.polyline(coords, {
+                                color: "#0000ff", // mantém padrão
+                                weight: 5,
+                                opacity: 0.5
+                            });
+
+                            drawnItems.addLayer(polyline);
+                            map.fitBounds(polyline.getBounds());
+
+                        })
+                        .catch(err => {
+                            console.error("Erro ao carregar shape:", err);
+                        });
+
+                });
+            </script>
 
             </section>
         </main>
@@ -404,5 +434,4 @@ include("../connection.php");
     document.getElementById("trip-select").addEventListener("change", function() {
         this.classList.remove("input-destaque");
     });
-
 </script>

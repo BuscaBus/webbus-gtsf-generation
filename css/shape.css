@@ -96,6 +96,18 @@ section{
 
 /* Configurações da página Maps_trips.php */
 
+.body-mptp{
+    margin:0;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+}
+
+.main-mptp{
+    display:flex;
+    flex:1;
+}
+
 .h2-rota {
     margin-bottom: 15px;
     font-size: 20px;
@@ -108,11 +120,15 @@ section{
     background-color: var(--color2); 
     width: 500px;
     height: 580px;
+    flex:0 0 35%;
+    padding: opx;
 }
 
 .sect-reg-map {
     width: 1100px;
-    height: 580px;    
+    height: 580px; 
+    flex:0 0 65%;
+    padding: 0px;      
 }
 
 .p-estilo {
@@ -225,35 +241,41 @@ section{
 
 /* Configurações da página shape_stops.php */
 
+.body-shst{
+    margin:0;
+    font-family:Arial;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+}
+
+.main-shst{
+    display:flex;
+    flex:1;
+}
+
 .sect-tab-traj {
     text-align: center;
     background-color: var(--color2); 
-    width: 700px;
+    width: 100px;
     height: 580px;
+    flex: 0 0 45%;
+    padding: 0px;
 }
 
 .sect-map-seq {
-    width: 900px;
-    height: 580px;    
+    width: 600px;
+    height: 100%;
+    flex:0 0 55%; 
+    padding: 0px;  
 }
 
-.trip-selec{
+.trip-select{
     background-color: #F3F4F0;
     width: 300px;
     border-radius: 5px;
     margin-right: 3px;
     padding: 4px;    
-}
-
-.btn-selec{
-    background-color: var(--color4);
-    color: var(--color0);
-    font-size: 11px;
-    font-weight: bold;
-    padding: 5px 10px 5px 10px;
-    border-radius: 6px;
-    margin-bottom: 15px;
-    cursor: pointer;
 }
 
 .btn-seq-cad{

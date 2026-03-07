@@ -31,7 +31,7 @@ $nomeRota = $route['route_short_name'] . " - " . $route['route_long_name'];
     <title>Mapa das Trips</title>
     <link rel="stylesheet" href="../css/style.css?v=1.2">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
-    <link rel="stylesheet" href="../css/shape.css?v=1.2">
+    <link rel="stylesheet" href="../css/shape.css?v=1.3">
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
@@ -40,19 +40,19 @@ $nomeRota = $route['route_short_name'] . " - " . $route['route_long_name'];
 
     <style>
         #div-map {
-            height: 550px;
-            width: 1000px;
+            height: 100%;
+            width: 100%;
             margin: auto;
         }
     </style>
 </head>
 
-<body>
+<body class="body-mptp">
     <div>
         <header>
             <h1>Trajetos</h1>
         </header>
-        <main>
+        <main class="main-mptp">
             <!-- Section para cadastrar novo trajeto -->
             <section class="sect-reg-traj">
                 <h2 class="h2-rota">
@@ -81,7 +81,7 @@ $nomeRota = $route['route_short_name'] . " - " . $route['route_long_name'];
                 <br><br><br>
                 <p>
                     <button class="btn-seq-par">
-                        <a href="shape_stops.php" class="a-btn-seq-par">SEQUENCIA DE PARADAS</a>
+                        <a href="shape_stops.php?route_id=<?= htmlspecialchars($route_id) ?>" class="a-btn-seq-par"> SEQUENCIA DE PARADAS </a>
                     </button>
                 </p>
                 <br>
