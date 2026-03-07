@@ -55,7 +55,7 @@ if (!$route_id) {
                             echo "<option value='$tracado'>$tracado</option>";
                         }
                         ?>
-                    </select>                    
+                    </select>
                 </p>
                 <br>
                 <table>
@@ -113,8 +113,18 @@ if (!$route_id) {
                     attribution: '&copy; OpenStreetMap'
                 }).addTo(map);
 
+                var busIcon = L.icon({
+                    iconUrl: "../img/icon-bus2.png",
+                    iconSize: [15, 15],
+                    iconAnchor: [7, 15],
+                    popupAnchor: [0, -15]
+                });               
+
                 var drawnItems = new L.FeatureGroup();
                 map.addLayer(drawnItems);
+                var stopsLayer = L.layerGroup().addTo(map);
+
+                carregarStops();
 
                 var drawControl = new L.Control.Draw({
                     edit: false,
@@ -123,39 +133,38 @@ if (!$route_id) {
 
                 map.addControl(drawControl);
 
-                // Carregar trajeto somente quando clicar em SELECIONAR
-                document.getElementById("btnSelec").addEventListener("click", function() {
+                // Cria função para carregar os stops
+                function carregarStops() {
 
-                    const shapeId = document.getElementById("trip-select").value;
-
-                    if (!shapeId) {
-                        alert("Selecione um trajeto.");
-                        return;
-                    }
-
-                    fetch("get_shape_by_id.php?shape_id=" + shapeId)
+                    fetch("get_stops.php")
                         .then(res => res.json())
-                        .then(coords => {
+                        .then(stops => {
 
-                            drawnItems.clearLayers();
+                            stopsLayer.clearLayers();
 
-                            const polyline = L.polyline(coords, {
-                                color: "#0000ff",
-                                weight: 5,
-                                opacity: 0.6,
-                                interactive: false
+                            stops.forEach(stop => {
+
+                                const marker = L.marker([stop.lat, stop.lon], {icon: busIcon})
+                                    .bindPopup(
+                                        "<b>" + stop.name + "</b><br>" +
+                                        "Código: " + stop.code
+                                    );
+
+                                stopsLayer.addLayer(marker);
+
                             });
 
-                            drawnItems.addLayer(polyline);
-
-                            map.fitBounds(polyline.getBounds());
+                            // AJUSTA O MAPA PARA MOSTRAR TODOS OS PONTOS
+                            if (stopsLayer.getLayers().length > 0) {
+                                map.fitBounds(stopsLayer.getBounds());
+                            }
 
                         })
                         .catch(err => {
-                            console.error("Erro ao carregar shape:", err);
+                            console.error("Erro ao carregar stops:", err);
                         });
 
-                });
+                }                
 
                 // Definição de palheta para as cores do traçado
                 const SHAPE_COLORS = [
