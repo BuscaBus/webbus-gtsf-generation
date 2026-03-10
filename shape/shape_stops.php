@@ -67,22 +67,7 @@ if (!$route_id) {
                         <th class="th-inter">Intervalo</th>
                         <th class="th-acoes">Ação</th>
                     </thead>
-
-                    <tbody>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td>
-                                <input type="time" name="interval">
-                            </td>
-                            <td>
-                                <form action="delete.php" method="POST">
-                                    <button class="btn-excluir" onclick="return deletar()">EXCLUIR</button>
-                                </form>
-                            </td>
-                        </tr>
-                    </tbody>
+                    <tbody id="tbodyStops"></tbody>
                 </table>
                 <br>
                 <button type="button" id="btnCadastrar" class="btn-seq-cad">CADASTRAR</button>
@@ -115,16 +100,14 @@ if (!$route_id) {
 
                 var busIcon = L.icon({
                     iconUrl: "../img/icon-bus2.png",
-                    iconSize: [15, 15],
-                    iconAnchor: [7, 15],
+                    iconSize: [14, 14],
+                    iconAnchor: [7, 14],
                     popupAnchor: [0, -15]
-                });               
+                });
 
                 var drawnItems = new L.FeatureGroup();
                 map.addLayer(drawnItems);
                 var stopsLayer = L.layerGroup().addTo(map);
-
-                carregarStops();
 
                 var drawControl = new L.Control.Draw({
                     edit: false,
@@ -136,7 +119,15 @@ if (!$route_id) {
                 // Cria função para carregar os stops
                 function carregarStops() {
 
-                    fetch("get_stops.php")
+                    const bounds = map.getBounds();
+
+                    const url = "get_stops.php?" +
+                        "north=" + bounds.getNorth() +
+                        "&south=" + bounds.getSouth() +
+                        "&east=" + bounds.getEast() +
+                        "&west=" + bounds.getWest();
+
+                    fetch(url)
                         .then(res => res.json())
                         .then(stops => {
 
@@ -144,28 +135,77 @@ if (!$route_id) {
 
                             stops.forEach(stop => {
 
-                                const marker = L.marker([stop.lat, stop.lon], {icon: busIcon})
+                                const marker = L.marker([stop.lat, stop.lon], {
+                                        icon: busIcon
+                                    })
                                     .bindPopup(
                                         "<b>" + stop.name + "</b><br>" +
                                         "Código: " + stop.code
                                     );
 
+                                marker.stopData = stop;
+
+                                marker.on("contextmenu", function() {
+
+                                    adicionarStopNaTabela(this.stopData);
+
+                                });
+
                                 stopsLayer.addLayer(marker);
 
                             });
 
-                            // AJUSTA O MAPA PARA MOSTRAR TODOS OS PONTOS
-                            if (stopsLayer.getLayers().length > 0) {
-                                map.fitBounds(stopsLayer.getBounds());
-                            }
-
-                        })
-                        .catch(err => {
-                            console.error("Erro ao carregar stops:", err);
                         });
 
-                }                
+                }
 
+                map.on("zoomend", function() {
+
+                    if (map.getZoom() >= 17) {
+                        carregarStops();
+                    } else {
+                        stopsLayer.clearLayers();
+                    }
+
+                });
+
+                map.on("moveend", function() {
+
+                    if (map.getZoom() >= 17) {
+                        carregarStops();
+                    }
+
+                });
+
+                // ===== FUNÇÃO PARA ADICIONAR STOP NA TABELA =====
+                function adicionarStopNaTabela(stop) {
+
+                    const tbody = document.getElementById("tbodyStops");
+
+                    const seq = tbody.rows.length + 1;
+
+                    const novaLinha = document.createElement("tr");
+
+                    novaLinha.innerHTML = `
+                        <td style="display:none">${stop.id}</td>
+                        <td>${seq}</td>
+                        <td>${stop.code}</td>
+                        <td>${stop.name}</td>
+                        <td><input type="time" name="interval[]"></td>
+                        <td>
+                            <button class="btn-excluir" onclick="this.closest('tr').remove()">EXCLUIR</button>
+                        </td>
+                    `;
+
+                    const existe = [...tbody.rows].some(row => row.cells[2].innerText == stop.code);
+
+                    if (existe) {
+                        alert("Este ponto já foi adicionado.");
+                    return;
+                    }
+
+                    tbody.appendChild(novaLinha);
+                }
                 // Definição de palheta para as cores do traçado
                 const SHAPE_COLORS = [
                     "#0066ff", // azul
