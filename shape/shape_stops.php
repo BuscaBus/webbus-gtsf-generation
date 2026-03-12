@@ -2,12 +2,12 @@
 include("../connection.php");
 
 // Trás o route_id da lista de linhas
-$route_id = mysqli_real_escape_string($conexao, $_GET['route_id'] ?? '');
+$route_id = $_GET['route_id'] ?? null;
 
 if (!$route_id) {
     die("Route inválida");
 }
-
+$route_id = mysqli_real_escape_string($conexao, $route_id);
 ?>
 
 <!DOCTYPE html>
@@ -25,6 +25,7 @@ if (!$route_id) {
     <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
     <style>
         #div-map {
@@ -184,6 +185,8 @@ if (!$route_id) {
 
                     const seq = tbody.rows.length + 1;
 
+                    atualizarSequencia();
+
                     const novaLinha = document.createElement("tr");
 
                     novaLinha.innerHTML = `
@@ -193,7 +196,7 @@ if (!$route_id) {
                         <td>${stop.name}</td>
                         <td><input type="time" name="interval[]"></td>
                         <td>
-                            <button class="btn-excluir" onclick="this.closest('tr').remove()">EXCLUIR</button>
+                            <button class="btn-excluir" onclick="removerLinha(this)">EXCLUIR</button>
                         </td>
                     `;
 
@@ -201,11 +204,84 @@ if (!$route_id) {
 
                     if (existe) {
                         alert("Este ponto já foi adicionado.");
-                    return;
+                        return;
                     }
 
                     tbody.appendChild(novaLinha);
                 }
+
+                // Função para reorganizar sequência 
+                function atualizarSequencia() {
+
+                    const linhas = document.querySelectorAll("#tbodyStops tr");
+
+                    linhas.forEach((row, index) => {
+                        row.cells[1].innerText = index + 1;
+                    });
+
+                }
+
+                // Função para ativar o arrastar linhas da tabela
+                new Sortable(document.getElementById("tbodyStops"), {
+
+                    animation: 150,
+
+                    onEnd: function() {
+                        atualizarSequencia();
+                    }
+
+                });
+
+                // Função para remover linha atulizar sequencia
+                function removerLinha(btn) {
+
+                    btn.closest("tr").remove();
+
+                    atualizarSequencia();
+
+                }
+
+                // Função para carregar os pontos na tabela vindos do banco de dados 
+                function carregarStopsTabela(shapeId) {
+
+                    fetch("get_stops_sequence.php?shape_id=" + shapeId)
+                        .then(res => res.json())
+                        .then(stops => {
+
+                            const tbody = document.getElementById("tbodyStops");
+
+                            tbody.innerHTML = "";
+
+                            stops.forEach(stop => {
+
+                                const tr = document.createElement("tr");
+
+                                tr.innerHTML = `
+                <td style="display:none">${stop.stop_id}</td>
+                <td>${stop.seq}</td>
+                <td>${stop.codigo}</td>
+                <td>${stop.ponto}</td>
+                <td>
+                    <input type="time" value="${stop.intervalo ?? ''}">
+                </td>
+                <td>
+                    <button class="btn-excluir" onclick="removerLinha(this)">EXCLUIR</button>
+                </td>
+            `;
+
+                                tbody.appendChild(tr);
+
+                            });
+
+                            atualizarSequencia();
+
+                        })
+                        .catch(err => {
+                            console.error("Erro ao carregar stops:", err);
+                        });
+
+                }
+
                 // Definição de palheta para as cores do traçado
                 const SHAPE_COLORS = [
                     "#0066ff", // azul
@@ -397,6 +473,8 @@ if (!$route_id) {
 
                     if (!shapeId) return;
 
+                    carregarStopsTabela(shapeId);
+
                     fetch("get_shape_by_id.php?shape_id=" + shapeId)
                         .then(res => res.json())
                         .then(coords => {
@@ -404,7 +482,7 @@ if (!$route_id) {
                             drawnItems.clearLayers();
 
                             const polyline = L.polyline(coords, {
-                                color: "#0000ff", // mantém padrão
+                                color: "#0000ff",
                                 weight: 5,
                                 opacity: 0.5
                             });
@@ -427,6 +505,72 @@ if (!$route_id) {
             <p><a href="../route/list.php">Voltar</a></p>
         </footer>
     </div>
+
+    <!-- Script para o botão cadastrar -->
+    <script>
+        document.getElementById("btnCadastrar").addEventListener("click", function() {
+
+            const tbody = document.getElementById("tbodyStops");
+            const linhas = tbody.querySelectorAll("tr");
+
+            if (linhas.length === 0) {
+                alert("Adicione pelo menos um ponto.");
+                return;
+            }
+
+            const shape_id = document.getElementById("trip-select").value;
+
+            if (!shape_id) {
+                alert("Selecione um trajeto (shape).");
+                return;
+            }
+
+            let dados = [];
+
+            linhas.forEach((row, index) => {
+
+                const stop_id = row.cells[0].innerText;
+                const seq = row.cells[1].innerText;
+                const codigo = row.cells[2].innerText;
+                const ponto = row.cells[3].innerText;
+                const intervalo = row.querySelector("input").value;
+
+                dados.push({
+                    stop_id: stop_id,
+                    seq: seq,
+                    codigo: codigo,
+                    ponto: ponto,
+                    intervalo: intervalo,
+                    shape_id: shape_id
+                });
+
+            });
+
+            fetch("salvar_sequencia.php", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(dados)
+                })
+                .then(res => res.json())
+                .then(resp => {
+
+                    if (resp.status === "ok") {
+                        alert("Sequência salva com sucesso!");
+                        location.reload();
+                    } else {
+                        alert("Erro ao salvar.");
+                    }
+
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Erro no servidor.");
+                });
+
+        });
+    </script>
 </body>
 
 </html>

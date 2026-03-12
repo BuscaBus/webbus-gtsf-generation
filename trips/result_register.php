@@ -7,6 +7,7 @@
     $origem = $_POST['origem'];
     $destino = $_POST['destino'];
     $sentido = $_POST['sentido'];
+    $hrpartida = $_POST['hora-partida'];
     $partida = $_POST['partida'];
     $tracado = $_POST['tracado'];
     
@@ -17,6 +18,7 @@
                 trip_short_name,
                 trip_headsign,
                 direction_id,
+                departure_time,
                 departure_location, 
                 shape_id               
             ) 
@@ -26,6 +28,7 @@
                 '$origem',
                 '$destino',
                 '$sentido',
+                '$hrpartida',
                 '$partida',  
                 '$tracado'              
             )";

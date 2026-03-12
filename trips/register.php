@@ -40,7 +40,7 @@ $result_id = mysqli_fetch_assoc($result);
     <link rel="shortcut icon" href="../img/logo.ico" type="image/x-icon">
     <link rel="stylesheet" href="../css/style.css?v=1.2">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
-    <link rel="stylesheet" href="../css/trips.css?v=1.6">
+    <link rel="stylesheet" href="../css/trips.css?v=1.8">
 </head>
 
 <body>
@@ -89,6 +89,10 @@ $result_id = mysqli_fetch_assoc($result);
                             <option value="1">Volta</option>
                         </select>
                     </p>
+                    <p class="p-estilo">
+                        <label for="id-hrpart" class="lb-reg-hrpart">Partida:</label>
+                        <input type="time" name="hora-partida" class="inpt-reg-hrpart" id="id-hrpart">
+                    </p>  
                     <p class="p-estilo">
                         <label for="id-orig" class="lb-reg-orig">Origem:</label>
                         <input type="text" name="origem" class="inpt-reg-orig" id="id-org" placeholder="insira a origem da viagem...">
@@ -142,15 +146,12 @@ $result_id = mysqli_fetch_assoc($result);
                     <caption class="cap-list-vig">Relação de viagens</caption>
                     <thead>
                         <th class="th-viag">Viagem</th>
+                        <th class="th-hrpart">Partida</th>
                         <th class="th-sent">Sentido</th>
                         <th class="th-part">Partida</th>
                         <th class="th-acoes">Ações</th>
                     </thead>
-                    <?php
-                    // Serviço padrão: Segunda a Sexta
-                    if (!isset($_GET['servico']) || $_GET['servico'] == "") {
-                        $_GET['servico'] = "Segunda a Sexta";
-                    }
+                    <?php                    
 
                     // Consulta no banco de dados para exibir na tabela de viagens 
                     $filtro_servico = "";
@@ -164,14 +165,16 @@ $result_id = mysqli_fetch_assoc($result);
 
                     $sql = "
                     SELECT 
-                        MIN(trip_id) AS trip_id, route_id, trip_headsign, trip_short_name, direction_id, departure_location,
+                        MIN(trip_id) AS trip_id, route_id, trip_headsign, trip_short_name, departure_time, DATE_FORMAT(departure_time, '%H:%i') AS data_format, direction_id, departure_location,
                         CASE 
                             WHEN direction_id = '0' THEN 'Ida'
                             WHEN direction_id = '1' THEN 'Volta'
                         END AS direction_format
                     FROM trips WHERE route_id = $id $filtro_servico
-                    GROUP BY route_id, trip_headsign, trip_short_name, direction_id, departure_location
-                    ORDER BY direction_id ASC";
+                    GROUP BY 
+                      route_id, trip_headsign, trip_short_name, departure_time, direction_id, departure_location
+                    ORDER BY 
+                      service_id ASC, direction_id ASC, departure_time ASC";
 
                     $result = mysqli_query($conexao, $sql);
 
@@ -186,20 +189,21 @@ $result_id = mysqli_fetch_assoc($result);
                         $id_route  = $sql_result['route_id'];
                         $destino   = $sql_result['trip_headsign'];
                         $origem    = $sql_result['trip_short_name'];
+                        $hrpart    = $sql_result['data_format'];
                         $sentido   = $sql_result['direction_format'];
                         $partida   = $sql_result['departure_location'];
                     ?>
                         <tbody>
                             <tr>
                                 <td><?= $origem ?> - <?= $destino ?></td>
+                                <td><?= $hrpart ?></td>
                                 <td><?= $sentido ?></td>
                                 <td><?= $partida ?></td>
                                 <td>
                                     <form action="delete.php" method="POST">
                                         <input type="hidden" name="id" value="<?= $id_trip ?>">
                                         <input type="hidden" name="id-route" value="<?= $id_route ?>">
-                                        <a href="../stop_times/register.php?id=<?= $id_trip ?>" class="a-horario" id="a-hor">PARTIDAS</a>
-                                        <a href="../stop_times/maps_trips.php?id=<?= $id_trip ?>" class="a-mapa" id="a-traj">MAPA</a>
+                                        <a href="../stop_times/register.php?id=<?= $id_trip ?>" class="a-horario" id="a-hor">HORARIO</a>                                        
                                         <a href="edit.php?id=<?= $id_trip ?>" class="a-editar" id="a-edit">EDITAR</a>
                                         <button class="btn-excluir" onclick="return deletar()">EXCLUIR</button>
                                     </form>
@@ -208,12 +212,7 @@ $result_id = mysqli_fetch_assoc($result);
                         </tbody>
                     <?php } ?>
                 </table>
-                <br>
-                <?php if ($first_trip_id): ?>
-                    <form method="POST">
-                        <a href="../stop_routes/register.php?id=<?= $first_trip_id ?>" class="a-trajeto" id="a-traj">PONTOS DO TRAJETO</a>
-                    </form>
-                <?php endif; ?>
+                <br>                
             </section>
 
         </main>

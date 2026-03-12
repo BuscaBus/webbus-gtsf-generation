@@ -124,6 +124,10 @@ body{
     margin-right: 73px;
 }
 
+.lb-reg-hrpart{
+    margin-right: 73px;
+}
+
 .lb-reg-orig{
     margin-right: 73px;
 }
@@ -180,6 +184,13 @@ body{
 }
 
 .selc-reg-serv{
+    background-color: #F3F4F0;
+    width: 310px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.inpt-reg-hrpart{
     background-color: #F3F4F0;
     width: 310px;
     border-radius: 5px;
@@ -259,7 +270,11 @@ table{
 }
 
 .th-viag{
-    padding-right: 400px;
+    padding-right: 300px;
+}
+
+.th-hrpart{
+    padding-right: 10px;
 }
 
 .th-serv{
@@ -271,11 +286,11 @@ table{
 }
 
 .th-part{
-    padding-right: 65px;
+    padding-right: 130px;
 }
 
 .th-acoes{
-    padding-right: 200px;    
+    padding-right: 145px;    
 }
 
 /*Configurações da tela edit.php*/
