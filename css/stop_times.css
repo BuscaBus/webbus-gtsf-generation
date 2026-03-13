@@ -121,28 +121,8 @@ section{
     margin-right: 70px;
 }
 
-.lb-reg-ponto{
-    margin-right: 80px;
-}
-
-.lb-reg-sequ{
-    margin-right: 45px;
-}
-
-.lb-reg-dest{
-    margin-right: 65px;
-}
-
-.lb-reg-hrInc{
-    margin-right: 45px;
-}
-
-.lb-reg-hrFim{
-    margin-right: 55px;
-}
-
-.lb-reg-tpHr{
-    margin-right: 10px;
+.lb-reg-hrpart{
+    margin-right: 70px;
 }
 
 .inpt-reg-serv{
@@ -159,42 +139,7 @@ section{
     padding: 4px;
 }
 
-.inpt-reg-ponto{
-    background-color: #F3F4F0;
-    width: 310px;
-    border-radius: 5px;
-    padding: 4px;
-}
-
-.inpt-reg-sequ{
-    background-color: #F3F4F0;
-    width: 310px;
-    border-radius: 5px;
-    padding: 4px;
-}
-
-.inpt-reg-dest{
-    background-color: #F3F4F0;
-    width: 310px;
-    border-radius: 5px;
-    padding: 4px;
-}
-
-.inpt-reg-hrInc{
-    background-color: #F3F4F0;
-    width: 310px;
-    border-radius: 5px;
-    padding: 4px;
-}
-
-.inpt-reg-hrFim{
-    background-color: #F3F4F0;
-    width: 310px;
-    border-radius: 5px;
-    padding: 4px;
-}
-
-.selc-reg-tpHr{
+.inpt-reg-hrpart{
     background-color: #F3F4F0;
     width: 310px;
     border-radius: 5px;
@@ -237,16 +182,28 @@ table{
     margin: auto;
 }
 
-.th-hor{
-    padding-right: 20px;
+.th-seq{
+    padding-right: 25px;
 }
 
-.th-destino{
-    padding-right: 250px;
+.th-ponto{
+    padding-right: 300px;
 }
 
-.th-acoes{
-    padding-right: 25px;    
+.th-cheg{
+    padding-right: 15px;    
+}
+
+.th-part{
+    padding-right: 15px;    
+}
+
+.th-inter{
+    padding-right: 15px;    
+}
+
+.th-dest{
+    padding-right: 150px;    
 }
 
 /*Configurações da tabela da página trips.php*/

@@ -8,8 +8,14 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 
 $id = (int) $_GET['id'];
 
+$shape_id = $_GET['shape_id'] ?? null;
+
+if (!$shape_id) {
+    die("Erro: shape_id não informado.");
+}
+
 // Consulta o ID no banco de dados
-$sql = "SELECT route_id, trip_id, service_id, trip_headsign, trip_short_name FROM trips WHERE trip_id = $id";
+$sql = "SELECT route_id, trip_id, service_id, trip_headsign, trip_short_name, departure_time FROM trips WHERE trip_id = $id";
 $result = mysqli_query($conexao, $sql);
 
 // Variavel que recebe o ID do banco de dados    
@@ -37,7 +43,7 @@ $result_id = mysqli_fetch_assoc($result);
     <link rel="shortcut icon" href="../img/logo.ico" type="image/x-icon">
     <link rel="stylesheet" href="../css/style.css?v=1.2">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
-    <link rel="stylesheet" href="../css/stop_times.css?v=1.5">
+    <link rel="stylesheet" href="../css/stop_times.css?v=1.6">
 </head>
 
 <body>
@@ -54,25 +60,17 @@ $result_id = mysqli_fetch_assoc($result);
                     <input type="hidden" name="route_id" class="inpt1" id="id-nome" value="<?= $result_id['route_id'] ?>">
                     <input type="hidden" name="id" class="inpt1" id="id-nome" value="<?= $result_id['trip_id'] ?>">
                     <p class="p-estilo">
+                        <label for="id-viag" class="lb-reg-viag">Viagem:</label>
+                        <input type="text" name="viagem" class="inpt-reg-viag" id="id-viag" value="<?= $result_id['trip_short_name'] ?> - <?= $result_id['trip_headsign'] ?>" disabled>
+                    </p>
+                    <p class="p-estilo">
                         <label for="id-serv" class="lb-reg-serv">Serviço:</label>
                         <input type="text" name="servico" class="inpt-reg-serv" id="id-serv" value="<?= $result_id['service_id'] ?>" disabled>
                     </p>
                     <p class="p-estilo">
-                        <label for="id-viag" class="lb-reg-viag">Viagem:</label>
-                        <input type="text" name="viagem" class="inpt-reg-viag" id="id-viag" value="<?= $result_id['trip_short_name'] ?> - <?= $result_id['trip_headsign'] ?>" disabled>
-                    </p>                    
-                    <p class="p-estilo">
-                        <label for="id-dest" class="lb-reg-dest">Destino:</label>
-                        <input type="text" name="destino" class="inpt-reg-dest" id="id-dest" value="<?= $result_id['trip_headsign'] ?>">
+                        <label for="id-hrpart" class="lb-reg-hrpart">Partida:</label>
+                        <input type="time" name="hora_partida" class="inpt-reg-hrpart" id="id-part" value="<?= $result_id['departure_time'] ?>" disabled>
                     </p>
-                    <p class="p-estilo">
-                        <label for="id-ponto" class="lb-reg-ponto">Ponto:</label>
-                        <input type="text" name="ponto" class="inpt-reg-ponto" id="id-ponto" pattern="\d{5}" minlength="5" maxlength="5" placeholder="insira o código do ponto..." required>
-                    </p>
-                    <p class="p-estilo">
-                        <label for="id-hrInc" class="lb-reg-hrInc">Hora Inicio:</label>
-                        <input type="time" name="hora_inicio" class="inpt-reg-hrInc" id="id-hrInc">
-                    </p>                   
 
                     <br>
                     <nav class="nav-reg-btn">
@@ -92,47 +90,104 @@ $result_id = mysqli_fetch_assoc($result);
             <section class="sect-list-hor">
                 <br>
                 <table>
-                    <h3>Viagem:  <?= $result_id['trip_short_name'] ?> - <?= $result_id['trip_headsign'] ?> </h3>
+                    <h3>Viagem: <?= $result_id['trip_short_name'] ?> - <?= $result_id['trip_headsign'] ?> </h3>
                     <br>
+                    <button type="button" onclick="gerarHorarios()">GERAR HORÁRIOS</button>
+                    <br> <br>
                     <hr>
                     <br>
                     <thead>
-                        <th class="th-hor">Horário</th>
-                        <th class="th-destino">Destino</th>                        
-                        <th class="th-acoes">Ações</th>
+                        <th class="th-seq">Seq.</th>
+                        <th class="th-ponto">Ponto</th>
+                        <th class="th-cheg">Chegada</th>
+                        <th class="th-part">Partida</th>
+                        <th class="th-inter">Intervalo</th>
+                        <th class="th-dest">Destino</th>
                     </thead>
                     <?php
                     // Consulta no banco de dados para exibir na tabela de viagens 
-                    $sql = "SELECT time_id, trip_id, TIME_FORMAT(arrival_time, '%H:%i') AS arrival_time, stop_headsign
-                            FROM stop_times WHERE trip_id = $id ORDER BY arrival_time ASC";
+                    $sql = "SELECT ss.seq, ss.stop_id, ss.intervalo, s.stop_name
+                            FROM shape_stops ss
+                            JOIN stops s ON s.stop_id = ss.stop_id
+                            WHERE ss.shape_id = '$shape_id'
+                            ORDER BY ss.seq ASC";
                     $result = mysqli_query($conexao, $sql);
 
                     while ($sql_result = mysqli_fetch_array($result)) {
-                        $id = $sql_result['time_id'];
-                        $trip_id = $sql_result['trip_id'];
-                        $hr_inicio = $sql_result['arrival_time'];
-                        $destino = $sql_result['stop_headsign'];                                               
+                        $seq = $sql_result['seq'];
+                        $ponto = $sql_result['stop_id'];
+                        $stop_name = $sql_result['stop_name'];
+                        $intervalo = $sql_result['intervalo'];
                     ?>
                         <tbody>
                             <tr>
-                                <td><?php echo $hr_inicio ?></td>
-                                <td><?php echo $destino ?></td>                                                                
-                                <td>
-                                    <form action="delete.php" method="POST">
-                                        <input type="hidden" name="id" value="<?php echo $id ?>">  
-                                        <input type="hidden" name="trip-id" value="<?php echo $trip_id ?>">                                       
-                                        <button class="btn-excluir" onclick="return deletar()">EXCLUIR</button>
-                                    </form>
-                                </td>
+                                <td><?php echo $seq ?></td>
+                                <td><?php echo $stop_name ?></td>
+                                <td><input type="time" name="" class="chegada"></td>
+                                <td><input type="time" name="" class="partida"></td>
+                                <td><input type="time" name="intervalo[]" class="intervalo" value="<?= $intervalo ?>"></td>
+                                <td><input type="input" name=""></td>
                             </tr>
                         <?php }; ?>
+
+                        <!-- Script para calcular horários automaticamente -->
+                        <script>
+                            function gerarHorarios() {
+
+                                let partidaInicial = document.getElementById("id-part").value;
+
+                                if (!partidaInicial) {
+                                    alert("Informe o horário de partida da viagem.");
+                                    return;
+                                }
+
+                                let linhas = document.querySelectorAll("tbody tr");
+
+                                let horaAtual = partidaInicial;
+
+                                linhas.forEach((linha, index) => {
+
+                                    let chegada = linha.querySelector(".chegada");
+                                    let partida = linha.querySelector(".partida");
+                                    let intervalo = linha.querySelector(".intervalo");
+
+                                    if (index == 0) {
+
+                                        chegada.value = horaAtual;
+                                        partida.value = horaAtual;
+
+                                    } else {
+
+                                        let partes = horaAtual.split(":");
+                                        let minutos = (parseInt(partes[0]) * 60) + parseInt(partes[1]);
+
+                                        let intPart = intervalo.value.split(":");
+                                        let intervaloMin = (parseInt(intPart[0]) * 60) + parseInt(intPart[1]);
+
+                                        minutos += intervaloMin;
+
+                                        let novaHora = Math.floor(minutos / 60).toString().padStart(2, "0");
+                                        let novoMin = (minutos % 60).toString().padStart(2, "0");
+
+                                        horaAtual = novaHora + ":" + novoMin;
+
+                                        chegada.value = horaAtual;
+                                        partida.value = horaAtual;
+
+                                    }
+
+                                });
+
+                            }
+                        </script>
                         </tbody>
                 </table>
             </section>
 
         </main>
         <footer>
-            <p><a href="../trips/register.php?id=<?= $result_id['route_id'] ?>"> < Voltar</a>
+            <p><a href="../trips/register.php?id=<?= $result_id['route_id'] ?>">
+                    < Voltar</a>
             </p>
         </footer>
     </div>

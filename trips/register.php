@@ -40,7 +40,7 @@ $result_id = mysqli_fetch_assoc($result);
     <link rel="shortcut icon" href="../img/logo.ico" type="image/x-icon">
     <link rel="stylesheet" href="../css/style.css?v=1.2">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
-    <link rel="stylesheet" href="../css/trips.css?v=1.8">
+    <link rel="stylesheet" href="../css/trips.css?v=1.9">
 </head>
 
 <body>
@@ -92,7 +92,7 @@ $result_id = mysqli_fetch_assoc($result);
                     <p class="p-estilo">
                         <label for="id-hrpart" class="lb-reg-hrpart">Partida:</label>
                         <input type="time" name="hora-partida" class="inpt-reg-hrpart" id="id-hrpart">
-                    </p>  
+                    </p>
                     <p class="p-estilo">
                         <label for="id-orig" class="lb-reg-orig">Origem:</label>
                         <input type="text" name="origem" class="inpt-reg-orig" id="id-org" placeholder="insira a origem da viagem...">
@@ -141,6 +141,28 @@ $result_id = mysqli_fetch_assoc($result);
                 <table>
                     <form method="GET">
                         <input type="hidden" name="id" value="<?= $id ?>">
+
+                        <select name="servico" class="selc-serv" id="id-serv">                            
+
+                            <?php
+                            $sql_servicos = "SELECT DISTINCT service_id FROM trips WHERE route_id = $id 
+                                             ORDER BY service_id";
+
+                            $result_servicos = mysqli_query($conexao, $sql_servicos);
+
+                            while ($row = mysqli_fetch_assoc($result_servicos)) {
+
+                                $serv = $row['service_id'];
+
+                                $selected = ($servicoSelecionado == $serv) ? "selected" : "";
+
+                                echo "<option value='$serv' $selected>$serv</option>";
+                            }
+                            ?>
+
+                        </select>
+                        <button type="submit" class="btn-pesq-serv">FILTRAR</button>
+
                     </form>
 
                     <caption class="cap-list-vig">Relação de viagens</caption>
@@ -151,21 +173,23 @@ $result_id = mysqli_fetch_assoc($result);
                         <th class="th-part">Partida</th>
                         <th class="th-acoes">Ações</th>
                     </thead>
-                    <?php                    
+                    <?php
 
                     // Consulta no banco de dados para exibir na tabela de viagens 
                     $filtro_servico = "";
 
                     $filtro_servico = "";
 
-                    if ($servicoSelecionado != "Todas") {
+                    if (!empty($servicoSelecionado) && $servicoSelecionado != "Todas") {
+
                         $servico = mysqli_real_escape_string($conexao, $servicoSelecionado);
+
                         $filtro_servico = "AND service_id = '$servico'";
                     }
 
                     $sql = "
                     SELECT 
-                        MIN(trip_id) AS trip_id, route_id, trip_headsign, trip_short_name, departure_time, DATE_FORMAT(departure_time, '%H:%i') AS data_format, direction_id, departure_location,
+                        MIN(trip_id) AS trip_id, route_id, trip_headsign, trip_short_name, departure_time, DATE_FORMAT(departure_time, '%H:%i') AS data_format, direction_id, shape_id, departure_location,
                         CASE 
                             WHEN direction_id = '0' THEN 'Ida'
                             WHEN direction_id = '1' THEN 'Volta'
@@ -192,6 +216,7 @@ $result_id = mysqli_fetch_assoc($result);
                         $hrpart    = $sql_result['data_format'];
                         $sentido   = $sql_result['direction_format'];
                         $partida   = $sql_result['departure_location'];
+                        $shape_id  = $sql_result['shape_id'];
                     ?>
                         <tbody>
                             <tr>
@@ -203,7 +228,7 @@ $result_id = mysqli_fetch_assoc($result);
                                     <form action="delete.php" method="POST">
                                         <input type="hidden" name="id" value="<?= $id_trip ?>">
                                         <input type="hidden" name="id-route" value="<?= $id_route ?>">
-                                        <a href="../stop_times/register.php?id=<?= $id_trip ?>" class="a-horario" id="a-hor">HORARIO</a>                                        
+                                        <a href="../stop_times/register.php?id=<?= $id_trip ?>&shape_id=<?= $shape_id ?>" class="a-horario" id="a-hor">HORARIO</a>
                                         <a href="edit.php?id=<?= $id_trip ?>" class="a-editar" id="a-edit">EDITAR</a>
                                         <button class="btn-excluir" onclick="return deletar()">EXCLUIR</button>
                                     </form>
@@ -212,7 +237,7 @@ $result_id = mysqli_fetch_assoc($result);
                         </tbody>
                     <?php } ?>
                 </table>
-                <br>                
+                <br>
             </section>
 
         </main>
