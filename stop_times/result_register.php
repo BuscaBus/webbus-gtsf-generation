@@ -1,37 +1,32 @@
 <?php
-   include("../connection.php");
+include("../connection.php");
 
-    // Recebe as variaveis
-    $trip_id = $_POST['id'];
-    $hr_inicio = $_POST['hora_inicio'];    
-    $ponto = $_POST['ponto']; 
-    $destino = $_POST['destino'];  
-        
-    // Altera no banco de dados
-    $sql = "INSERT INTO stop_times (
-                trip_id, 
-                stop_code,
-                arrival_time, 
-                stop_headsign                                
-            ) 
-            VALUES (
-                '$trip_id', 
-                '$ponto',
-                '$hr_inicio', 
-                '$destino'                                
-            )";
-            
-    $query = mysqli_query($conexao, $sql);
+$trip_id = $_POST['trip_id'];
+$shape_id = $_POST['shape_id'];
 
-    //if(mysqli_query($conexao, $sql)){
-      //echo "Operadora editada com sucesso";        
-    //}
-    //else{
-      // echo "Erro ao editar".mysqli_connect_error($conexao);
-    //}
+$stop_ids = $_POST['stop_id'];
+$sequencias = $_POST['stop_sequence'];
+$arrivals = $_POST['arrival_time'];
+$departures = $_POST['departure_time'];
+$headsigns = $_POST['stop_headsign'];
 
-    // Redireciona para a página anterior passando o id
-    header("Location: register.php?id=$trip_id");
-    exit;
+$total = count($stop_ids);
 
-?>
+for ($i = 0; $i < $total; $i++) {
+
+    $sql = "INSERT INTO stop_times
+    (trip_id, arrival_time, departure_time, stop_id, stop_sequence, stop_headsign)
+    VALUES (
+        '{$trip_id}',
+        '{$arrivals[$i]}',
+        '{$departures[$i]}',
+        '{$stop_ids[$i]}',
+        '{$sequencias[$i]}',
+        '{$headsigns[$i]}'
+    )";
+
+    mysqli_query($conexao, $sql);
+}
+
+header("Location: register.php?id=".$trip_id."&shape_id=".$shape_id."&success=1");
+exit;

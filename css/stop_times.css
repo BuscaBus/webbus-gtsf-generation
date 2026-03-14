@@ -206,6 +206,16 @@ table{
     padding-right: 150px;    
 }
 
+.btn-gerHor{
+    background-color: var(--color4);
+    color: var(--color0);
+    font-weight: bold;
+    border-radius: 6px;
+    margin-right: 5px;
+    padding: 3px 15px 3px 15px;
+    cursor: pointer;
+}
+
 /*Configurações da tabela da página trips.php*/
 
 h3{

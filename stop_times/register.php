@@ -23,6 +23,12 @@ $result_id = mysqli_fetch_assoc($result);
 
 ?>
 
+<?php
+if (isset($_GET['success'])) {
+    echo "<script>alert('Horários cadastrados com sucesso!');</script>";
+}
+?>
+
 <!--Script para confirmar a exclusão-->
 <script>
     function deletar() {
@@ -43,7 +49,7 @@ $result_id = mysqli_fetch_assoc($result);
     <link rel="shortcut icon" href="../img/logo.ico" type="image/x-icon">
     <link rel="stylesheet" href="../css/style.css?v=1.2">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
-    <link rel="stylesheet" href="../css/stop_times.css?v=1.6">
+    <link rel="stylesheet" href="../css/stop_times.css?v=1.8">
 </head>
 
 <body>
@@ -58,7 +64,8 @@ $result_id = mysqli_fetch_assoc($result);
                 <br>
                 <form action="result_register.php" method="POST" autocomplete="off" class="form-cad-vig">
                     <input type="hidden" name="route_id" class="inpt1" id="id-nome" value="<?= $result_id['route_id'] ?>">
-                    <input type="hidden" name="id" class="inpt1" id="id-nome" value="<?= $result_id['trip_id'] ?>">
+                    <input type="hidden" name="trip_id" class="inpt1" id="id-nome" value="<?= $result_id['trip_id'] ?>">
+                    <input type="hidden" name="shape_id" value="<?= $shape_id ?>">
                     <p class="p-estilo">
                         <label for="id-viag" class="lb-reg-viag">Viagem:</label>
                         <input type="text" name="viagem" class="inpt-reg-viag" id="id-viag" value="<?= $result_id['trip_short_name'] ?> - <?= $result_id['trip_headsign'] ?>" disabled>
@@ -83,19 +90,15 @@ $result_id = mysqli_fetch_assoc($result);
                             </button>
                         </p>
                     </nav>
-                </form>
+
             </section>
 
             <!-- Section para listar os horários -->
             <section class="sect-list-hor">
                 <br>
+                <button type="button" class="btn-gerHor" onclick="gerarHorarios()">GERAR HORÁRIOS</button>
                 <table>
-                    <h3>Viagem: <?= $result_id['trip_short_name'] ?> - <?= $result_id['trip_headsign'] ?> </h3>
-                    <br>
-                    <button type="button" onclick="gerarHorarios()">GERAR HORÁRIOS</button>
-                    <br> <br>
-                    <hr>
-                    <br>
+                    <br><br>
                     <thead>
                         <th class="th-seq">Seq.</th>
                         <th class="th-ponto">Ponto</th>
@@ -121,12 +124,31 @@ $result_id = mysqli_fetch_assoc($result);
                     ?>
                         <tbody>
                             <tr>
-                                <td><?php echo $seq ?></td>
-                                <td><?php echo $stop_name ?></td>
-                                <td><input type="time" name="" class="chegada"></td>
-                                <td><input type="time" name="" class="partida"></td>
-                                <td><input type="time" name="intervalo[]" class="intervalo" value="<?= $intervalo ?>"></td>
-                                <td><input type="input" name=""></td>
+                                <td>
+                                    <?= $sql_result['seq'] ?>
+                                    <input type="hidden" name="stop_sequence[]" value="<?= $sql_result['seq'] ?>">
+                                </td>
+
+                                <td>
+                                    <?= $sql_result['stop_name'] ?>
+                                    <input type="hidden" name="stop_id[]" value="<?= $sql_result['stop_id'] ?>">
+                                </td>
+
+                                <td>
+                                    <input type="time" name="arrival_time[]" class="chegada">
+                                </td>
+
+                                <td>
+                                    <input type="time" name="departure_time[]" class="partida">
+                                </td>
+
+                                <td>
+                                    <input type="time" name="intervalo[]" class="intervalo" value="<?= $sql_result['intervalo'] ?>">
+                                </td>
+
+                                <td>
+                                    <input type="text" name="stop_headsign[]" class="headsign">
+                                </td>
                             </tr>
                         <?php }; ?>
 
@@ -182,6 +204,7 @@ $result_id = mysqli_fetch_assoc($result);
                         </script>
                         </tbody>
                 </table>
+                </form>
             </section>
 
         </main>
@@ -191,6 +214,42 @@ $result_id = mysqli_fetch_assoc($result);
             </p>
         </footer>
     </div>
+    <!-- Script para preenchimento dos campos automaticamente -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            const campos = document.querySelectorAll(".headsign");
+
+            campos.forEach((campo, index) => {
+
+                campo.addEventListener("change", function() {
+
+                    // Só pergunta se for o primeiro campo
+                    if (index !== 0) return;
+
+                    let destino = campo.value.trim();
+
+                    if (destino === "") return;
+
+                    if (confirm("Deseja preencher os demais destinos com \"" + destino + "\" ?")) {
+
+                        campos.forEach((c, i) => {
+
+                            if (i > 0) {
+                                c.value = destino;
+                            }
+
+                        });
+
+                    }
+
+                });
+
+            });
+
+        });
+    </script>
+    
 </body>
 
 </html>

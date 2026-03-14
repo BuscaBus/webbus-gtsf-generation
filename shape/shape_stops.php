@@ -235,9 +235,44 @@ $route_id = mysqli_real_escape_string($conexao, $route_id);
                 // Função para remover linha atulizar sequencia
                 function removerLinha(btn) {
 
-                    btn.closest("tr").remove();
+                    const row = btn.closest("tr");
 
-                    atualizarSequencia();
+                    const id = row.cells[0].innerText;
+
+                    if (!confirm("Deseja excluir este ponto?")) return;
+
+                    fetch("delete_shape_stop.php", {
+
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                id: id
+                            })
+
+                        })
+                        .then(res => res.json())
+                        .then(resp => {
+
+                            if (resp.status === "ok") {
+
+                                row.remove();
+                                atualizarSequencia();
+
+                            } else {
+
+                                alert("Erro ao excluir.");
+
+                            }
+
+                        })
+                        .catch(err => {
+
+                            console.error(err);
+                            alert("Erro no servidor.");
+
+                        });
 
                 }
 
@@ -257,6 +292,7 @@ $route_id = mysqli_real_escape_string($conexao, $route_id);
                                 const tr = document.createElement("tr");
 
                                 tr.innerHTML = `
+                <td style="display:none">${stop.id}</td>
                 <td style="display:none">${stop.stop_id}</td>
                 <td>${stop.seq}</td>
                 <td>${stop.codigo}</td>

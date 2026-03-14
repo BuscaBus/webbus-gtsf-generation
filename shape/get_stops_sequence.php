@@ -12,6 +12,7 @@ if(!$shape_id){
 $shape_id = mysqli_real_escape_string($conexao,$shape_id);
 
 $sql = "SELECT 
+            Id as id,
             seq,
             stop_id,
             codigo,
