@@ -203,8 +203,14 @@ table{
 }
 
 .th-dest{
-    padding-right: 150px;    
+    padding-right: 200px;    
 }
+
+.headsign{    
+    width: 250px;
+    padding: 2px;
+}
+ 
 
 .btn-gerHor{
     background-color: var(--color4);

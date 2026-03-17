@@ -8,6 +8,19 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 
 $id = (int) $_GET['id'];
 
+// Buscar horários já cadastrados
+$sql_stop_times = "SELECT stop_id, arrival_time, departure_time, stop_headsign 
+                   FROM stop_times 
+                   WHERE trip_id = $id";
+
+$result_stop_times = mysqli_query($conexao, $sql_stop_times);
+
+$horarios = [];
+
+while ($row = mysqli_fetch_assoc($result_stop_times)) {
+    $horarios[$row['stop_id']] = $row;
+}
+
 $shape_id = $_GET['shape_id'] ?? null;
 
 if (!$shape_id) {
@@ -49,7 +62,7 @@ if (isset($_GET['success'])) {
     <link rel="shortcut icon" href="../img/logo.ico" type="image/x-icon">
     <link rel="stylesheet" href="../css/style.css?v=1.2">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
-    <link rel="stylesheet" href="../css/stop_times.css?v=1.8">
+    <link rel="stylesheet" href="../css/stop_times.css?v=1.9">
 </head>
 
 <body>
@@ -80,16 +93,7 @@ if (isset($_GET['success'])) {
                     </p>
 
                     <br>
-                    <nav class="nav-reg-btn">
-                        <p>
-                            <button class="btn-reg-cad">CADASTRAR</button>
-                        </p>
-                        <p>
-                            <button class="btn-reg-canc">
-                                <a href="../trips/register.php?id=<?= $result_id['route_id'] ?>" class="a-btn-canc">CANCELAR</a>
-                            </button>
-                        </p>
-                    </nav>
+                    
 
             </section>
 
@@ -121,8 +125,14 @@ if (isset($_GET['success'])) {
                         $ponto = $sql_result['stop_id'];
                         $stop_name = $sql_result['stop_name'];
                         $intervalo = $sql_result['intervalo'];
+
+                        $stop_id = $sql_result['stop_id'];
+
+                        $arrival = $horarios[$stop_id]['arrival_time'] ?? '';
+                        $departure = $horarios[$stop_id]['departure_time'] ?? '';
+                        $headsign = $horarios[$stop_id]['stop_headsign'] ?? '';
                     ?>
-                        <tbody>
+                        <tbody>                            
                             <tr>
                                 <td>
                                     <?= $sql_result['seq'] ?>
@@ -135,22 +145,24 @@ if (isset($_GET['success'])) {
                                 </td>
 
                                 <td>
-                                    <input type="time" name="arrival_time[]" class="chegada">
+                                    <input type="time" name="arrival_time[]" class="chegada" value="<?= $arrival ?>">
                                 </td>
 
                                 <td>
-                                    <input type="time" name="departure_time[]" class="partida">
+                                    <input type="time" name="departure_time[]" class="partida" value="<?= $departure ?>">
                                 </td>
 
                                 <td>
-                                    <input type="time" name="intervalo[]" class="intervalo" value="<?= $sql_result['intervalo'] ?>">
+                                    <input type="time" name="intervalo[]" class="intervalo" value="<?= $sql_result['intervalo'] ?>" disabled>
                                 </td>
 
                                 <td>
-                                    <input type="text" name="stop_headsign[]" class="headsign">
+                                    <input type="text" name="stop_headsign[]" class="headsign" value="<?= $headsign ?>">
                                 </td>
                             </tr>
                         <?php }; ?>
+
+                       
 
                         <!-- Script para calcular horários automaticamente -->
                         <script>
@@ -204,6 +216,12 @@ if (isset($_GET['success'])) {
                         </script>
                         </tbody>
                 </table>
+                <br>    
+                 <nav class="nav-reg-btn">
+                    <p>
+                        <button class="btn-reg-cad">SALVAR</button>
+                    </p>                    
+                </nav>                
                 </form>
             </section>
 
@@ -231,7 +249,7 @@ if (isset($_GET['success'])) {
 
                     if (destino === "") return;
 
-                    if (confirm("Deseja preencher os demais destinos com \"" + destino + "\" ?")) {
+                    if (confirm("Deseja preencher os demais destinos como \"" + destino + "\" ?")) {
 
                         campos.forEach((c, i) => {
 

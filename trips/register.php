@@ -23,7 +23,7 @@ $result_id = mysqli_fetch_assoc($result);
 <!--Script para confirmar a exclusão-->
 <script>
     function deletar() {
-        if (confirm("Deseja exluir esse item?"))
+        if (confirm("Deseja exluir essa viagem?"))
             document.forms[0].submit();
         else
             return false
