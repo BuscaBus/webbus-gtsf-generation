@@ -9,11 +9,11 @@ include("../connection.php");
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de linhas</title>
-    <link rel="stylesheet" href="../css/route.css?v=2.0">
+    <link rel="stylesheet" href="../css/route.css?v=2.1">
 </head>
 
 <body>
-    <section class="scroll-area-reg">
+    <section>
         <h1>Cadastrar linha</h1>
         <form action="result_register.php" method="POST" autocomplete="off">
             <hr>
@@ -44,7 +44,7 @@ include("../connection.php");
             <p class="p-estilo">
                 <label for="id-desc" class="lb-reg-desc">Descrição:</label>
                 <textarea name="descricao" id="id-desc" class="txt-reg-desc" placeholder="insira uma descrição..."></textarea>
-            </p>            
+            </p>
             <p class="p-estilo">
                 <label for="id-tipo" class="lb-reg-tipo">Tipo:</label>
                 <select name="tipo" class="selc-reg-tipo" id="id-tipo" required>
@@ -52,16 +52,15 @@ include("../connection.php");
                     <option value="0">Bonde, VLT</option>
                     <option value="1">Metrô</option>
                     <option value="2">Trem</option>
-                    <option value="3">Ônibus</option>                    
-                </select> 
-            </p>             
-            <p class="p-estilo">
-                <label for="id-cor" class="lb-reg-cor">Cor da linha:</label>
-                <input type="color" name="cor-linha"  class="inpt-reg-cor" id="id-cor-linha">              
+                    <option value="3">Ônibus</option>
+                </select>
             </p>
             <p class="p-estilo">
-                <label for="id-cor" class="lb-reg-cor">Cor do texto:</label>
-                <input type="color" name="cor-texto"  class="inpt-reg-cor" id="id-cor-texto" value="#FFFFFF">              
+                <label for="id-cor" class="lb-reg-cor-linha">Cor da linha:</label>
+                <input type="color" name="cor-linha" class="inpt-reg-cor" id="id-cor-linha">
+            
+                <label for="id-cor" class="lb-reg-cor-texto">Cor do texto:</label>
+                <input type="color" name="cor-texto" class="inpt-reg-cor" id="id-cor-texto" value="#FFFFFF">
             </p>
             <p class="p-estilo">
                 <label for="id-ordem" class="lb-reg-ordem">Ordem:</label>
@@ -70,15 +69,37 @@ include("../connection.php");
             <p class="p-estilo">
                 <label for="id-grupo" class="lb-reg-grupo">Grupo:</label>
                 <input type="text" name="grupo" class="inpt-reg-grupo" id="id-grupo" placeholder="insira o grupo da linha...">
-            </p>            
-            <hr>            
+            </p>
+            <p class="p-estilo">
+                <label for="id-tarifa" class="lb-reg-tarifa">Tarifa:</label>
+                <select name="fare_id" id="id-tarifa" class="selc-reg-tarifa">
+                    <option value="">Selecione uma tarifa</option>
+                    <?php
+                    $sql_tarifa = "SELECT fare_id, price, currency_type 
+                       FROM fare_attributes 
+                       ORDER BY price ASC";
+
+                    $result_tarifa = mysqli_query($conexao, $sql_tarifa);
+
+                    while ($tarifa = mysqli_fetch_array($result_tarifa)) {
+
+                        $fare_id = $tarifa['fare_id'];
+                        $valor = number_format($tarifa['price'], 2, ',', '.');
+                        $moeda = $tarifa['currency_type'];
+
+                        echo "<option value='$fare_id'>$fare_id - R$ $valor</option>";
+                    }
+                    ?>
+                </select>
+            </p>
+            <hr>
             <nav class="nav-reg-btn">
                 <p>
                     <Button type="submit" class="btn-reg-cad">CADASTRAR</Button>
                 </p>
                 <p>
                     <Button class="btn-reg-canc">
-                        <a href="list.php" class="a-btn-canc">CANCELAR</a> 
+                        <a href="list.php" class="a-btn-canc">CANCELAR</a>
                     </Button>
                 </p>
             </nav>
@@ -89,5 +110,3 @@ include("../connection.php");
 </body>
 
 </html>
-
-

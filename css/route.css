@@ -149,8 +149,13 @@ table{
 .th-linha{
     padding-right: 350px;
 }
+
 .th-grupo{
     padding-right: 100px;
+}
+
+.th-tarifa{
+    padding-right: 25px;
 }
 
 .th-status{
@@ -211,8 +216,13 @@ table{
     margin-right: 90px;   
 }
 
-.lb-reg-cor{
+.lb-reg-cor-linha{
     margin-right: 30px;
+}
+
+.lb-reg-cor-texto{
+    margin-right: 15px;
+    margin-left: 15px;
 }
 
 .lb-reg-ordem{
@@ -220,6 +230,10 @@ table{
 }
 
 .lb-reg-grupo{
+    margin-right: 75px;   
+}
+
+.lb-reg-tarifa{
     margin-right: 75px;   
 }
 
@@ -262,7 +276,7 @@ table{
 
 .inpt-reg-cor{
     background-color: #F3F4F0;
-    width: 380px;
+    width: 125px;
     border-radius: 5px;
     padding: 4px;
 }
@@ -277,6 +291,13 @@ table{
 .inpt-reg-grupo{
     background-color: #F3F4F0;
     width: 368px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.selc-reg-tarifa{
+    background-color: #F3F4F0;
+    width: 380px;
     border-radius: 5px;
     padding: 4px;
 }

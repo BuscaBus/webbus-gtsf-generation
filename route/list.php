@@ -34,24 +34,26 @@ if (isset($_GET['sit_linha']) && $_GET['sit_linha'] != "" && $_GET['sit_linha'] 
 
 // Consulta principal
 $sql = "SELECT 
-            agency.agency_name,            
-            routes.route_id,
-            routes.route_short_name,
-            routes.route_long_name,
-            routes.route_color,
-            routes.route_text_color,
-            routes.network_id,           
-            routes.route_status,
-            CASE 
-                WHEN routes.route_status = 'A' THEN 'Ativa'
-                WHEN routes.route_status = 'I' THEN 'Inativa'                    
-            END AS status_format,
-            routes.update_date,
-            DATE_FORMAT(routes.update_date, '%d/%m/%Y') AS data_format
-        FROM routes
-        JOIN agency ON agency.agency_id = routes.agency_id           
+        agency.agency_name,            
+        routes.route_id,
+        routes.route_short_name,
+        routes.route_long_name,
+        routes.route_color,
+        routes.route_text_color,
+        routes.network_id,           
+        routes.route_status,
+        fa.price AS fare_price,
+        CASE 
+            WHEN routes.route_status = 'A' THEN 'Ativa'
+            WHEN routes.route_status = 'I' THEN 'Inativa'                    
+        END AS status_format,
+        routes.update_date,
+        DATE_FORMAT(routes.update_date, '%d/%m/%Y') AS data_format
+    FROM routes JOIN agency ON agency.agency_id = routes.agency_id
+        LEFT JOIN fare_rules fr ON routes.route_id = fr.route_id
+        LEFT JOIN fare_attributes fa ON fr.fare_id = fa.fare_id
         $filtro_sql
-        ORDER BY agency.agency_name ASC, routes.route_short_name ASC";
+    ORDER BY agency.agency_name ASC, routes.route_short_name ASC";
 
 $result = mysqli_query($conexao, $sql);
 ?>
@@ -76,7 +78,7 @@ $result = mysqli_query($conexao, $sql);
     <title>Sistema WebBus</title>
     <link rel="shortcut icon" href="../img/logo.ico" type="image/x-icon">
     <link rel="stylesheet" href="../css/style.css?v=1.2">
-    <link rel="stylesheet" href="../css/route.css?v=2.2">
+    <link rel="stylesheet" href="../css/route.css?v=2.3">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
 </head>
 
@@ -139,6 +141,7 @@ $result = mysqli_query($conexao, $sql);
                         <th class="th-cod">Código</th>
                         <th class="th-linha">Linha</th>
                         <th class="th-grupo">Grupo</th>
+                        <th class="th-tarifa">Tarifa</th>
                         <th class="th-status">Status</th>
                         <th class="th-atual">Atualização</th>
                         <th class="th-acoes">Ações</th>
@@ -154,6 +157,7 @@ $result = mysqli_query($conexao, $sql);
                         $corLinha = $sql_result['route_color'];
                         $corTexto = $sql_result['route_text_color'];
                         $id_grupo = $sql_result['network_id'];
+                        $tarifa = $sql_result['fare_price'];
                         $status = $sql_result['status_format'];
                         $data = $sql_result['data_format'];
                     ?>
@@ -177,6 +181,15 @@ $result = mysqli_query($conexao, $sql);
 
                                 <td><?php echo $linha ?></td>
                                 <td><?php echo $id_grupo ?></td>
+                                <td>
+                                    <?php 
+                                        if(!empty($tarifa)){
+                                            echo "R$ " . number_format($tarifa, 2, ',', '.');
+                                        }else{
+                                            echo "-";
+                                        }
+                                    ?>
+                                </td>
                                 <td><?php echo $status ?></td>
                                 <td><?php echo $data ?></td>
                                 <td>
