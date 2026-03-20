@@ -29,9 +29,11 @@ include("../connection.php");
                     <label>Tabela:</label>
                     <select name="table" required>
                         <option value="agency">Agency</option>
+                        <option value="stops">Stops</option>
                         <option value="routes">Routes</option>
                         <option value="trips">Trips</option>
-                        <option value="stops">Stops</option>
+                        <option value="stop_times">Stop Times</option>
+                        
                     </select>
 
                     <br><br>

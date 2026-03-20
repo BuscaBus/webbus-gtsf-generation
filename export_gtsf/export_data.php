@@ -6,7 +6,7 @@ $table  = $_GET['table'] ?? '';
 $format = $_GET['format'] ?? 'txt';
 
 // Tabelas permitidas
-$allowed_tables = ['agency', 'routes', 'trips', 'stops'];
+$allowed_tables = ['agency', 'stops', 'routes', 'trips' ];
 
 // Colunas fixas por tabela (PADRÃO GTSF)
 $gtsf_columns = [
@@ -22,29 +22,42 @@ $gtsf_columns = [
         'agency_email'        
     ],
 
+     'stops' => [
+        'stop_id',
+        'stop_code',
+        'stop_name',
+        'stop_desc',
+        'stop_lat',
+        'stop_lon',
+        'location_type',
+        'parent_station',
+        'platform_code'
+    ],
+
     'routes' => [
         'route_id',
         'agency_id',
         'route_short_name',
         'route_long_name',
-        'route_type'
+        'route_desc',
+        'route_type',
+        'route_color',
+        'route_text_color',
+        'route_sort_order',
+        'network_id'
     ],
 
     'trips' => [
-        'trip_id',
         'route_id',
         'service_id',
+        'trip_id',
         'trip_headsign',
+        'trip_short_name',
         'direction_id',
-        'shape_id'
+        'shape_id'  
     ],
 
-    'stops' => [
-        'stop_id',
-        'stop_name',
-        'stop_lat',
-        'stop_lon'
-    ]
+   
 
 ];
 
