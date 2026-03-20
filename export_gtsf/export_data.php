@@ -6,7 +6,7 @@ $table  = $_GET['table'] ?? '';
 $format = $_GET['format'] ?? 'txt';
 
 // Tabelas permitidas
-$allowed_tables = ['agency', 'stops', 'routes', 'trips' ];
+$allowed_tables = ['agency', 'stops', 'routes', 'trips', 'stop_times', 'calendar ', 'calendar_dates', 'fare_attributes', 'fare_rules', 'shapes'];
 
 // Colunas fixas por tabela (PADRÃO GTSF)
 $gtsf_columns = [
@@ -57,7 +57,58 @@ $gtsf_columns = [
         'shape_id'  
     ],
 
-   
+    'stop_times' => [
+        'trip_id',
+        'arrival_time',
+        'departure_time',
+        'stop_id',
+        'stop_sequence',
+        'stop_headsign',
+        'timepoint'  
+    ],
+
+    'calendar' => [
+        'service_id',
+        'monday',
+        'tuesday',
+        'wednesday',
+        'thursday',
+        'friday',
+        'saturday',
+        'sunday',
+        'start_date',
+        'end_date'  
+    ],
+    
+    'calendar_dates' => [
+        'service_id',
+        'date',
+        'exception_type'         
+    ],
+
+    'fare_attributes' => [
+        'fare_id',
+        'price',
+        'currency_type',
+        'payment_method',
+        'transfers',
+        'agency_id'        
+    ],
+
+    'fare_rules' => [
+        'fare_id',
+        'route_id',
+        'origin_id',
+        'destination_id'                
+    ],
+    
+    'shapes' => [
+        'shape_id',
+        'shape_pt_lat',
+        'shape_pt_lon',
+        'shape_pt_sequence',  
+        'shape_dist_traveled'              
+    ],   
 
 ];
 
