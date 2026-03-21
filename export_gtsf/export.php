@@ -55,9 +55,7 @@ include("../connection.php");
             </section>
         </main>
         <footer>
-            <p><a href="../index.html">
-                    < Voltar</a>
-            </p>
+            <p><a href="../index.html"> < Voltar</a></p>
         </footer>
     </div>
 </body>
