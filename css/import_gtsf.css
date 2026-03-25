@@ -1,0 +1,54 @@
+@charset "UTF-8";
+
+/*-- Variaveis de cores CSS*/
+:root{
+    --color0: #F3F4F0;
+    --color1: #CED8D0;
+    --color2: #96A5A0;
+    --color3: #4F5C55;
+    --color4: #517709;
+}
+
+/*Configurações da página export.php*/
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #CED8D0;
+}
+
+section{
+    text-align: center;
+    background-color: var(--color1);    
+    height: 580px;
+    padding-top: 20px;
+    padding-left: 30px;
+}
+
+.lb-tabela{
+    margin-right: 35px;
+}
+
+.selc-tabela{
+    background-color: #F3F4F0;
+    width: 300px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.impt-arquivo{
+    background-color: #F3F4F0;
+    width: 300px;
+    border-radius: 5px;
+    padding: 4px;
+}
+
+.btn-importar{
+    background-color: var(--color4);
+    color: var(--color0);
+    font-size: 12px;
+    font-weight: bold;
+    padding: 5px 15px 5px 15px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    cursor: pointer;
+}
+
