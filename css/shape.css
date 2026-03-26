@@ -309,6 +309,15 @@ section{
     cursor: pointer;
 }
 
+.marker-hover {
+    filter: drop-shadow(0 0 4px(0, 0, 0, 0.6));
+}
+
+.linha-destaque {
+    background-color: #fff3cd;
+    transition: 0.2s;
+}
+
 /* Configurações tabela da página shape_stops.php */
 
 table{

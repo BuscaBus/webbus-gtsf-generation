@@ -47,7 +47,8 @@ $total_itens = mysqli_num_rows($result_itens);
     <link rel="shortcut icon" href="../img/logo.ico" type="image/x-icon">
     <link rel="stylesheet" href="../css/style.css?v=1.2">
     <link rel="stylesheet" href="../css/table.css?v=1.2">
-    <link rel="stylesheet" href="../css/agency.css?v=1.7">
+    <link rel="stylesheet" href="../css/agency.css?v=1.9">
+
 </head>
 
 <body>
@@ -85,10 +86,9 @@ $total_itens = mysqli_num_rows($result_itens);
                     <caption>Relação de operadoras</caption>
                     <thead>
                         <th class="th-op">Operadora</th>
+                        <th class="th-cid">Cidade</th>
                         <th class="th-site">Site</th>
-                        <th class="th-fuso">Fuso</th>
                         <th class="th-tel">Telefone</th>
-                        <th class="th-cred">Créditos</th>
                         <th class="th-email">Email</th>
                         <th class="th-acoes">Ação</th>
                     </thead>
@@ -97,21 +97,32 @@ $total_itens = mysqli_num_rows($result_itens);
                     while ($sql_result = mysqli_fetch_array($result)) {
                         $id = $sql_result['agency_id'];
                         $nome = $sql_result['agency_name'];
+                        $cidade = $sql_result['agency_city'];
                         $url = $sql_result['agency_url'];
-                        $fuso = $sql_result['agency_timezone'];
                         $tel = $sql_result['agency_phone'];
-                        $cred = $sql_result['agency_fare_url'];
                         $email = $sql_result['agency_email'];
-                        
                     ?>
                         <tbody>
                             <tr>
-                                <td><?php echo $nome ?></td>
-                                <td><?php echo $url ?></td>
-                                <td><?php echo $fuso ?></td>
-                                <td><?php echo $tel ?></td>
-                                <td><?php echo $cred ?></td>
-                                <td><?php echo $email ?></td>
+                                <td><?php echo !empty($nome) ? $nome : '-'; ?></td>
+                                <td><?php echo !empty($cidade) ? $cidade : '-'; ?></td>
+                                <td>
+                                    <?php if (!empty($url)) {
+                                        $link = $url;
+
+                                        if (!preg_match("~^(?:f|ht)tps?://~i", $link)) {
+                                            $link = "http://" . $link;
+                                        }
+                                    ?>
+                                        <a href="<?php echo $link; ?>" target="_blank">
+                                            <?php echo $url; ?>
+                                        </a>
+                                    <?php } else { ?>
+                                        -
+                                    <?php } ?>
+                                </td>
+                                <td><?php echo !empty($tel) ? $tel : '-'; ?></td>
+                                <td><?php echo !empty($email) ? $email : '-'; ?></td>
                                 <td>
                                     <form action="delete.php" method="POST">
                                         <input type="hidden" name="id" value="<?php echo $id ?>">
@@ -165,12 +176,11 @@ $total_itens = mysqli_num_rows($result_itens);
             </section>
         </main>
         <footer>
-            <p><a href="../index.html">< Voltar</a>
+            <p><a href="../index.html">
+                    < Voltar</a>
             </p>
         </footer>
     </div>
 </body>
-<script src="../js/modal-agency.js"></script>
-<script src="../js/agency.js"></script>
 
 </html>

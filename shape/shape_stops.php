@@ -19,7 +19,7 @@ $route_id = mysqli_real_escape_string($conexao, $route_id);
     <title>Mapa das Trips</title>
     <link rel="stylesheet" href="../css/style.css?v=1.2">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
-    <link rel="stylesheet" href="../css/shape.css?v=1.5">
+    <link rel="stylesheet" href="../css/shape.css?v=1.6">
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
@@ -106,8 +106,17 @@ $route_id = mysqli_real_escape_string($conexao, $route_id);
                     popupAnchor: [0, -15]
                 });
 
+                var busIconHover = L.icon({
+                    iconUrl: "../img/icon-bus2.png",
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 24],
+                    popupAnchor: [0, -15],
+                    className: "marker-hover"
+                });
+
                 var drawnItems = new L.FeatureGroup();
                 map.addLayer(drawnItems);
+
                 var stopsLayer = L.layerGroup().addTo(map);
 
                 var drawControl = new L.Control.Draw({
@@ -144,12 +153,19 @@ $route_id = mysqli_real_escape_string($conexao, $route_id);
                                         "Código: " + stop.code
                                     );
 
-                                marker.stopData = stop;
+                                // ✅ HOVER
+                                marker.on("mouseover", function() {
+                                    this.setIcon(busIconHover);
+                                });
 
-                                marker.on("contextmenu", function() {
+                                marker.on("mouseout", function() {
+                                    this.setIcon(busIcon);
+                                });
 
-                                    adicionarStopNaTabela(this.stopData);
-
+                                // ✅ BOTÃO DIREITO (FUNCIONANDO)
+                                marker.on("contextmenu", function(e) {
+                                    e.originalEvent.preventDefault(); // MUITO IMPORTANTE
+                                    adicionarStopNaTabela(stop);
                                 });
 
                                 stopsLayer.addLayer(marker);
@@ -157,8 +173,26 @@ $route_id = mysqli_real_escape_string($conexao, $route_id);
                             });
 
                         });
-
                 }
+
+                // Ativar carregamento por zoom                        
+                map.on("zoomend", function() {
+
+                    if (map.getZoom() >= 17) {
+                        carregarStops();
+                    } else {
+                        stopsLayer.clearLayers();
+                    }
+
+                });
+
+                map.on("moveend", function() {
+
+                    if (map.getZoom() >= 17) {
+                        carregarStops();
+                    }
+
+                });
 
                 map.on("zoomend", function() {
 

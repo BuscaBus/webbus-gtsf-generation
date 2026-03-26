@@ -98,20 +98,16 @@ table{
     padding-right: 125px;
 }
 
-.th-site{
-    padding-right: 150px;
+.th-cid{
+    padding-right: 200px;
 }
 
-.th-fuso{
-    padding-right: 100px;
+.th-site{
+    padding-right: 50px;
 }
 
 .th-tel{
     padding-right: 50px;
-}
-
-.th-cred{
-    padding-right: 150px;
 }
 
 .th-email{
@@ -120,6 +116,15 @@ table{
 
 .th-acoes{
     padding-right: 90px; 
+}
+
+td a {
+    color: inherit;        /* herda a cor da tabela */
+    text-decoration: none; /* remove sublinhado */
+}
+
+td a:hover {
+    text-decoration: underline; /* opcional: efeito ao passar o mouse */
 }
 
 /*Configurações da tela register.html*/

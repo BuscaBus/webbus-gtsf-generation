@@ -66,7 +66,7 @@
             </p>
             <p class="p-estilo">
                 <label for="id-cid" class="lb-edt-cid">Cidade:</label>
-                <input type="text" name="cid" class="inpt-edt-cid" id="id-cid" value="<?=$result_id['agency_city']?>" disabled>                 
+                <input type="text" name="cid" class="inpt-edt-cid" id="id-cid" value="<?=$result_id['agency_city']?>">                 
             </p>
             <p class="p-estilo">
                 <label for="id-cred" class="lb-edt-cred">Compra de crédito:</label>
