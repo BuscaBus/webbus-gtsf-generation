@@ -19,7 +19,7 @@ $route_id = mysqli_real_escape_string($conexao, $route_id);
     <title>Mapa das Trips</title>
     <link rel="stylesheet" href="../css/style.css?v=1.2">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
-    <link rel="stylesheet" href="../css/shape.css?v=1.6">
+    <link rel="stylesheet" href="../css/shape.css?v=1.8">
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
@@ -72,9 +72,7 @@ $route_id = mysqli_real_escape_string($conexao, $route_id);
                 </table>
                 <br>
                 <button type="button" id="btnCadastrar" class="btn-seq-cad">CADASTRAR</button>
-                <button class="btn-seq-canc">
-                    <a href="../route/list.php" class="a-btn-seq-canc">CANCELAR</a>
-                </button>
+                <button type="button" id="btnEditar" class="btn-seq-edt">EDITAR</button>                
                 </p>
             </section>
 
@@ -156,10 +154,24 @@ $route_id = mysqli_real_escape_string($conexao, $route_id);
                                 // ✅ HOVER
                                 marker.on("mouseover", function() {
                                     this.setIcon(busIconHover);
+
+                                    const linha = document.querySelector(`tr[data-code="${stop.code}"]`);
+                                    if (linha) {
+                                        linha.classList.add("highlight-row");
+                                        linha.scrollIntoView({
+                                            behavior: "smooth",
+                                            block: "center"
+                                        });
+                                    }
                                 });
 
                                 marker.on("mouseout", function() {
                                     this.setIcon(busIcon);
+
+                                    const linha = document.querySelector(`tr[data-code="${stop.code}"]`);
+                                    if (linha) {
+                                        linha.classList.remove("highlight-row");
+                                    }
                                 });
 
                                 // ✅ BOTÃO DIREITO (FUNCIONANDO)
@@ -222,6 +234,7 @@ $route_id = mysqli_real_escape_string($conexao, $route_id);
                     atualizarSequencia();
 
                     const novaLinha = document.createElement("tr");
+                    novaLinha.setAttribute("data-code", stop.code);
 
                     novaLinha.innerHTML = `
                         <td style="display:none">${stop.id}</td>
@@ -243,6 +256,7 @@ $route_id = mysqli_real_escape_string($conexao, $route_id);
 
                     tbody.appendChild(novaLinha);
                 }
+
 
                 // Função para reorganizar sequência 
                 function atualizarSequencia() {
@@ -312,6 +326,9 @@ $route_id = mysqli_real_escape_string($conexao, $route_id);
 
                 // Função para carregar os pontos na tabela vindos do banco de dados 
                 function carregarStopsTabela(shapeId) {
+
+                    const tr = document.createElement("tr");
+                    tr.setAttribute("data-code", stop.codigo);
 
                     fetch("get_stops_sequence.php?shape_id=" + shapeId)
                         .then(res => res.json())
@@ -640,6 +657,54 @@ $route_id = mysqli_real_escape_string($conexao, $route_id);
                 });
 
         });
+
+        <!-- Script para o botão editar -->
+        document.getElementById("btnEditar").addEventListener("click", function() {
+
+    const linhas = document.querySelectorAll("#tbodyStops tr");
+
+    if (linhas.length === 0) {
+        alert("Nenhum ponto na tabela.");
+        return;
+    }
+
+    let dados = [];
+
+    linhas.forEach(row => {
+
+        const id = row.cells[0].innerText;
+        const intervalo = row.querySelector("input").value;
+
+        dados.push({
+            id: id,
+            intervalo: intervalo
+        });
+
+    });
+
+    fetch("editar_intervalo.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dados)
+    })
+    .then(res => res.json())
+    .then(resp => {
+
+        if (resp.status === "ok") {
+            alert("Intervalos atualizados com sucesso!");
+        } else {
+            alert("Erro ao atualizar.");
+        }
+
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Erro no servidor.");
+    });
+
+});
     </script>
 </body>
 

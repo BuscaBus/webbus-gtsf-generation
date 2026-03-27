@@ -288,6 +288,16 @@ section{
     cursor: pointer;
 }
 
+.btn-seq-edt{
+    background-color: blue;
+    color: var(--color0);
+    font-weight: bold;
+    border-radius: 6px;
+    margin-right: 5px;
+    padding: 3px 40px 3px 40px;
+    cursor: pointer;
+}
+
 .btn-seq-canc{
     background-color: red;
     color: var(--color0);
@@ -316,6 +326,11 @@ section{
 .linha-destaque {
     background-color: #fff3cd;
     transition: 0.2s;
+}
+
+.highlight-row {
+    background-color: #ffeaa7 !important;
+    transition: 0.8s;
 }
 
 /* Configurações tabela da página shape_stops.php */
