@@ -9,7 +9,7 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 $id = (int) $_GET['id'];
 
 // Buscar horários já cadastrados
-$sql_stop_times = "SELECT stop_id, arrival_time, departure_time, stop_headsign 
+$sql_stop_times = "SELECT stop_id, arrival_time, departure_time, stop_headsign, timepoint 
                    FROM stop_times 
                    WHERE trip_id = $id";
 
@@ -62,7 +62,7 @@ if (isset($_GET['success'])) {
     <link rel="shortcut icon" href="../img/logo.ico" type="image/x-icon">
     <link rel="stylesheet" href="../css/style.css?v=1.2">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
-    <link rel="stylesheet" href="../css/stop_times.css?v=1.9">
+    <link rel="stylesheet" href="../css/stop_times.css?v=2.1">
 </head>
 
 <body>
@@ -89,11 +89,32 @@ if (isset($_GET['success'])) {
                     </p>
                     <p class="p-estilo">
                         <label for="id-hrpart" class="lb-reg-hrpart">Partida:</label>
-                        <input type="time" name="hora_partida" class="inpt-reg-hrpart" id="id-part" value="<?= $result_id['departure_time'] ?>" disabled>
+                        <?php
+                            $sql_horarios = "SELECT trip_id, 
+                            TIME_FORMAT(departure_time, '%H:%i') AS departure_time,
+                            trip_headsign
+                            FROM trips
+                            WHERE route_id = {$result_id['route_id']}
+                            AND service_id = '{$result_id['service_id']}'
+                            ORDER BY departure_time";
+
+                             $res_horarios = mysqli_query($conexao, $sql_horarios);
+                        ?>
+
+                        <select id="select-horario" class="inpt-reg-hrpart">
+                            
+                            <?php while ($h = mysqli_fetch_assoc($res_horarios)) { ?>
+                                <option value="<?= $h['trip_id'] ?>"
+                                    <?= ($h['trip_id'] == $id) ? 'selected' : '' ?>>
+
+                                    <?= $h['departure_time'] ?>
+                                </option>
+                            <?php } ?>
+                        </select>
                     </p>
 
                     <br>
-                    
+
 
             </section>
 
@@ -108,6 +129,7 @@ if (isset($_GET['success'])) {
                         <th class="th-ponto">Ponto</th>
                         <th class="th-cheg">Chegada</th>
                         <th class="th-part">Partida</th>
+                        <th class="th-prev">*</th>
                         <th class="th-inter">Intervalo</th>
                         <th class="th-dest">Destino</th>
                     </thead>
@@ -132,7 +154,7 @@ if (isset($_GET['success'])) {
                         $departure = $horarios[$stop_id]['departure_time'] ?? '';
                         $headsign = $horarios[$stop_id]['stop_headsign'] ?? '';
                     ?>
-                        <tbody>                            
+                        <tbody>
                             <tr>
                                 <td>
                                     <?= $sql_result['seq'] ?>
@@ -153,16 +175,23 @@ if (isset($_GET['success'])) {
                                 </td>
 
                                 <td>
+                                    <input
+                                        type="checkbox"
+                                        name="timepoint[<?= $seq ?>]"
+                                        value="0"
+                                        <?= (!isset($horarios[$stop_id]) || $horarios[$stop_id]['timepoint'] == 0) ? 'checked' : '' ?>>
+                                </td>
+
+                                <td>
                                     <input type="time" name="intervalo[]" class="intervalo" value="<?= $sql_result['intervalo'] ?>" disabled>
                                 </td>
 
                                 <td>
                                     <input type="text" name="stop_headsign[]" class="headsign" value="<?= $headsign ?>">
                                 </td>
+
                             </tr>
                         <?php }; ?>
-
-                       
 
                         <!-- Script para calcular horários automaticamente -->
                         <script>
@@ -216,12 +245,12 @@ if (isset($_GET['success'])) {
                         </script>
                         </tbody>
                 </table>
-                <br>    
-                 <nav class="nav-reg-btn">
+                <br>
+                <nav class="nav-reg-btn">
                     <p>
                         <button class="btn-reg-cad">SALVAR</button>
-                    </p>                    
-                </nav>                
+                    </p>
+                </nav>
                 </form>
             </section>
 
@@ -232,6 +261,7 @@ if (isset($_GET['success'])) {
             </p>
         </footer>
     </div>
+
     <!-- Script para preenchimento dos campos automaticamente -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -267,7 +297,53 @@ if (isset($_GET['success'])) {
 
         });
     </script>
-    
+
 </body>
+
+<!-- Script para atualizar tabela -->
+<script>
+    document.getElementById("select-horario").addEventListener("change", function() {
+
+        let trip_id = this.value;
+
+        if (!trip_id) return;
+
+        fetch("get_stop_times.php?trip_id=" + trip_id)
+            .then(res => res.json())
+            .then(data => {
+
+                let linhas = document.querySelectorAll("tbody tr");
+
+                linhas.forEach(linha => {
+
+                    let stop_id = linha.querySelector("input[name='stop_id[]']").value;
+
+                    let chegada = linha.querySelector(".chegada");
+                    let partida = linha.querySelector(".partida");
+                    let headsign = linha.querySelector(".headsign");
+                    let timepoint = linha.querySelector("input[type='checkbox']");
+
+                    if (data[stop_id]) {
+
+                        chegada.value = data[stop_id].arrival_time;
+                        partida.value = data[stop_id].departure_time;
+                        headsign.value = data[stop_id].stop_headsign;
+                        timepoint.checked = (data[stop_id].timepoint == 0);
+
+                    } else {
+
+                        chegada.value = "";
+                        partida.value = "";
+                        headsign.value = "";
+                        timepoint.checked = true;
+
+                    }
+
+                });
+
+            });
+
+    });
+</script>
 
 </html>

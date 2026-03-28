@@ -10,6 +10,7 @@ $stop_id = $_POST['stop_id'];
 $arrival_time = $_POST['arrival_time'];
 $departure_time = $_POST['departure_time'];
 $stop_headsign = $_POST['stop_headsign'];
+$timepoints = $_POST['timepoint'] ?? [];
 
 for ($i = 0; $i < count($stop_id); $i++) {
 
@@ -19,17 +20,21 @@ for ($i = 0; $i < count($stop_id); $i++) {
     $departure = $departure_time[$i];
     $headsign = $stop_headsign[$i];
 
+    // 🔥 lógica correta do checkbox
+    $timepoint = isset($timepoints[$seq]) ? 0 : 1;
+
     $sql = "
     INSERT INTO stop_times
-    (trip_id, arrival_time, departure_time, stop_id, stop_sequence, stop_headsign)
+    (trip_id, arrival_time, departure_time, stop_id, stop_sequence, stop_headsign, timepoint)
     VALUES
-    ('$trip_id','$arrival','$departure','$stop','$seq','$headsign')
+    ('$trip_id','$arrival','$departure','$stop','$seq','$headsign','$timepoint')
 
     ON DUPLICATE KEY UPDATE
         arrival_time = VALUES(arrival_time),
         departure_time = VALUES(departure_time),
         stop_id = VALUES(stop_id),
-        stop_headsign = VALUES(stop_headsign)
+        stop_headsign = VALUES(stop_headsign),
+        timepoint = VALUES(timepoint)
     ";
 
     mysqli_query($conexao, $sql);

@@ -165,7 +165,11 @@ $result_id = mysqli_fetch_assoc($result);
 
                     </form>
 
-                    <caption class="cap-list-vig">Relação de viagens</caption>
+                    <caption class="cap-list-vig">
+                        Relação de viagens  
+                        <?= (!empty($servicoSelecionado) ? "($servicoSelecionado)":"") ?>
+                    </caption>
+                    
                     <thead>
                         <th class="th-viag">Viagem</th>
                         <th class="th-hrpart">Partida</th>

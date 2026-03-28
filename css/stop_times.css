@@ -183,7 +183,7 @@ table{
 }
 
 .th-seq{
-    padding-right: 25px;
+    padding-right: 5px;
 }
 
 .th-ponto{
@@ -206,11 +206,14 @@ table{
     padding-right: 200px;    
 }
 
+.th-prev{
+    padding-right: 5px;    
+}
+
 .headsign{    
     width: 250px;
     padding: 2px;
-}
- 
+} 
 
 .btn-gerHor{
     background-color: var(--color4);
@@ -221,73 +224,4 @@ table{
     padding: 3px 15px 3px 15px;
     cursor: pointer;
 }
-
-/*Configurações da tabela da página trips.php*/
-
-h3{
-    color: #517709;
-}
-
-caption{
-    font-size: 18px;
-}
-
-table{
-    margin: auto;
-}
-
-.th-seq{
-    padding-right: 10px;          
-}
-
-.th-pont{
-    padding-right: 300px;
-}
-
-.th-bair{
-    padding-right: 150px;
-}
-
-.th-cid{
-    padding-right: 150px;
-}
-
-.scroll-area {
-   width: 1600px; 
-   height: 580px;
-   max-height: 580px; /* ou height: 400px; */
-   overflow-y: auto; /* mostra rolagem só quando precisar */
-   overflow-x: hidden; /* evita rolagem horizontal */
-   padding: 1rem;
-   border: 1px solid #ddd;
-   border-radius: 8px;
-}
-
-
-/*Configurações da tela maps_trips.php*/
-#div-map{
-    height: 470px;
-    width: 1000px;
-    margin: 20px auto; 
-    border: solid 1px black;
-}
-
-.selc-viag{
-    background-color: #F3F4F0;
-    width: 350px;
-    border-radius: 5px;
-    padding: 4px;
-}
-
-.btn-salv{
-    background-color: var(--color4);
-    color: var(--color0);
-    font-weight: bold;
-    border-radius: 6px;
-    margin-right: 5px;
-    padding: 3px 15px 3px 15px;
-    cursor: pointer;
-}
-
-
 

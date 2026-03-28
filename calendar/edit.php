@@ -39,7 +39,7 @@
             <input type="hidden" name="id_original" value="<?=$result_id['service_id']?>">
             <p class="p-estilo">
                 <label for="id-edt-serv" class="lb-edt-serv">Serviço:</label>
-                <input type="text" name="servico" class="inpt-edt-serv" id="id-edt-serv" value="<?=$result_id['service_id']?>" disabled>
+                <input type="text" name="servico" class="inpt-edt-serv" id="id-edt-serv" value="<?=$result_id['service_id']?>">
             </p>
             <p class="p-estilo">
                 <label for="id-inicio-vig" class="lb-edt-inic">Inicio da vigência:</label>
