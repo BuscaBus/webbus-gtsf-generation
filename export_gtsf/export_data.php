@@ -6,7 +6,7 @@ $table  = $_GET['table'] ?? '';
 $format = $_GET['format'] ?? 'txt';
 
 // Tabelas permitidas
-$allowed_tables = ['agency', 'stops', 'routes', 'trips', 'stop_times', 'calendar ', 'calendar_dates', 'fare_attributes', 'fare_rules', 'shapes'];
+$allowed_tables = ['agency', 'stops', 'routes', 'trips', 'stop_times', 'calendar', 'calendar_dates', 'fare_attributes', 'fare_rules', 'shapes'];
 
 // Colunas fixas por tabela (PADRÃO GTSF)
 $gtsf_columns = [
