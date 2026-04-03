@@ -110,10 +110,10 @@ $result = mysqli_query($conexao, $sql);
                         ?>
                             <tr>
                                 <td><?php echo $codigo ?></td>
-                                <td><?php echo $ponto ?></tddesc>
-                                <td><?php echo $desc ?></td>                                
-                                <td><?php echo $local ?></td>
-                                <td><?php echo $box ?></td>
+                                <td><?php echo $ponto ?></tddesc>                                
+                                <td><?php echo !empty($desc) ? $desc : '-'; ?></td>                                
+                                <td><?php echo $local ?></td>                               
+                                <td><?php echo !empty($box) ? $box : '-'; ?></td>
                                 <td><?php echo $atual ?></td>
                                 <td>
                                     <form action="delete.php" method="POST">

@@ -42,7 +42,7 @@ include("../connection.php");
                         <option value="calendar_dates">Calendar Dates</option>
                         <option value="fare_attributes">Fare Attributes</option>
                         <option value="fare_rules">Fare Rules</option>
-                        <option value="shape">Shape</option>
+                        <option value="shapes">Shapes</option>
                     </select>
                     <br><br>
                     <input type="file" name="arquivo" class="impt-arquivo" accept=".txt,.csv" required>
