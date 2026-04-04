@@ -29,8 +29,8 @@ $sql = "SELECT stop_id,
                stop_desc,               
                location_type, 
                CASE 
-                    WHEN location_type = 0 THEN 'Parada (Ponto)'
-                    WHEN location_type = 1 THEN 'Estação (Terminal)'
+                    WHEN location_type = 0 THEN 'Parada'
+                    WHEN location_type = 1 THEN 'Terminal'
                     WHEN location_type = 2 THEN 'Entrada/Saída'
                     WHEN location_type = 3 THEN 'Nó Genérico'
                     WHEN location_type = 4 THEN 'Box da plataforma'                    
@@ -90,8 +90,7 @@ $result = mysqli_query($conexao, $sql);
                     <caption>Relação de pontos</caption>
                     <thead>
                         <th class="th-cod">Código</th>
-                        <th class="th-pont">Ponto</th>  
-                        <th class="th-desc">Descrição</th>                      
+                        <th class="th-pont">Ponto</th>                                               
                         <th class="th-loc">Local</th>
                         <th class="th-box">Box</th>
                         <th class="th-atual">Atualização</th>
@@ -102,16 +101,14 @@ $result = mysqli_query($conexao, $sql);
                         while ($sql_result = mysqli_fetch_array($result)) {
                             $id = $sql_result['stop_id'];
                             $codigo = $sql_result['stop_code'];
-                            $ponto = $sql_result['stop_name'];
-                            $desc = $sql_result['stop_desc'];                           
+                            $ponto = $sql_result['stop_name'];                                                       
                             $local = $sql_result['tipo_local'];
                             $box = $sql_result['platform_code'];
                             $atual = $sql_result['data_format'];
                         ?>
                             <tr>
                                 <td><?php echo $codigo ?></td>
-                                <td><?php echo $ponto ?></tddesc>                                
-                                <td><?php echo !empty($desc) ? $desc : '-'; ?></td>                                
+                                <td><?php echo $ponto ?></td>                                                               
                                 <td><?php echo $local ?></td>                               
                                 <td><?php echo !empty($box) ? $box : '-'; ?></td>
                                 <td><?php echo $atual ?></td>
