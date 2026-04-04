@@ -43,7 +43,7 @@ $res_viagens = mysqli_query($conexao, $sql_viagens);
 <head>
     <meta charset="UTF-8">
     <title>Sistema WebBus</title>
-    <link rel="shortcut icon" href="../img/logo.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="../img/logo-icon2.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/style.css?v=1.2">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
     <link rel="stylesheet" href="../css/stop_routes.css?v=1.4">

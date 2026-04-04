@@ -76,9 +76,9 @@ $result = mysqli_query($conexao, $sql);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema WebBus</title>
-    <link rel="shortcut icon" href="../img/logo.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="../img/logo-icon2.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/style.css?v=1.2">
-    <link rel="stylesheet" href="../css/route.css?v=2.3">
+    <link rel="stylesheet" href="../css/route.css?v=2.4">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
 </head>
 

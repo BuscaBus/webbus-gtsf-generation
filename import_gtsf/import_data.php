@@ -11,27 +11,18 @@ function ajustarCoordenada($valor, $tipo = 'lat')
     $valor = trim((string)$valor);
     if ($valor === '') return null;
 
-    $valor = preg_replace('/[^0-9\-]/', '', $valor);
+    // substitui vírgula por ponto (IMPORTANTE no Brasil)
+    $valor = str_replace(',', '.', $valor);
 
-    if ($valor === '' || $valor === '-') return null;
+    if (!is_numeric($valor)) return null;
 
-    $negativo = ($valor[0] === '-');
-    $numero = ltrim($valor, '-');
-
-    // divisão correta (seu padrão)
-    $resultado = bcdiv($numero, '100000000000', 7);
-
-    if ($negativo) {
-        $resultado = '-' . $resultado;
-    }
+    $valor = (float)$valor;
 
     // validação
-    $teste = (float)$resultado;
+    if ($tipo === 'lat' && ($valor < -90 || $valor > 90)) return null;
+    if ($tipo === 'lon' && ($valor < -180 || $valor > 180)) return null;
 
-    if ($tipo === 'lat' && ($teste < -90 || $teste > 90)) return null;
-    if ($tipo === 'lon' && ($teste < -180 || $teste > 180)) return null;
-
-    return $resultado; // NÃO usa substr, NÃO usa float
+    return $valor;
 }
 
 // Função para ajustar coordenadas na tabela shape

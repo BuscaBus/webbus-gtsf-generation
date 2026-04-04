@@ -3,7 +3,7 @@
     $server = "localhost";
     $user = "root";
     $password = "";
-    $dbname = "webbus_gtsf_test2"; 
+    $dbname = "webbus_gtsf_db"; 
     
     // criar conexão 
     $conexao = mysqli_connect($server, $user, $password, $dbname);

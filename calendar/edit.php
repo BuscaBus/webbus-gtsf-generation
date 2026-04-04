@@ -28,6 +28,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar calendário</title>
+    <link rel="shortcut icon" href="../img/logo-icon2.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/calendar.css?v=1.2">  
 </head>
 

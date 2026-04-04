@@ -13,6 +13,7 @@ $lng = $_GET['longitude'];*/
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de pontos</title>
+    <link rel="shortcut icon" href="../img/logo-icon2.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/stops.css?v=1.3">
 </head>
 
