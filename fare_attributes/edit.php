@@ -43,7 +43,8 @@
             <hr>
             <p class="p-estilo">
                 <label for="id-codigo" class="lb-edt-cod">Nome:</label>
-                <input type="text" name="codigo" class="inpt-edt-cod" id="id-codigo" value="<?=$result_id['fare_id']?>" disabled>
+                <input type="hidden" name="codigo-atual" class="inpt-edt-cod" id="id-codigo" value="<?=$result_id['fare_id']?>">
+                <input type="text" name="codigo-novo" class="inpt-edt-cod" id="id-codigo" value="<?=$result_id['fare_id']?>">
             </p>
             <p class="p-estilo">
                 <label for="id-tarifa" class="lb-edt-tar">Tarifa:</label>

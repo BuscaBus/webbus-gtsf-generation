@@ -39,7 +39,7 @@
     <link rel="shortcut icon" href="../img/logo-icon2.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/style.css?v=1.2">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
-    <link rel="stylesheet" href="../css/fare_attributes.css?v=1.7">    
+    <link rel="stylesheet" href="../css/fare_attributes.css?v=1.8">    
 </head>
 
 <body>

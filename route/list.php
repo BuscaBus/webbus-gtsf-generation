@@ -40,7 +40,8 @@ $sql = "SELECT
         routes.route_long_name,
         routes.route_color,
         routes.route_text_color,
-        routes.network_id,           
+        routes.network_id, 
+        route_sort_order,          
         routes.route_status,
         fa.price AS fare_price,
         CASE 
@@ -53,11 +54,15 @@ $sql = "SELECT
         LEFT JOIN fare_rules fr ON routes.route_id = fr.route_id
         LEFT JOIN fare_attributes fa ON fr.fare_id = fa.fare_id
         $filtro_sql
-    ORDER BY agency.agency_name ASC, routes.route_short_name ASC";
+    ORDER BY 
+        agency.agency_name ASC,
+        (routes.route_sort_order = 0) ASC,
+        routes.route_sort_order ASC,
+        routes.route_short_name ASC";       
 
 $result = mysqli_query($conexao, $sql);
-?>
 
+?>
 
 <!--Script para confirmar a exclusão-->
 <script>
