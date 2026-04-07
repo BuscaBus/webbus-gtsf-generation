@@ -73,7 +73,7 @@ $route_id = mysqli_real_escape_string($conexao, $route_id);
                 </table>
                 <br>
                 <button type="button" id="btnCadastrar" class="btn-seq-cad">CADASTRAR</button>
-                <button type="button" id="btnEditar" class="btn-seq-edt">EDITAR</button>                
+                <button type="button" id="btnEditar" class="btn-seq-edt">EDITAR</button>
                 </p>
             </section>
 
@@ -249,10 +249,12 @@ $route_id = mysqli_real_escape_string($conexao, $route_id);
                     `;
 
                     const existe = [...tbody.rows].some(row => row.cells[2].innerText == stop.code);
-
                     if (existe) {
-                        alert("Este ponto já foi adicionado.");
-                        return;
+                        const confirmar = confirm("Este ponto já foi adicionado.\nDeseja cadastrar novamente mesmo assim?");
+
+                        if (!confirmar) {
+                            return; // cancela inclusão
+                        }
                     }
 
                     tbody.appendChild(novaLinha);
@@ -659,53 +661,53 @@ $route_id = mysqli_real_escape_string($conexao, $route_id);
 
         });
 
-        <!-- Script para o botão editar -->
+        <!--Script para o botão editar-- >
         document.getElementById("btnEditar").addEventListener("click", function() {
 
-    const linhas = document.querySelectorAll("#tbodyStops tr");
+            const linhas = document.querySelectorAll("#tbodyStops tr");
 
-    if (linhas.length === 0) {
-        alert("Nenhum ponto na tabela.");
-        return;
-    }
+            if (linhas.length === 0) {
+                alert("Nenhum ponto na tabela.");
+                return;
+            }
 
-    let dados = [];
+            let dados = [];
 
-    linhas.forEach(row => {
+            linhas.forEach(row => {
 
-        const id = row.cells[0].innerText;
-        const intervalo = row.querySelector("input").value;
+                const id = row.cells[0].innerText;
+                const intervalo = row.querySelector("input").value;
 
-        dados.push({
-            id: id,
-            intervalo: intervalo
+                dados.push({
+                    id: id,
+                    intervalo: intervalo
+                });
+
+            });
+
+            fetch("editar_intervalo.php", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(dados)
+                })
+                .then(res => res.json())
+                .then(resp => {
+
+                    if (resp.status === "ok") {
+                        alert("Intervalos atualizados com sucesso!");
+                    } else {
+                        alert("Erro ao atualizar.");
+                    }
+
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Erro no servidor.");
+                });
+
         });
-
-    });
-
-    fetch("editar_intervalo.php", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(dados)
-    })
-    .then(res => res.json())
-    .then(resp => {
-
-        if (resp.status === "ok") {
-            alert("Intervalos atualizados com sucesso!");
-        } else {
-            alert("Erro ao atualizar.");
-        }
-
-    })
-    .catch(err => {
-        console.error(err);
-        alert("Erro no servidor.");
-    });
-
-});
     </script>
 </body>
 

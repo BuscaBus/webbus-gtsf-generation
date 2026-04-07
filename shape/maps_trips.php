@@ -164,7 +164,7 @@ $nomeRota = $route['route_short_name'] . " - " . $route['route_long_name'];
 
                 // Definição de palheta para as cores do traçado
                 const SHAPE_COLORS = [
-                    "#0066ff", // azul
+                    "#0000FF", // azul
                     "#ff0000", // vermelho
                     "#00aa00", // verde
                     "#800080", // roxo
