@@ -1,5 +1,5 @@
 <?php
-include("../connection.php");
+require_once __DIR__ . "/../connection.php";
 
 // Trás o route_id da lista de linhas
 $route_id = $_GET['route_id'] ?? null;
@@ -20,7 +20,7 @@ $route_id = mysqli_real_escape_string($conexao, $route_id);
     <link rel="shortcut icon" href="../img/logo-icon2.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/style.css?v=1.2">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
-    <link rel="stylesheet" href="../css/shape.css?v=1.8">
+    <link rel="stylesheet" href="../css/shape.css?v=1.9">
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
@@ -72,7 +72,7 @@ $route_id = mysqli_real_escape_string($conexao, $route_id);
                     <tbody id="tbodyStops"></tbody>
                 </table>
                 <br>
-                <button type="button" id="btnCadastrar" class="btn-seq-cad">CADASTRAR</button>
+                <button type="button" id="btnCadastrar" class="btn-seq-cad">SALVAR</button>
                 <button type="button" id="btnEditar" class="btn-seq-edt">EDITAR</button>
                 </p>
             </section>
@@ -573,7 +573,7 @@ $route_id = mysqli_real_escape_string($conexao, $route_id);
 
                             const polyline = L.polyline(coords, {
                                 color: "#0000ff",
-                                weight: 5,
+                                weight: 3,
                                 opacity: 0.5
                             });
 

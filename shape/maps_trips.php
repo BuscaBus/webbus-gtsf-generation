@@ -103,6 +103,7 @@ $nomeRota = $route['route_short_name'] . " - " . $route['route_long_name'];
 
             <script>
                 // ===== MAPA =====
+                // Criar shapes 
                 var map = L.map('div-map').setView([-27.595740, -48.568228], 13);
 
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -193,7 +194,7 @@ $nomeRota = $route['route_short_name'] . " - " . $route['route_long_name'];
 
                                 const polyline = L.polyline(shapes[shapeId], {
                                     color: color,
-                                    weight: 5,
+                                    weight: 3,
                                     opacity: 0.85
                                 });
 
