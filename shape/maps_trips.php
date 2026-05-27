@@ -1,5 +1,5 @@
 <?php
-include("../connection.php");
+require_once __DIR__ . "/../connection.php";
 
 // Trás o route_id da lista de linhas
 $route_id = $_GET['route_id'] ?? null;
@@ -32,7 +32,7 @@ $nomeRota = $route['route_short_name'] . " - " . $route['route_long_name'];
     <link rel="shortcut icon" href="../img/logo-icon2.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/style.css?v=1.2">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
-    <link rel="stylesheet" href="../css/shape.css?v=1.4">
+    <link rel="stylesheet" href="../css/shape.css?v=1.6">
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
@@ -59,6 +59,11 @@ $nomeRota = $route['route_short_name'] . " - " . $route['route_long_name'];
                 <h2 class="h2-rota">
                     <?= htmlspecialchars($nomeRota) ?>
                 </h2>
+                <label for="tripSelect" class="lb-select-traj">Trajeto:</label>
+                    <select id="trip-select-traj" class="trip-select-traj">
+                        <option value="">Selecione</option>
+                    </select>
+                <br>    
                 <br>
                 <button type="button" id="btnNovo" class="btn-novo">+ NOVO</button>
                 <button type="button" id="btnCopiar" class="btn-copiar">COPIAR</button>
@@ -161,67 +166,7 @@ $nomeRota = $route['route_short_name'] . " - " . $route['route_long_name'];
                     }
                 });
 
-                map.addControl(drawControl);
-
-                // Definição de palheta para as cores do traçado
-                const SHAPE_COLORS = [
-                    "#0000FF", // azul
-                    "#ff0000", // vermelho
-                    "#00aa00", // verde
-                    "#800080", // roxo
-                    "#ff9900", // laranja
-                    "#ffff00", // amarelo
-                    "#8a2be2" // violeta
-                ];
-
-                // Carregar shape salvo
-                function carregarShape() {
-
-                    fetch("get_shape.php?route_id=" + ROUTE_ID)
-                        .then(res => res.json())
-                        .then(shapes => {
-
-                            if (!shapes || Object.keys(shapes).length === 0) return;
-
-                            drawnItems.clearLayers();
-
-                            let bounds = [];
-                            let colorIndex = 0;
-
-                            Object.keys(shapes).forEach(shapeId => {
-
-                                const color = SHAPE_COLORS[colorIndex % SHAPE_COLORS.length];
-
-                                const polyline = L.polyline(shapes[shapeId], {
-                                    color: color,
-                                    weight: 3,
-                                    opacity: 0.85
-                                });
-
-                                polyline.bindTooltip(
-                                    "Trajeto: " + shapeId, {
-                                        sticky: true
-                                    }
-                                );
-
-                                drawnItems.addLayer(polyline);
-                                bounds.push(...polyline.getLatLngs());
-
-                                colorIndex++;
-                            });
-
-                            if (bounds.length > 0) {
-                                map.fitBounds(bounds);
-                            }
-                        })
-                        .catch(err => {
-                            console.error("Erro ao carregar shapes:", err);
-                        });
-                }
-
-                if (!modoNovo) {
-                    carregarShape();
-                }
+               map.addControl(drawControl);
 
                 // ===== SALVAR SHAPE =====
                 function salvarShape(layer) {
@@ -485,4 +430,68 @@ $nomeRota = $route['route_short_name'] . " - " . $route['route_long_name'];
 
             });
     }
+</script>
+
+<!-- Script para carregar trajetos no select trip-select-traj -->
+<script>
+    function carregarTrajetos() {
+
+        fetch("get_shapes_route.php?route_id=" + ROUTE_ID)
+            .then(res => res.json())
+            .then(shapes => {
+
+                const select = document.getElementById("trip-select-traj");
+
+                select.innerHTML = '<option value="">Selecione</option>';
+
+                shapes.forEach(shapeId => {
+
+                    const option = document.createElement("option");
+
+                    option.value = shapeId;
+                    option.textContent = shapeId;
+
+                    select.appendChild(option);
+                });
+
+            })
+            .catch(err => {
+                console.error("Erro ao carregar trajetos:", err);
+            });
+    }
+
+    // carrega automaticamente ao abrir a página
+    carregarTrajetos();
+</script>
+
+<!-- Script para selecionar trajeto e exibir no mapa -->
+<script>
+    document.getElementById("trip-select-traj").addEventListener("change", function () {
+
+        const shapeId = this.value;
+
+        if (!shapeId) return;
+
+        fetch("get_shape_by_id.php?shape_id=" + shapeId)
+            .then(res => res.json())
+            .then(coords => {
+
+                drawnItems.clearLayers();
+
+                const polyline = L.polyline(coords, {
+                    color: "#0000ff",
+                    weight: 3,
+                    opacity: 0.8
+                });
+
+                drawnItems.addLayer(polyline);
+
+                map.fitBounds(polyline.getBounds());
+
+            })
+            .catch(err => {
+                console.error("Erro ao carregar trajeto:", err);
+            });
+
+    });
 </script>

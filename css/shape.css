@@ -143,11 +143,22 @@ section{
     margin-right: 20px;     
 }
 
+.lb-select-traj{
+    margin-right: 70px;     
+}
+
 .inpt-reg-trip-traj{
     background-color: #F3F4F0;
     width: 300px;
     border-radius: 5px;
     padding: 4px;
+}
+
+.trip-select-traj{
+    background-color: #F3F4F0;
+    width: 300px;
+    border-radius: 5px;
+    padding: 4px;    
 }
 
 .trip-select{
