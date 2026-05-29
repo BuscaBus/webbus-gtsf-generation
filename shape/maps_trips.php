@@ -61,7 +61,7 @@ $nomeRota = $route['route_short_name'] . " - " . $route['route_long_name'];
                 </h2>
                 <label for="tripSelect" class="lb-select-traj">Trajeto:</label>
                     <select id="trip-select-traj" class="trip-select-traj">
-                        <option value="">Selecione</option>
+                        
                     </select>
                 <br>    
                 <br>
@@ -459,9 +459,43 @@ $nomeRota = $route['route_short_name'] . " - " . $route['route_long_name'];
                 console.error("Erro ao carregar trajetos:", err);
             });
     }
+// carrega automaticamente ao abrir a página
+window.addEventListener("DOMContentLoaded", function () {
 
-    // carrega automaticamente ao abrir a página
-    carregarTrajetos();
+    fetch("get_shapes_route.php?route_id=" + ROUTE_ID)
+        .then(res => res.json())
+        .then(shapes => {
+
+            const select = document.getElementById("trip-select-traj");
+
+            select.innerHTML = '<option value="">Selecione</option>';
+
+            shapes.forEach(shapeId => {
+
+                const option = document.createElement("option");
+
+                option.value = shapeId;
+                option.textContent = shapeId;
+
+                select.appendChild(option);
+            });
+
+            // ===== seleciona automaticamente o primeiro trajeto =====
+            if (shapes.length > 0) {
+
+                select.value = shapes[0];
+
+                // dispara o evento change automaticamente
+                select.dispatchEvent(new Event("change"));
+            }
+
+        })
+        .catch(err => {
+            console.error("Erro ao carregar trajetos:", err);
+        });
+
+});
+
 </script>
 
 <!-- Script para selecionar trajeto e exibir no mapa -->

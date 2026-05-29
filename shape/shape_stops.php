@@ -709,6 +709,26 @@ $route_id = mysqli_real_escape_string($conexao, $route_id);
 
         });
     </script>
+
+    <script>
+    // ===== CARREGA AUTOMATICAMENTE O PRIMEIRO TRAJETO =====
+    window.addEventListener("DOMContentLoaded", function () {
+
+        const select = document.getElementById("trip-select");
+
+        // verifica se existe algum trajeto
+        if (select.options.length > 1) {
+
+            // seleciona o primeiro trajeto válido
+            select.selectedIndex = 1;
+
+            // dispara automaticamente o change
+            select.dispatchEvent(new Event("change"));
+        }
+
+    });
+    </script>
+
 </body>
 
 </html>

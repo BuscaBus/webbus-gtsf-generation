@@ -1,5 +1,5 @@
 <?php
-    include("../connection.php");
+    require_once __DIR__ . "/../connection.php";
 
     // Declaração da variavel para receber o ID
     $id = $_GET['id'];
