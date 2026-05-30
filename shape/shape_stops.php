@@ -33,6 +33,10 @@ $route_id = mysqli_real_escape_string($conexao, $route_id);
             width: 100%;
             height: 100%;
         }
+
+        .seq-input {
+            width: 33px;
+        }
     </style>
 </head>
 
@@ -238,11 +242,22 @@ $route_id = mysqli_real_escape_string($conexao, $route_id);
                     novaLinha.setAttribute("data-code", stop.code);
 
                     novaLinha.innerHTML = `
+                        <td style="display:none">0</td>
                         <td style="display:none">${stop.id}</td>
-                        <td>${seq}</td>
+
+                        <td>
+                            <input
+                                type="number"
+                                class="seq-input"
+                                value="${seq}"
+                                min="1"
+                                onchange="reposicionarLinha(this)">
+                        </td>
                         <td>${stop.code}</td>
                         <td>${stop.name}</td>
-                        <td><input type="time" name="interval[]"></td>
+                        <td>
+                            <input type="time" name="interval[]">
+                        </td>
                         <td>
                             <button class="btn-excluir" onclick="removerLinha(this)">EXCLUIR</button>
                         </td>
@@ -267,9 +282,53 @@ $route_id = mysqli_real_escape_string($conexao, $route_id);
                     const linhas = document.querySelectorAll("#tbodyStops tr");
 
                     linhas.forEach((row, index) => {
-                        row.cells[1].innerText = index + 1;
+
+                        const campoSeq = row.querySelector(".seq-input");
+
+                        if (campoSeq) {
+                            campoSeq.value = index + 1;
+                        }
+
                     });
 
+                }
+
+                // Função para reposicionar a sequencia na tabela de pontos 
+                function reposicionarLinha(input) {
+
+                    const row = input.closest("tr");
+                    const tbody = document.getElementById("tbodyStops");
+
+                    let novaPosicao = parseInt(input.value);
+
+                    const totalLinhas = tbody.rows.length;
+
+                    if (isNaN(novaPosicao) || novaPosicao < 1) {
+                        novaPosicao = 1;
+                    }
+
+                    if (novaPosicao > totalLinhas) {
+                        novaPosicao = totalLinhas;
+                    }
+
+                    row.remove();
+
+                    const linhas = tbody.querySelectorAll("tr");
+
+                    if (novaPosicao > linhas.length) {
+
+                        tbody.appendChild(row);
+
+                    } else {
+
+                        tbody.insertBefore(
+                            row,
+                            linhas[novaPosicao - 1]
+                        );
+
+                    }
+
+                    atualizarSequencia();
                 }
 
                 // Função para ativar o arrastar linhas da tabela
@@ -348,7 +407,14 @@ $route_id = mysqli_real_escape_string($conexao, $route_id);
                                 tr.innerHTML = `
                 <td style="display:none">${stop.id}</td>
                 <td style="display:none">${stop.stop_id}</td>
-                <td>${stop.seq}</td>
+                <td>
+    <input
+        type="number"
+        class="seq-input"
+        value="${stop.seq}"
+        min="1"
+        onchange="reposicionarLinha(this)">
+</td>
                 <td>${stop.codigo}</td>
                 <td>${stop.ponto}</td>
                 <td>
@@ -619,11 +685,11 @@ $route_id = mysqli_real_escape_string($conexao, $route_id);
 
             linhas.forEach((row, index) => {
 
-                const stop_id = row.cells[0].innerText;
-                const seq = row.cells[1].innerText;
-                const codigo = row.cells[2].innerText;
-                const ponto = row.cells[3].innerText;
-                const intervalo = row.querySelector("input").value;
+                const stop_id = row.cells[1].innerText;
+                const seq = row.querySelector(".seq-input").value;
+                const codigo = row.cells[3].innerText;
+                const ponto = row.cells[4].innerText;
+                const intervalo = row.querySelector('input[type="time"]').value;
 
                 dados.push({
                     stop_id: stop_id,
@@ -661,6 +727,7 @@ $route_id = mysqli_real_escape_string($conexao, $route_id);
 
         });
 
+    
         <!--Script para o botão editar-- >
         document.getElementById("btnEditar").addEventListener("click", function() {
 
@@ -711,22 +778,22 @@ $route_id = mysqli_real_escape_string($conexao, $route_id);
     </script>
 
     <script>
-    // ===== CARREGA AUTOMATICAMENTE O PRIMEIRO TRAJETO =====
-    window.addEventListener("DOMContentLoaded", function () {
+        // ===== CARREGA AUTOMATICAMENTE O PRIMEIRO TRAJETO =====
+        window.addEventListener("DOMContentLoaded", function() {
 
-        const select = document.getElementById("trip-select");
+            const select = document.getElementById("trip-select");
 
-        // verifica se existe algum trajeto
-        if (select.options.length > 1) {
+            // verifica se existe algum trajeto
+            if (select.options.length > 1) {
 
-            // seleciona o primeiro trajeto válido
-            select.selectedIndex = 1;
+                // seleciona o primeiro trajeto válido
+                select.selectedIndex = 1;
 
-            // dispara automaticamente o change
-            select.dispatchEvent(new Event("change"));
-        }
+                // dispara automaticamente o change
+                select.dispatchEvent(new Event("change"));
+            }
 
-    });
+        });
     </script>
 
 </body>

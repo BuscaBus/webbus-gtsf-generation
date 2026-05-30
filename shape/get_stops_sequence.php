@@ -1,5 +1,6 @@
 <?php
-include("../connection.php");
+require_once __DIR__ . "/../connection.php";
+
 header("Content-Type: application/json");
 
 $shape_id = $_GET['shape_id'] ?? '';
