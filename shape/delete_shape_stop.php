@@ -1,5 +1,5 @@
 <?php
-include("../connection.php");
+require_once __DIR__ . "/../connection.php";
 
 $data = json_decode(file_get_contents("php://input"), true);
 
