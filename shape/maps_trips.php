@@ -560,6 +560,7 @@ $nomeRota = $route['route_short_name'] . " - " . $route['route_long_name'];
             shapeOriginalSelecionado = shapeId;
 
             document.getElementById("shape-id-edit").value = shapeId;
+            document.getElementById("id-trip-traj").value = shapeId;
 
         fetch("get_shape_by_id.php?shape_id=" + shapeId)
             .then(res => res.json())

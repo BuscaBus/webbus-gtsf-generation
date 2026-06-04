@@ -1,5 +1,5 @@
 <?php
-include("../connection.php");
+require_once __DIR__ . "/../connection.php";
 ?>
 
 <!DOCTYPE html>
@@ -78,7 +78,7 @@ include("../connection.php");
                     <?php
                     $sql_tarifa = "SELECT fare_id, price, currency_type 
                        FROM fare_attributes 
-                       ORDER BY price ASC";
+                       ORDER BY fare_id ASC";
 
                     $result_tarifa = mysqli_query($conexao, $sql_tarifa);
 
