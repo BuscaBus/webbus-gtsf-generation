@@ -243,6 +243,16 @@ table{
     cursor: pointer;
 }
 
+.btn-edt-cad{
+    background-color: blue;
+    color: var(--color0);
+    font-weight: bold;
+    border-radius: 6px;
+    margin-right: 5px;
+    padding: 3px 15px 3px 15px;
+    cursor: pointer;
+}
+
 .btn-reg-canc{
     background-color: red;
     color: var(--color0);

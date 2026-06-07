@@ -1,5 +1,5 @@
 <?php
-   include("../connection.php");
+   require_once __DIR__ . "/../connection.php";
 
    $data_edicao = date('Y-m-d'); // Editar a data no UPDATE
 
