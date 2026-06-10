@@ -253,6 +253,16 @@ body{
     margin-right: 5px;
 }
 
+.selc-sent{
+    background-color: #F3F4F0;
+    width: 200px;
+    height: 27px;
+    border-radius: 5px;
+    padding: 2px;   
+    margin-left: 1px;
+    margin-right: 5px;
+}
+
 .btn-pesq-serv{
     background-color: var(--color4);
     color: var(--color0);

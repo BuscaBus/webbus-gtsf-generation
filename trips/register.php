@@ -1,8 +1,9 @@
 <?php
-include("../connection.php");
+require_once __DIR__ . "/../connection.php";
 
 // Serviço padrão (evita Undefined array key)
 $servicoSelecionado = $_GET['servico'] ?? "Segunda a Sexta";
+$sentidoSelecionado = $_GET['sentido'] ?? "0";
 
 // Declaração da variavel para receber o ID
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
@@ -40,7 +41,7 @@ $result_id = mysqli_fetch_assoc($result);
     <link rel="shortcut icon" href="../img/logo-icon2.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/style.css?v=1.2">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
-    <link rel="stylesheet" href="../css/trips.css?v=1.9">
+    <link rel="stylesheet" href="../css/trips.css?v=2.0">
 </head>
 
 <body>
@@ -140,13 +141,17 @@ $result_id = mysqli_fetch_assoc($result);
                 <br>
                 <table>
                     <form method="GET">
+
                         <input type="hidden" name="id" value="<?= $id ?>">
 
-                        <select name="servico" class="selc-serv" id="id-serv">                            
+                        <!-- Serviço -->
+                        <select name="servico" class="selc-serv" id="id-serv">
 
                             <?php
-                            $sql_servicos = "SELECT DISTINCT service_id FROM trips WHERE route_id = $id 
-                                             ORDER BY service_id";
+                            $sql_servicos = "SELECT DISTINCT service_id
+                         FROM trips
+                         WHERE route_id = $id
+                         ORDER BY service_id";
 
                             $result_servicos = mysqli_query($conexao, $sql_servicos);
 
@@ -161,15 +166,42 @@ $result_id = mysqli_fetch_assoc($result);
                             ?>
 
                         </select>
-                        <button type="submit" class="btn-pesq-serv">FILTRAR</button>
+
+                        <!-- Sentido -->
+                        <select name="sentido" class="selc-sent" id="id-sentido">
+
+                            <option value="" <?= ($sentidoSelecionado == "") ? "selected" : "" ?>>
+                                Todos os sentidos
+                            </option>
+
+                            <option value="0" <?= ($sentidoSelecionado == "0") ? "selected" : "" ?>>
+                                Ida
+                            </option>
+
+                            <option value="1" <?= ($sentidoSelecionado == "1") ? "selected" : "" ?>>
+                                Volta
+                            </option>
+
+                        </select>
+
+                        <button type="submit" class="btn-pesq-serv">
+                            FILTRAR
+                        </button>
 
                     </form>
 
                     <caption class="cap-list-vig">
-                        Relação de viagens  
-                        <?= (!empty($servicoSelecionado) ? "($servicoSelecionado)":"") ?>
+
+                        Relação de viagens
+
+                        <?= (!empty($servicoSelecionado) ? " | Serviço: $servicoSelecionado" : "") ?>
+
+                        <?= ($sentidoSelecionado === "0" ? " | Sentido: Ida" : "") ?>
+
+                        <?= ($sentidoSelecionado === "1" ? " | Sentido: Volta" : "") ?>
+
                     </caption>
-                    
+
                     <thead>
                         <th class="th-viag">Viagem</th>
                         <th class="th-hrpart">Partida</th>
@@ -181,16 +213,26 @@ $result_id = mysqli_fetch_assoc($result);
 
                     // Consulta no banco de dados para exibir na tabela de viagens 
                     $filtro_servico = "";
+                    $filtro_sentido = "";
 
-                    $filtro_servico = "";
+                    /* filtro serviço */
+                    if (!empty($servicoSelecionado)) {
 
-                    if (!empty($servicoSelecionado) && $servicoSelecionado != "Todas") {
-
-                        $servico = mysqli_real_escape_string($conexao, $servicoSelecionado);
+                        $servico = mysqli_real_escape_string(
+                            $conexao,
+                            $servicoSelecionado
+                        );
 
                         $filtro_servico = "AND service_id = '$servico'";
                     }
 
+                    /* filtro sentido */
+                    if ($sentidoSelecionado !== "") {
+
+                        $sentido = (int)$sentidoSelecionado;
+
+                        $filtro_sentido = "AND direction_id = $sentido";
+                    }
                     $sql = "
                     SELECT 
                         MIN(trip_id) AS trip_id, route_id, trip_headsign, trip_short_name, departure_time, DATE_FORMAT(departure_time, '%H:%i') AS data_format, direction_id, shape_id, departure_location,
@@ -198,7 +240,7 @@ $result_id = mysqli_fetch_assoc($result);
                             WHEN direction_id = '0' THEN 'Ida'
                             WHEN direction_id = '1' THEN 'Volta'
                         END AS direction_format
-                    FROM trips WHERE route_id = $id $filtro_servico
+                    FROM trips WHERE route_id = $id $filtro_servico $filtro_sentido
                     GROUP BY 
                       route_id, trip_headsign, trip_short_name, departure_time, direction_id, departure_location
                     ORDER BY 

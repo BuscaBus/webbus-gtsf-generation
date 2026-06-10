@@ -396,3 +396,16 @@ table{
    border: 1px solid #ddd;
    border-radius: 8px;
 }
+
+/* Configurações maps.php */
+
+.a-btn-maps-voltar{
+    text-decoration: none;   
+    background-color: var(--color4);
+    color: var(--color0);
+    font-weight: bold;
+    border-radius: 6px;
+    margin-right: 5px;
+    padding: 3px 5px 3px 5px;
+    cursor: pointer;
+}
