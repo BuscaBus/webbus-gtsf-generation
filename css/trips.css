@@ -39,10 +39,20 @@ body{
     width: 500px;
     height: 580px;
 }
-.sect-list-viag {    
+
+.sect-list-viag{
     background-color: var(--color1);
     width: 1100px;
     height: 580px;
+    display: flex;
+    flex-direction: column;
+}
+
+.lista-viagens{
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin: 10px;
 }
 
 .a-mapa{
@@ -276,7 +286,7 @@ body{
 }
 
 table{
-    margin: auto;
+    margin: 0 auto;
 }
 
 .th-viag{
@@ -300,7 +310,7 @@ table{
 }
 
 .th-acoes{
-    padding-right: 145px;    
+    padding-right: 150px;    
 }
 
 /*Configurações da tela edit.php*/

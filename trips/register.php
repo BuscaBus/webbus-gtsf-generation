@@ -41,7 +41,7 @@ $result_id = mysqli_fetch_assoc($result);
     <link rel="shortcut icon" href="../img/logo-icon2.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/style.css?v=1.2">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
-    <link rel="stylesheet" href="../css/trips.css?v=2.0">
+    <link rel="stylesheet" href="../css/trips.css?v=2.1">
 </head>
 
 <body>
@@ -139,101 +139,102 @@ $result_id = mysqli_fetch_assoc($result);
             <!-- Section para listar as viagens -->
             <section class="sect-list-viag">
                 <br>
-                <table>
-                    <form method="GET">
+                <form method="GET">
 
-                        <input type="hidden" name="id" value="<?= $id ?>">
+                            <input type="hidden" name="id" value="<?= $id ?>">
 
-                        <!-- Serviço -->
-                        <select name="servico" class="selc-serv" id="id-serv">
+                            <!-- Serviço -->
+                            <select name="servico" class="selc-serv" id="id-serv">
 
-                            <?php
-                            $sql_servicos = "SELECT DISTINCT service_id
+                                <?php
+                                $sql_servicos = "SELECT DISTINCT service_id
                          FROM trips
                          WHERE route_id = $id
                          ORDER BY service_id";
 
-                            $result_servicos = mysqli_query($conexao, $sql_servicos);
+                                $result_servicos = mysqli_query($conexao, $sql_servicos);
 
-                            while ($row = mysqli_fetch_assoc($result_servicos)) {
+                                while ($row = mysqli_fetch_assoc($result_servicos)) {
 
-                                $serv = $row['service_id'];
+                                    $serv = $row['service_id'];
 
-                                $selected = ($servicoSelecionado == $serv) ? "selected" : "";
+                                    $selected = ($servicoSelecionado == $serv) ? "selected" : "";
 
-                                echo "<option value='$serv' $selected>$serv</option>";
-                            }
-                            ?>
+                                    echo "<option value='$serv' $selected>$serv</option>";
+                                }
+                                ?>
 
-                        </select>
+                            </select>
 
-                        <!-- Sentido -->
-                        <select name="sentido" class="selc-sent" id="id-sentido">
+                            <!-- Sentido -->
+                            <select name="sentido" class="selc-sent" id="id-sentido">
 
-                            <option value="" <?= ($sentidoSelecionado == "") ? "selected" : "" ?>>
-                                Todos os sentidos
-                            </option>
+                                <option value="" <?= ($sentidoSelecionado == "") ? "selected" : "" ?>>
+                                    Todos os sentidos
+                                </option>
 
-                            <option value="0" <?= ($sentidoSelecionado == "0") ? "selected" : "" ?>>
-                                Ida
-                            </option>
+                                <option value="0" <?= ($sentidoSelecionado == "0") ? "selected" : "" ?>>
+                                    Ida
+                                </option>
 
-                            <option value="1" <?= ($sentidoSelecionado == "1") ? "selected" : "" ?>>
-                                Volta
-                            </option>
+                                <option value="1" <?= ($sentidoSelecionado == "1") ? "selected" : "" ?>>
+                                    Volta
+                                </option>
 
-                        </select>
+                            </select>
 
-                        <button type="submit" class="btn-pesq-serv">
-                            FILTRAR
-                        </button>
+                            <button type="submit" class="btn-pesq-serv">
+                                FILTRAR
+                            </button>
 
-                    </form>
+                        </form>
+                <div class="lista-viagens">
+                    <table>                       
 
-                    <caption class="cap-list-vig">
+                        <caption class="cap-list-vig">
 
-                        Relação de viagens
+                            Relação de viagens
 
-                        <?= (!empty($servicoSelecionado) ? " | Serviço: $servicoSelecionado" : "") ?>
+                            <?= (!empty($servicoSelecionado) ? " | Serviço: $servicoSelecionado" : "") ?>
 
-                        <?= ($sentidoSelecionado === "0" ? " | Sentido: Ida" : "") ?>
+                            <?= ($sentidoSelecionado === "0" ? " | Sentido: Ida" : "") ?>
 
-                        <?= ($sentidoSelecionado === "1" ? " | Sentido: Volta" : "") ?>
+                            <?= ($sentidoSelecionado === "1" ? " | Sentido: Volta" : "") ?>
 
-                    </caption>
+                        </caption>
 
-                    <thead>
-                        <th class="th-viag">Viagem</th>
-                        <th class="th-hrpart">Partida</th>
-                        <th class="th-sent">Sentido</th>
-                        <th class="th-part">Partida</th>
-                        <th class="th-acoes">Ações</th>
-                    </thead>
-                    <?php
+                        <thead>
+                            <th class="th-viag">Viagem</th>
+                            <th class="th-hrpart">Partida</th>
+                            <th class="th-sent">Sentido</th>
+                            <th class="th-part">Partida</th>
+                            <th class="th-acoes">Ações</th>
+                        </thead>
+                        <?php
 
-                    // Consulta no banco de dados para exibir na tabela de viagens 
-                    $filtro_servico = "";
-                    $filtro_sentido = "";
+                        // Consulta no banco de dados para exibir na tabela de viagens 
+                        $filtro_servico = "";
+                        $filtro_sentido = "";
 
-                    /* filtro serviço */
-                    if (!empty($servicoSelecionado)) {
+                        /* filtro serviço */
+                        if (!empty($servicoSelecionado)) {
 
-                        $servico = mysqli_real_escape_string(
-                            $conexao,
-                            $servicoSelecionado
-                        );
+                            $servico = mysqli_real_escape_string(
+                                $conexao,
+                                $servicoSelecionado
+                            );
 
-                        $filtro_servico = "AND service_id = '$servico'";
-                    }
+                            $filtro_servico = "AND service_id = '$servico'";
+                        }
 
-                    /* filtro sentido */
-                    if ($sentidoSelecionado !== "") {
+                        /* filtro sentido */
+                        if ($sentidoSelecionado !== "") {
 
-                        $sentido = (int)$sentidoSelecionado;
+                            $sentido = (int)$sentidoSelecionado;
 
-                        $filtro_sentido = "AND direction_id = $sentido";
-                    }
-                    $sql = "
+                            $filtro_sentido = "AND direction_id = $sentido";
+                        }
+                        $sql = "
                     SELECT 
                         MIN(trip_id) AS trip_id, route_id, trip_headsign, trip_short_name, departure_time, DATE_FORMAT(departure_time, '%H:%i') AS data_format, direction_id, shape_id, departure_location,
                         CASE 
@@ -246,43 +247,44 @@ $result_id = mysqli_fetch_assoc($result);
                     ORDER BY 
                       service_id ASC, direction_id ASC, departure_time ASC";
 
-                    $result = mysqli_query($conexao, $sql);
+                        $result = mysqli_query($conexao, $sql);
 
-                    $first_trip_id = null; // salvar a primeira viagem
+                        $first_trip_id = null; // salvar a primeira viagem
 
-                    while ($sql_result = mysqli_fetch_array($result)) {
-                        if ($first_trip_id === null) {
-                            $first_trip_id = $sql_result['trip_id']; // guarda a primeira
-                        }
+                        while ($sql_result = mysqli_fetch_array($result)) {
+                            if ($first_trip_id === null) {
+                                $first_trip_id = $sql_result['trip_id']; // guarda a primeira
+                            }
 
-                        $id_trip   = $sql_result['trip_id'];
-                        $id_route  = $sql_result['route_id'];
-                        $destino   = $sql_result['trip_headsign'];
-                        $origem    = $sql_result['trip_short_name'];
-                        $hrpart    = $sql_result['data_format'];
-                        $sentido   = $sql_result['direction_format'];
-                        $partida   = $sql_result['departure_location'];
-                        $shape_id  = $sql_result['shape_id'];
-                    ?>
-                        <tbody>
-                            <tr>
-                                <td><?= $origem ?> - <?= $destino ?></td>
-                                <td><?= $hrpart ?></td>
-                                <td><?= $sentido ?></td>
-                                <td><?= $partida ?></td>
-                                <td>
-                                    <form action="delete.php" method="POST">
-                                        <input type="hidden" name="id" value="<?= $id_trip ?>">
-                                        <input type="hidden" name="id-route" value="<?= $id_route ?>">
-                                        <a href="../stop_times/register.php?id=<?= $id_trip ?>&shape_id=<?= $shape_id ?>" class="a-horario" id="a-hor">HORARIO</a>
-                                        <a href="edit.php?id=<?= $id_trip ?>" class="a-editar" id="a-edit">EDITAR</a>
-                                        <button class="btn-excluir" onclick="return deletar()">EXCLUIR</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        </tbody>
-                    <?php } ?>
-                </table>
+                            $id_trip   = $sql_result['trip_id'];
+                            $id_route  = $sql_result['route_id'];
+                            $destino   = $sql_result['trip_headsign'];
+                            $origem    = $sql_result['trip_short_name'];
+                            $hrpart    = $sql_result['data_format'];
+                            $sentido   = $sql_result['direction_format'];
+                            $partida   = $sql_result['departure_location'];
+                            $shape_id  = $sql_result['shape_id'];
+                        ?>
+                            <tbody>
+                                <tr>
+                                    <td><?= $origem ?> - <?= $destino ?></td>
+                                    <td><?= $hrpart ?></td>
+                                    <td><?= $sentido ?></td>
+                                    <td><?= $partida ?></td>
+                                    <td>
+                                        <form action="delete.php" method="POST">
+                                            <input type="hidden" name="id" value="<?= $id_trip ?>">
+                                            <input type="hidden" name="id-route" value="<?= $id_route ?>">
+                                            <a href="../stop_times/register.php?id=<?= $id_trip ?>&shape_id=<?= $shape_id ?>" class="a-horario" id="a-hor">HORARIO</a>
+                                            <a href="edit.php?id=<?= $id_trip ?>" class="a-editar" id="a-edit">EDITAR</a>
+                                            <button class="btn-excluir" onclick="return deletar()">EXCLUIR</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        <?php } ?>
+                    </table>
+                </div>
                 <br>
             </section>
 
