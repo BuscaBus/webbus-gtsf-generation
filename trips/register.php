@@ -205,7 +205,7 @@ $result_id = mysqli_fetch_assoc($result);
 
                         <thead>
                             <th class="th-viag">Viagem</th>
-                            <th class="th-hrpart">Partida</th>
+                            <th class="th-hrpart">Horário</th>
                             <th class="th-sent">Sentido</th>
                             <th class="th-part">Partida</th>
                             <th class="th-acoes">Ações</th>
