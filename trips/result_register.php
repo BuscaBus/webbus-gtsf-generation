@@ -1,34 +1,28 @@
 <?php
-   include("../connection.php");
+   require_once __DIR__ . "/../connection.php";
 
     // Recebe as variaveis
-    $route_id = $_POST['id'];
-    $servico = $_POST['servico'];
+    $route_id = $_POST['id'];   
     $origem = $_POST['origem'];
     $destino = $_POST['destino'];
-    $sentido = $_POST['sentido'];
-    $hrpartida = $_POST['hora-partida'];
+    $sentido = $_POST['sentido'];   
     $partida = $_POST['partida'];
     $tracado = $_POST['tracado'];
     
     // Altera no banco de dados
     $sql = "INSERT INTO trips (
                 route_id, 
-                service_id, 
                 trip_short_name,
                 trip_headsign,
-                direction_id,
-                departure_time,
+                direction_id,                
                 departure_location, 
                 shape_id               
             ) 
             VALUES (
-                '$route_id', 
-                '$servico', 
+                '$route_id',                 
                 '$origem',
                 '$destino',
-                '$sentido',
-                '$hrpartida',
+                '$sentido',                
                 '$partida',  
                 '$tracado'              
             )";

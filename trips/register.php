@@ -1,9 +1,7 @@
 <?php
 require_once __DIR__ . "/../connection.php";
 
-// Serviço padrão (evita Undefined array key)
-$servicoSelecionado = $_GET['servico'] ?? "Segunda a Sexta";
-$sentidoSelecionado = $_GET['sentido'] ?? "0";
+
 
 // Declaração da variavel para receber o ID
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
@@ -65,23 +63,7 @@ $result_id = mysqli_fetch_assoc($result);
                     <p class="p-estilo">
                         <label for="id-linha" class="lb-reg-linha">Linha:</label>
                         <input type="text" name="linha" class="inpt-reg-linha" id="id-linha" value="<?= $result_id['route_long_name'] ?>" disabled>
-                    </p>
-                    <p class="p-estilo">
-                        <label for="id-serv" class="lb-reg-serv">Serviço:</label>
-                        <select name="servico" class="selc-reg-serv" id="id-serv">
-                            <option value="">Selecione um serviço</option>
-                            <?php
-                            $sql_select = "SELECT service_id FROM calendar ORDER BY service_id DESC";
-                            $result_selec = mysqli_query($conexao, $sql_select);
-
-                            while ($dados = mysqli_fetch_array($result_selec)) {
-                                $servicos = $dados['service_id'];
-                                $selected = ($servicos == $result_id['service_id']) ? 'selected' : '';
-                                echo "<option value='$servicos' $selected>$servicos</option>";
-                            }
-                            ?>
-                        </select>
-                    </p>
+                    </p>                    
                     <p class="p-estilo">
                         <label for="id-sent" class="lb-reg-sent">Sentido:</label>
                         <select name="sentido" class="selc-reg-sent" id="id-sent">
@@ -89,11 +71,7 @@ $result_id = mysqli_fetch_assoc($result);
                             <option value="0">Ida</option>
                             <option value="1">Volta</option>
                         </select>
-                    </p>
-                    <p class="p-estilo">
-                        <label for="id-hrpart" class="lb-reg-hrpart">Partida:</label>
-                        <input type="time" name="hora-partida" class="inpt-reg-hrpart" id="id-hrpart">
-                    </p>
+                    </p>                    
                     <p class="p-estilo">
                         <label for="id-orig" class="lb-reg-orig">Origem:</label>
                         <input type="text" name="origem" class="inpt-reg-orig" id="id-org" placeholder="insira a origem da viagem...">
@@ -105,23 +83,7 @@ $result_id = mysqli_fetch_assoc($result);
                     <p class="p-estilo">
                         <label for="id-part" class="lb-reg-part">Local de Partida:</label>
                         <input type="text" name="partida" class="inpt-reg-part" id="id-part" placeholder="insira o local de partida...">
-                    </p>
-                    <p class="p-estilo">
-                        <label for="id-trac" class="lb-reg-trac">Traçado:</label>
-                        <select name="tracado" class="selc-reg-trac" id="id-trac">
-                            <option value="">Selecione um traçado</option>
-                            <?php
-                            $sql_select = "SELECT DISTINCT mt.shape_id FROM maps_trips mt WHERE mt.route_id = $id ORDER BY mt.shape_id ASC";
-
-                            $result_selec = mysqli_query($conexao, $sql_select);
-
-                            while ($dados = mysqli_fetch_assoc($result_selec)) {
-                                $tracado = $dados['shape_id'];
-                                echo "<option value='$tracado'>$tracado</option>";
-                            }
-                            ?>
-                        </select>
-                    </p>
+                    </p>                    
                     <br>
                     <nav class="nav-reg-btn">
                         <p>
@@ -139,113 +101,35 @@ $result_id = mysqli_fetch_assoc($result);
             <!-- Section para listar as viagens -->
             <section class="sect-list-viag">
                 <br>
-                <form method="GET">
-
-                            <input type="hidden" name="id" value="<?= $id ?>">
-
-                            <!-- Serviço -->
-                            <select name="servico" class="selc-serv" id="id-serv">
-
-                                <?php
-                                $sql_servicos = "SELECT DISTINCT service_id
-                         FROM trips
-                         WHERE route_id = $id
-                         ORDER BY service_id";
-
-                                $result_servicos = mysqli_query($conexao, $sql_servicos);
-
-                                while ($row = mysqli_fetch_assoc($result_servicos)) {
-
-                                    $serv = $row['service_id'];
-
-                                    $selected = ($servicoSelecionado == $serv) ? "selected" : "";
-
-                                    echo "<option value='$serv' $selected>$serv</option>";
-                                }
-                                ?>
-
-                            </select>
-
-                            <!-- Sentido -->
-                            <select name="sentido" class="selc-sent" id="id-sentido">
-
-                                <option value="" <?= ($sentidoSelecionado == "") ? "selected" : "" ?>>
-                                    Todos os sentidos
-                                </option>
-
-                                <option value="0" <?= ($sentidoSelecionado == "0") ? "selected" : "" ?>>
-                                    Ida
-                                </option>
-
-                                <option value="1" <?= ($sentidoSelecionado == "1") ? "selected" : "" ?>>
-                                    Volta
-                                </option>
-
-                            </select>
-
-                            <button type="submit" class="btn-pesq-serv">
-                                FILTRAR
-                            </button>
-
-                        </form>
                 <div class="lista-viagens">
                     <table>                       
 
                         <caption class="cap-list-vig">
 
-                            Relação de viagens
-
-                            <?= (!empty($servicoSelecionado) ? " | Serviço: $servicoSelecionado" : "") ?>
-
-                            <?= ($sentidoSelecionado === "0" ? " | Sentido: Ida" : "") ?>
-
-                            <?= ($sentidoSelecionado === "1" ? " | Sentido: Volta" : "") ?>
+                            Relação de viagens                           
 
                         </caption>
 
                         <thead>
-                            <th class="th-viag">Viagem</th>
-                            <th class="th-hrpart">Horário</th>
+                            <th class="th-viag">Viagem</th>                            
                             <th class="th-sent">Sentido</th>
                             <th class="th-part">Partida</th>
                             <th class="th-acoes">Ações</th>
                         </thead>
                         <?php
-
-                        // Consulta no banco de dados para exibir na tabela de viagens 
-                        $filtro_servico = "";
-                        $filtro_sentido = "";
-
-                        /* filtro serviço */
-                        if (!empty($servicoSelecionado)) {
-
-                            $servico = mysqli_real_escape_string(
-                                $conexao,
-                                $servicoSelecionado
-                            );
-
-                            $filtro_servico = "AND service_id = '$servico'";
-                        }
-
-                        /* filtro sentido */
-                        if ($sentidoSelecionado !== "") {
-
-                            $sentido = (int)$sentidoSelecionado;
-
-                            $filtro_sentido = "AND direction_id = $sentido";
-                        }
+                        
                         $sql = "
                     SELECT 
-                        MIN(trip_id) AS trip_id, route_id, trip_headsign, trip_short_name, departure_time, DATE_FORMAT(departure_time, '%H:%i') AS data_format, direction_id, shape_id, departure_location,
+                        MIN(trip_id) AS trip_id, route_id, trip_headsign, trip_short_name, direction_id, shape_id, departure_location,
                         CASE 
                             WHEN direction_id = '0' THEN 'Ida'
                             WHEN direction_id = '1' THEN 'Volta'
                         END AS direction_format
-                    FROM trips WHERE route_id = $id $filtro_servico $filtro_sentido
+                    FROM trips WHERE route_id = $id 
                     GROUP BY 
-                      route_id, trip_headsign, trip_short_name, departure_time, direction_id, departure_location
+                      route_id, trip_headsign, trip_short_name, direction_id, departure_location
                     ORDER BY 
-                      service_id ASC, direction_id ASC, departure_time ASC";
+                      service_id ASC, direction_id ASC";
 
                         $result = mysqli_query($conexao, $sql);
 
@@ -260,7 +144,6 @@ $result_id = mysqli_fetch_assoc($result);
                             $id_route  = $sql_result['route_id'];
                             $destino   = $sql_result['trip_headsign'];
                             $origem    = $sql_result['trip_short_name'];
-                            $hrpart    = $sql_result['data_format'];
                             $sentido   = $sql_result['direction_format'];
                             $partida   = $sql_result['departure_location'];
                             $shape_id  = $sql_result['shape_id'];
@@ -268,7 +151,6 @@ $result_id = mysqli_fetch_assoc($result);
                             <tbody>
                                 <tr>
                                     <td><?= $origem ?> - <?= $destino ?></td>
-                                    <td><?= $hrpart ?></td>
                                     <td><?= $sentido ?></td>
                                     <td><?= $partida ?></td>
                                     <td>
