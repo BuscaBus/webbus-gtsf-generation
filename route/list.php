@@ -1,5 +1,5 @@
 <?php
-include("../connection.php");
+require_once __DIR__ . "/../connection.php";
 
 $filtro_sql = "";
 

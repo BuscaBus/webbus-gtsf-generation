@@ -1,8 +1,6 @@
 <?php
 require_once __DIR__ . "/../connection.php";
 
-
-
 // Declaração da variavel para receber o ID
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     die("Erro: ID não informado ou inválido.");
@@ -39,7 +37,7 @@ $result_id = mysqli_fetch_assoc($result);
     <link rel="shortcut icon" href="../img/logo-icon2.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/style.css?v=1.2">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
-    <link rel="stylesheet" href="../css/trips.css?v=2.1">
+    <link rel="stylesheet" href="../css/trips.css?v=2.2">
 </head>
 
 <body>
@@ -63,15 +61,7 @@ $result_id = mysqli_fetch_assoc($result);
                     <p class="p-estilo">
                         <label for="id-linha" class="lb-reg-linha">Linha:</label>
                         <input type="text" name="linha" class="inpt-reg-linha" id="id-linha" value="<?= $result_id['route_long_name'] ?>" disabled>
-                    </p>                    
-                    <p class="p-estilo">
-                        <label for="id-sent" class="lb-reg-sent">Sentido:</label>
-                        <select name="sentido" class="selc-reg-sent" id="id-sent">
-                            <option value="select">Selecione um sentido</option>
-                            <option value="0">Ida</option>
-                            <option value="1">Volta</option>
-                        </select>
-                    </p>                    
+                    </p>                
                     <p class="p-estilo">
                         <label for="id-orig" class="lb-reg-orig">Origem:</label>
                         <input type="text" name="origem" class="inpt-reg-orig" id="id-org" placeholder="insira a origem da viagem...">
@@ -80,6 +70,14 @@ $result_id = mysqli_fetch_assoc($result);
                         <label for="id-dest" class="lb-reg-dest">Destino:</label>
                         <input type="text" name="destino" class="inpt-reg-dest" id="id-dest" placeholder="insira o destino da viagem...">
                     </p>
+                     <p class="p-estilo">
+                        <label for="id-sent" class="lb-reg-sent">Sentido:</label>
+                        <select name="sentido" class="selc-reg-sent" id="id-sent">
+                            <option value="select">Selecione um sentido</option>
+                            <option value="0">Ida</option>
+                            <option value="1">Volta</option>
+                        </select>
+                    </p>         
                     <p class="p-estilo">
                         <label for="id-part" class="lb-reg-part">Local de Partida:</label>
                         <input type="text" name="partida" class="inpt-reg-part" id="id-part" placeholder="insira o local de partida...">
@@ -157,7 +155,8 @@ $result_id = mysqli_fetch_assoc($result);
                                         <form action="delete.php" method="POST">
                                             <input type="hidden" name="id" value="<?= $id_trip ?>">
                                             <input type="hidden" name="id-route" value="<?= $id_route ?>">
-                                            <a href="../stop_times/register.php?id=<?= $id_trip ?>&shape_id=<?= $shape_id ?>" class="a-horario" id="a-hor">HORARIO</a>
+                                            <a href=".../shape/register.php?trip_id=<?= $id_trip['trip_id'] ?>" class="a-trajeto" id="a-hor">TRAJETO</a>
+                                            <a href="../register.php?id=<?= $id_trip ?>" class="a-horario" id="a-hor">HORARIO</a>
                                             <a href="edit.php?id=<?= $id_trip ?>" class="a-editar" id="a-edit">EDITAR</a>
                                             <button class="btn-excluir" onclick="return deletar()">EXCLUIR</button>
                                         </form>

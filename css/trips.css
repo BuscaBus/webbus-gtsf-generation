@@ -16,6 +16,14 @@ body{
     background-color: #CED8D0;  
 }
 
+section{
+    text-align: center;
+    background-color: var(--color1);    
+    height: 580px;
+    padding-top: 20px;
+    padding-left: 30px;
+}
+
 .main-cont {
     display: flex;
     justify-content: left;
@@ -36,7 +44,7 @@ body{
 .sect-reg-viag {
     text-align: center;
     background-color: var(--color2); 
-    width: 500px;
+    width: 600px;
     height: 580px;
 }
 
@@ -67,13 +75,13 @@ body{
 }
 
 .a-trajeto{
-    background-color: var(--color4);
+    background-color: brown;
     color: var(--color0);
-    font-size: 12px;
+    font-size: 10px;
     font-weight: bold;
-    padding: 5px 7px 5px 7px;
+    padding: 3px 6px 3px 6px;
     border-radius: 5px;
-    margin-left: 15px;
+    margin-right: 2px;
     cursor: pointer;
 }
 
@@ -310,66 +318,55 @@ table{
 }
 
 .th-acoes{
-    padding-right: 150px;    
+    padding-right: 210px;    
 }
 
 /*Configurações da tela edit.php*/
 
-.sect-edt{
-    text-align: center;
+.p-estilo{
+    text-align: center;    
 }
-    
-.lb-edt-serv{
-    margin-right: 73px;
-}
-
-.lb-edt-orig{
-    margin-right: 73px;
+   
+.lb-edt-origem{
+    margin-right: 90px;
 }
 
-.lb-edt-dest{
-    margin-right: 73px;
+.lb-edt-destino{
+    margin-right: 85px;
 }
 
-.lb-edt-sent{
-    margin-right: 73px;
+.lb-edt-sentido{
+    margin-right: 85px;
 }
 
-.lb-edt-part{
-    margin-right: 10px;
+.lb-edt-partida{
+    margin-right: 20px;
 }
 
-.inpt-edt-serv{
+.inpt-edt-origem{
     background-color: #F3F4F0;
-    width: 310px;
+    width: 300px;
     border-radius: 5px;
     padding: 4px;
 }
 
-.inpt-edt-sent{
+.inpt-edt-destino{
     background-color: #F3F4F0;
-    width: 310px;
+    width: 300px;
     border-radius: 5px;
     padding: 4px;
 }
 
-.inpt-edt-orig{
+.selec-edt-sentido{
     background-color: #F3F4F0;
-    width: 310px;
+    width: 300px;
     border-radius: 5px;
     padding: 4px;
 }
 
-.inpt-edt-dest{
+.inpt-edt-partida{
     background-color: #F3F4F0;
-    width: 310px;
-    border-radius: 5px;
-    padding: 4px;
-}
-
-.inpt-edt-part{
-    background-color: #F3F4F0;
-    width: 310px;
+    width: 300px;
     border-radius: 5px;
     padding: 4px;
 }
@@ -403,4 +400,3 @@ table{
     text-decoration: none;
     color: inherit;
 }
-
