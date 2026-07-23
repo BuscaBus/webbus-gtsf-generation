@@ -1,25 +1,34 @@
 <?php
 require_once __DIR__ . "/../connection.php";
 
-// Trás o route_id da lista de linhas
-$route_id = $_GET['route_id'] ?? null;
+$trip_id = isset($_GET['trip_id']) ? (int)$_GET['trip_id'] : 0;
 
-if (!$route_id) {
-    die("Route inválida");
+if ($trip_id <= 0) {
+    die("Trip inválida.");
 }
 
-// Buscar nome da rota/linha
-$sql = " SELECT route_short_name, route_long_name FROM routes WHERE route_id = '$route_id'";
+// Buscar Trip
+$sql = "SELECT
+    t.trip_id,
+    t.route_id,
+    t.shape_id,
+    r.route_short_name,
+    r.route_long_name
+FROM trips t
+INNER JOIN routes r
+    ON r.route_id = t.route_id
+WHERE t.trip_id = ?
+";
 
-$result = mysqli_query($conexao, $sql);
+$stmt = $conexao->prepare($sql);
+$stmt->bind_param("i", $trip_id);
+$stmt->execute();
 
-if (!$result || mysqli_num_rows($result) == 0) {
-    die("Rota não encontrada");
+$trip = $stmt->get_result()->fetch_assoc();
+
+if (!$trip) {
+    die("Trip não encontrada.");
 }
-
-$route = mysqli_fetch_assoc($result);
-
-$nomeRota = $route['route_short_name'] . " - " . $route['route_long_name'];
 ?>
 
 <!DOCTYPE html>
@@ -28,14 +37,15 @@ $nomeRota = $route['route_short_name'] . " - " . $route['route_long_name'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mapa das Trips</title>
-    <link rel="shortcut icon" href="../img/logo-icon2.png" type="image/x-icon">
+    <title>Mapa da Trip</title>
+
+    <link rel="shortcut icon" href="../img/logo-icon2.png">
     <link rel="stylesheet" href="../css/style.css?v=1.2">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
     <link rel="stylesheet" href="../css/shape.css?v=1.7">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css">
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
 
@@ -46,116 +56,64 @@ $nomeRota = $route['route_short_name'] . " - " . $route['route_long_name'];
             margin: auto;
         }
     </style>
+
 </head>
 
 <body class="body-mptp">
     <div>
         <header>
-            <h1>Trajetos</h1>
+            <h1>Trajeto da Trip</h1>
         </header>
         <main class="main-mptp">
-            <!-- Section para cadastrar novo trajeto -->
             <section class="sect-reg-traj">
                 <h2 class="h2-rota">
-                    <?= htmlspecialchars($nomeRota) ?>
+                    <?= htmlspecialchars($trip['route_short_name']) ?> - <?= htmlspecialchars($trip['route_long_name']) ?>
                 </h2>
-                <label for="tripSelect" class="lb-select-traj">Trajeto:</label>
-                <select id="trip-select-traj" class="trip-select-traj">
-
+                <br>
+                <label> Copiar trajeto: </label>
+                <select id="trip-copy-select">
+                    <option value=""> Selecione uma Viagem</option>
                 </select>
-                <br>
-                <br>
-                <button type="button" id="btnNovo" class="btn-novo">+ NOVO</button>
-                <button type="button" id="btnCopiar" class="btn-copiar">COPIAR</button>
-                <br><br><br>
-                <p>
-                    <label for="id-trip-traj" class="lb-reg-trip-traj">Código:</label>
-                    <input type="text" name="trip-trajeto" class="inpt-reg-trip-traj" id="id-trip-traj" placeholder="insira o código para o trajeto..." required disabled>
-                </p>
-                <br>
-                <label for="shape-id-edit" class="lb-shape-id-edit">Editar código:</label>
-                <input
-                    type="text"
-                    id="shape-id-edit"
-                    class="inpt-reg-trip-traj"
-                    placeholder="Código do trajeto">
+                <br><br>
+                <button type="button" id="btnSalvar" class="btn-salv"> SALVAR </button>
+                <button class="btn-reg-canc"> <a href="../route/list.php" class="a-btn-canc"> CANCELAR </a> </button>
                 <br><br>
                 <p>
-                    <label for="tripSelect" class="lb-select">Copiar trajeto:</label>
-                    <select id="trip-select" class="trip-select">
-                        <option value="">Selecione</option>
-                    </select>
-                    <br><br><br>
-                    <button type="button" id="btnSalvar" class="btn-salv">SALVAR</button>
-                    <button class="btn-reg-canc">
-                        <a href="../route/list.php" class="a-btn-canc">CANCELAR</a>
-                    </button>
-                </p>
-                <br><br><br>
-                <p>
                     <button class="btn-seq-par">
-                        <a href="shape_stops.php?route_id=<?= htmlspecialchars($route_id) ?>" class="a-btn-seq-par"> SEQUENCIA DE PARADAS </a>
+                        <a href="shape_stops.php?shape_id=<?= htmlspecialchars($trip['shape_id']) ?>" class="a-btn-seq-par"> SEQUÊNCIA DE PARADAS </a>
                     </button>
                 </p>
-                <br>
             </section>
 
-            <!-- Section para o mapa do trajeto -->
             <section class="sect-reg-map">
                 <div id="div-map"></div>
             </section>
 
             <script>
-                const ROUTE_ID = "<?= $route_id ?>";
+                const TRIP_ID = <?= $trip['trip_id'] ?>;
+                const ROUTE_ID = <?= $trip['route_id'] ?>;
+                let SHAPE_ID = "<?= $trip['shape_id'] ?>";
             </script>
 
             <script>
-                let modoNovo = false;
-            </script>
+                // MAPA
+                let map = L.map('div-map').setView([-27.595740, -48.568228], 13);
 
-            <script>
-                // ===== MAPA =====
-                // Criar shapes 
-                var map = L.map('div-map').setView([-27.595740, -48.568228], 13);
+                L.tileLayer(
+                    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; OpenStreetMap'
+                    }
+                ).addTo(map);
 
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '&copy; OpenStreetMap'
-                }).addTo(map);
-
-                var drawnItems = new L.FeatureGroup();
+                // CAMADA DOS SHAPES
+                let drawnItems = new L.FeatureGroup();
                 map.addLayer(drawnItems);
 
-                var busIcon = L.icon({
-                    iconUrl: "../img/icon-bus2.png",
-                    iconSize: [14, 14],
-                    iconAnchor: [7, 14],
-                    popupAnchor: [0, -15]
-                });
-
-                map.on("zoomend", function() {
-
-                    if (map.getZoom() >= 17) {
-                        carregarStops();
-                    } else {
-                        stopsLayer.clearLayers();
-                    }
-
-                });
-
-                map.on("moveend", function() {
-
-                    if (map.getZoom() >= 17) {
-                        carregarStops();
-                    }
-
-                });
-
-                var stopsLayer = L.layerGroup().addTo(map);
-
-                var drawControl = new L.Control.Draw({
+                // CONTROLE DE DESENHO
+                let drawControl = new L.Control.Draw({
                     edit: {
                         featureGroup: drawnItems,
-                        remove: true
+                        remove: false
                     },
                     draw: {
                         polyline: {
@@ -165,6 +123,7 @@ $nomeRota = $route['route_short_name'] . " - " . $route['route_long_name'];
                                 opacity: 0.8
                             }
                         },
+
                         polygon: false,
                         marker: false,
                         rectangle: false,
@@ -175,413 +134,239 @@ $nomeRota = $route['route_short_name'] . " - " . $route['route_long_name'];
 
                 map.addControl(drawControl);
 
-                let shapeOriginalSelecionado = "";
-
-               
-                // ===== SALVAR SHAPE =====
-                function salvarShape(layer) {
-
-                    var shapeId = document.getElementById("id-trip-traj").value.trim();
-
-                    if (!shapeId) {
-                        alert("Informe o código do trajeto antes de desenhar.");
+                // CARREGAR SHAPE EXISTENTE
+                function carregarShapeExistente() {
+                    if (!SHAPE_ID) {
+                        console.log(
+                            "Trip sem shape. Aguardando desenho."
+                        );
                         return;
                     }
 
-                    var geojson = layer.toGeoJSON();
+                    fetch(
+                            "get_shape_by_id.php?shape_id=" +
+                            SHAPE_ID
+                        )
 
-                    if (geojson.geometry.type !== "LineString") {
-                        alert("Somente linhas são permitidas.");
-                        return;
-                    }
-
-                    var coords = geojson.geometry.coordinates;
-
-                    fetch("salvar_shape.php", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-                            body: JSON.stringify({
-                                shape_id: shapeId,
-                                route_id: ROUTE_ID,
-                                direction_id: 0,
-                                coords: coords
-                            })
-                        })
-                        .then(res => res.json())
-                        .then(data => {
-
-                            if (data.status === "ok") {
-                                alert("Trajeto salvo com sucesso!");
-                            } else {
-                                alert("Erro ao salvar o trajeto");
-                                console.error(data);
-                            }
-
-                        })
-                        .catch(err => {
-                            alert("Erro de comunicação com o servidor");
-                            console.error(err);
-                        });
-                }
-
-                // ===== EVENTOS DO DRAW =====
-                map.on(L.Draw.Event.CREATED, function(e) {
-                    drawnItems.clearLayers();
-                    drawnItems.addLayer(e.layer);
-                    salvarShape(e.layer);
-                });
-
-                map.on(L.Draw.Event.EDITED, function(e) {
-                    e.layers.eachLayer(function(layer) {
-                        salvarShape(layer);
-                    });
-                });
-
-                map.on(L.Draw.Event.DELETED, function() {
-                    drawnItems.clearLayers();
-                });
-
-                // ===== BOTÃO SALVAR (regrava shape desenhado) =====
-                document.getElementById("btnSalvar").addEventListener("click", function() {
-
-                    const novoShapeId =
-                        document.getElementById("shape-id-edit").value.trim();
-
-                    if (
-                        shapeOriginalSelecionado &&
-                        novoShapeId &&
-                        shapeOriginalSelecionado !== novoShapeId
-                    ) {
-
-                        fetch("renomear_shape.php", {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/x-www-form-urlencoded"
-                                },
-                                body: "shape_antigo=" +
-                                    encodeURIComponent(shapeOriginalSelecionado) +
-                                    "&shape_novo=" +
-                                    encodeURIComponent(novoShapeId)
-                            })
-                            .then(res => res.json())
-                            .then(data => {
-
-                                if (data.status === "ok") {
-
-                                    alert("Código alterado com sucesso!");
-
-                                    carregarTrajetos();
-
-                                    shapeOriginalSelecionado = novoShapeId;
-
-                                } else {
-
-                                    alert(data.mensagem);
-                                }
-
-                            });
-
-                        return;
-                    }
-
-                    if (drawnItems.getLayers().length === 0) {
-
-                        alert("Desenhe um trajeto antes de salvar.");
-                        return;
-                    }
-
-                    salvarShape(drawnItems.getLayers()[0]);
-                });
-                // correção visual quando layout carrega
-                setTimeout(() => {
-                    map.invalidateSize();
-                }, 300);
-            </script>
-
-            <!-- Script para carregar select Shape -->
-            <script>
-                function carregarSelectShapes() {
-
-                    fetch("get_shapes_route.php?route_id=" + ROUTE_ID)
-                        .then(res => res.json())
-                        .then(shapes => {
-
-                            const select = document.getElementById("trip-select");
-                            select.innerHTML = '<option value="">Selecione</option>';
-
-                            shapes.forEach(shapeId => {
-                                const opt = document.createElement("option");
-                                opt.value = shapeId;
-                                opt.textContent = shapeId;
-                                select.appendChild(opt);
-                            });
-
-                        })
-                        .catch(err => {
-                            console.error("Erro ao carregar shapes:", err);
-                        });
-                }
-            </script>
-
-            <!-- Script para o botão novo -->
-            <script>
-                document.getElementById("btnNovo").addEventListener("click", function(e) {
-
-                    e.preventDefault(); // evita abrir nova aba
-
-                    modoNovo = true;
-
-                    // limpa mapa
-                    drawnItems.clearLayers();
-
-                    // limpa código
-                    document.getElementById("id-trip-traj").value = "";
-
-                    // carrega shapes para copiar
-                    carregarSelectShapes();
-
-                    alert("Modo novo trajeto ativado. Selecione um trajeto para copiar ou desenhe um novo.");
-
-                });
-            </script>
-
-            <!-- Script para selecionar um shape e carregar no mapa -->
-            <script>
-                document.getElementById("trip-select").addEventListener("change", function() {
-
-                    const shapeId = this.value;
-
-                    if (!shapeId) return;
-
-                    fetch("get_shape_by_id.php?shape_id=" + shapeId)
                         .then(res => res.json())
                         .then(coords => {
 
-                            drawnItems.clearLayers();
+                            if (!coords || coords.length === 0) {
+                                return;
+                            }
 
-                            const polyline = L.polyline(coords, {
-                                color: "#0000ff", // mantém padrão
-                                weight: 5,
-                                opacity: 0.8
-                            });
+                            let linha = L.polyline(
+                                coords, {
+                                    color: '#0000ff',
+                                    weight: 5,
+                                    opacity: 0.8
+                                }
+                            );
 
-                            drawnItems.addLayer(polyline);
-                            map.fitBounds(polyline.getBounds());
+                            drawnItems.addLayer(linha);
+
+                            map.fitBounds(
+                                linha.getBounds()
+                            );
 
                         })
-                        .catch(err => {
-                            console.error("Erro ao carregar shape:", err);
-                        });
 
-                });
+                        .catch(err => {
+                            console.error(
+                                "Erro ao carregar shape:",
+                                err
+                            );
+                        });
+                }
+
+                // QUANDO ABRE A PÁGINA
+                window.onload = function() {
+                    carregarShapeExistente();
+                    carregarTripsComShape();
+                    setTimeout(() => {
+                        map.invalidateSize();
+                    }, 300);
+                };
+
+                // CRIOU UMA LINHA NOVA
+                map.on(
+                    L.Draw.Event.CREATED,
+                    function(e) {
+                        // permite apenas uma linha
+                        drawnItems.clearLayers();
+                        drawnItems.addLayer(
+                            e.layer
+                        );
+
+                        console.log(
+                            "Novo shape desenhado"
+                        );
+                    }
+
+                );
+
+                // EDITOU A LINHA
+                map.on(
+                    L.Draw.Event.EDITED,
+                    function(e) {
+                        e.layers.eachLayer(
+                            function(layer) {
+                                console.log(
+                                    "Shape alterado"
+                                );
+                            }
+                        );
+                    }
+                );
+
+                // FUNÇÃO GERAR DADOS DO SHAPE
+                function obterCoordenadasShape() {
+                    let layer =
+                        drawnItems.getLayers()[0];
+                    if (!layer) {
+                        return null;
+                    }
+
+                    let geojson = layer.toGeoJSON();
+                    if (
+                        geojson.geometry.type !==
+                        "LineString"
+                    ) {
+                        return null;
+                    }
+
+                    return geojson.geometry.coordinates;
+
+                }
             </script>
 
-            </section>
-        </main>
+            <script>
+                // BOTÃO SALVAR
+                document
+                    .getElementById("btnSalvar")
+                    .addEventListener(
+                        "click",
+                        function() {
+                            let coords =
+                                obterCoordenadasShape();
+                            if (!coords) {
+                                alert(
+                                    "Nenhum trajeto desenhado."
+                                );
+                                return;
+                            }
+                            let dados = {
+                                trip_id: TRIP_ID,
+                                route_id: ROUTE_ID,
+                                shape_id: SHAPE_ID,
+                                direction_id: 0,
+                                coords: coords
+                            };
 
+                            fetch(
+                                    "salvar_shape.php", {
+                                        method: "POST",
+                                        headers: {
+                                            "Content-Type": "application/json"
+                                        },
+
+                                        body: JSON.stringify(dados)
+                                    }
+                                )
+
+                                .then(res => res.json())
+                                .then(data => {
+                                    console.log(data);
+
+                                    if (data.status === "ok") {
+                                        alert(
+                                            "Trajeto salvo com sucesso!"
+                                        );
+
+                                        // caso tenha criado novo shape
+                                        if (!SHAPE_ID && data.shape_id) { SHAPE_ID = data.shape_id;
+                                            document.getElementById("shapeAtual").innerHTML = SHAPE_ID;
+
+                                            // atualiza link sequência
+                                            document.querySelector(".a-btn-seq-par").href = "shape_stops.php?shape_id=" +           SHAPE_ID;
+                                        }
+                                    } else {
+                                        alert(
+                                            data.mensagem ||
+                                            "Erro ao salvar trajeto."
+                                        );
+                                    }
+                                })
+
+                                .catch(err => {
+                                    console.error(err);
+                                    alert(
+                                        "Erro de comunicação."
+                                    );
+                                });
+                        }
+
+                    );
+                // Carregar as Trips automaticamente
+                function carregarTripsComShape() {
+                    fetch("get_trips_com_shape.php")
+                        .then(res => res.json())
+                        .then(trips => {
+                            let select =
+                                document.getElementById(
+                                    "trip-copy-select"
+                                );
+                            trips.forEach(trip => {
+                                let option =
+                                    document.createElement("option");
+                                option.value =
+                                    trip.shape_id;
+                                option.textContent =
+                                    trip.nome;
+                                select.appendChild(option);
+                            });
+                        });
+                }
+
+                // Ao escolher uma Trip, carregar o trajeto
+                document.getElementById("trip-copy-select").addEventListener(
+                    "change",
+                    function() {
+                        let shape_id = this.value;
+                        if (!shape_id) {
+                            return;
+                        }
+
+                        fetch(
+                                "get_shape_by_id.php?shape_id=" +
+                                shape_id
+                            )
+                            .then(res => res.json())
+                            .then(coords => {
+                                drawnItems.clearLayers();
+                                let linha =
+                                    L.polyline(
+                                        coords, {
+                                            color: "#0000ff",
+                                            weight: 5
+                                        }
+                                    );
+
+                                drawnItems.addLayer(linha);
+
+                                map.fitBounds(
+                                    linha.getBounds()
+                                );
+                            });
+                    });
+            </script>
+        </main>
         <footer>
-            <p><a href="../route/list.php">Voltar</a></p>
+            <p>
+                <a href="../route/list.php"> Voltar </a>
+            </p>
         </footer>
     </div>
 </body>
 
 </html>
-
-<!-- Script em JS para destaque do imput ao clicar no botão novo -->
-<script>
-    document.getElementById("btnNovo").addEventListener("click", function(e) {
-
-        e.preventDefault();
-
-        modoNovo = true;
-
-        drawnItems.clearLayers();
-
-        const input = document.getElementById("id-trip-traj");
-        const select = document.getElementById("trip-select");
-
-        input.value = "";
-        select.value = "";
-
-        input.disabled = false;
-
-        // remove destaque do select
-        select.classList.remove("input-destaque");
-
-        // adiciona destaque no input
-        input.classList.add("input-destaque");
-
-        input.focus();
-
-        carregarSelectShapes();
-    });
-
-    // Script em JS para destaque do trip-select ao clicar no botão copiar 
-    document.getElementById("btnCopiar").addEventListener("click", function(e) {
-
-        e.preventDefault();
-
-        const input = document.getElementById("id-trip-traj");
-        const select = document.getElementById("trip-select");
-
-        // remove destaque do input
-        input.classList.remove("input-destaque");
-
-        // adiciona destaque no select
-        select.classList.add("input-destaque");
-
-        select.focus();
-
-        carregarSelectShapes();
-    });
-
-    document.getElementById("id-trip-traj").addEventListener("input", function() {
-        this.classList.remove("input-destaque");
-    });
-    document.getElementById("trip-select").addEventListener("change", function() {
-        this.classList.remove("input-destaque");
-    });
-
-    // Função para carregar stops
-    function carregarStops() {
-
-        const bounds = map.getBounds();
-
-        const url = "get_stops.php?" +
-            "north=" + bounds.getNorth() +
-            "&south=" + bounds.getSouth() +
-            "&east=" + bounds.getEast() +
-            "&west=" + bounds.getWest();
-
-        fetch(url)
-            .then(res => res.json())
-            .then(stops => {
-
-                stopsLayer.clearLayers();
-
-                stops.forEach(stop => {
-
-                    const marker = L.marker([stop.lat, stop.lon], {
-                            icon: busIcon
-                        })
-                        .bindPopup(
-                            "<b>" + stop.name + "</b><br>" +
-                            "Código: " + stop.code
-                        );
-
-                    // 👉 AQUI você pode adaptar ação
-                    marker.on("contextmenu", function() {
-                        document.getElementById("id-trip-traj").value = stop.code;
-                    });
-
-                    stopsLayer.addLayer(marker);
-
-                });
-
-            });
-    }
-</script>
-
-<!-- Script para carregar trajetos no select trip-select-traj -->
-<script>
-    function carregarTrajetos() {
-
-        fetch("get_shapes_route.php?route_id=" + ROUTE_ID)
-            .then(res => res.json())
-            .then(shapes => {
-
-                const select = document.getElementById("trip-select-traj");
-
-                select.innerHTML = '<option value="">Selecione</option>';
-
-                shapes.forEach(shapeId => {
-
-                    const option = document.createElement("option");
-
-                    option.value = shapeId;
-                    option.textContent = shapeId;
-
-                    select.appendChild(option);
-                });
-
-            })
-            .catch(err => {
-                console.error("Erro ao carregar trajetos:", err);
-            });
-    }
-    // carrega automaticamente ao abrir a página
-    window.addEventListener("DOMContentLoaded", function() {
-
-        fetch("get_shapes_route.php?route_id=" + ROUTE_ID)
-            .then(res => res.json())
-            .then(shapes => {
-
-                const select = document.getElementById("trip-select-traj");
-
-                select.innerHTML = '<option value="">Selecione</option>';
-
-                shapes.forEach(shapeId => {
-
-                    const option = document.createElement("option");
-
-                    option.value = shapeId;
-                    option.textContent = shapeId;
-
-                    select.appendChild(option);
-                });
-
-                // ===== seleciona automaticamente o primeiro trajeto =====
-                if (shapes.length > 0) {
-
-                    select.value = shapes[0];
-
-                    // dispara o evento change automaticamente
-                    select.dispatchEvent(new Event("change"));
-                }
-
-            })
-            .catch(err => {
-                console.error("Erro ao carregar trajetos:", err);
-            });
-
-    });
-</script>
-
-<!-- Script para selecionar trajeto e exibir no mapa -->
-<script>
-    document.getElementById("trip-select-traj").addEventListener("change", function() {
-
-        const shapeId = this.value;
-
-        if (!shapeId) return;
-
-            shapeOriginalSelecionado = shapeId;
-
-            document.getElementById("shape-id-edit").value = shapeId;
-            document.getElementById("id-trip-traj").value = shapeId;
-
-        fetch("get_shape_by_id.php?shape_id=" + shapeId)
-            .then(res => res.json())
-            .then(coords => {
-
-                drawnItems.clearLayers();
-
-                const polyline = L.polyline(coords, {
-                    color: "#0000ff",
-                    weight: 3,
-                    opacity: 0.8
-                });
-
-                drawnItems.addLayer(polyline);
-
-                map.fitBounds(polyline.getBounds());
-
-            })
-            .catch(err => {
-                console.error("Erro ao carregar trajeto:", err);
-            });
-
-    });
-</script>
