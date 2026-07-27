@@ -1,13 +1,13 @@
 <?php
 require_once __DIR__ . "/../connection.php";
 
-// Trás o route_id da lista de linhas
-$route_id = $_GET['route_id'] ?? null;
+// Trás a trip_id 
+$trip_id = isset($_GET['trip_id']) ? (int)$_GET['trip_id'] : 0;
 
-if (!$route_id) {
-    die("Route inválida");
+if ($trip_id <= 0) {
+    die("Trip inválida.");
 }
-$route_id = mysqli_real_escape_string($conexao, $route_id);
+
 ?>
 
 <!DOCTYPE html>
@@ -52,7 +52,7 @@ $route_id = mysqli_real_escape_string($conexao, $route_id);
                     <select id="trip-select" class="trip-select">
                         <option value="">Selecione um trajeto</option>
                         <?php
-                        $sql_select = "SELECT DISTINCT mt.shape_id FROM maps_trips mt WHERE mt.route_id = '$route_id' ORDER BY mt.shape_id ASC";
+                        $sql_select = "SELECT DISTINCT mt.shape_id FROM maps_trips mt WHERE mt.trip_id = '$trip_id' ORDER BY mt.shape_id ASC";
 
                         $result_selec = mysqli_query($conexao, $sql_select);
 
@@ -87,7 +87,7 @@ $route_id = mysqli_real_escape_string($conexao, $route_id);
             </section>
 
             <script>
-                const ROUTE_ID = "<?= $route_id ?>";
+                const ROUTE_ID = "<?= $trip_id ?>";
             </script>
 
             <script>

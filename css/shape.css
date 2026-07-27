@@ -135,63 +135,15 @@ section{
     text-align: center;
 }  
 
-.lb-reg-trip-traj{    
-    margin-right: 65px;    
+.lb-copy-select{    
+    margin-right: 10px;    
 }
 
-.lb-shape-id-edit{    
-    margin-right: 25px;    
-}
-
-.lb-select{
-    margin-right: 20px;     
-}
-
-.lb-select-traj{
-    margin-right: 70px;     
-}
-
-.inpt-reg-trip-traj{
+.trip-copy-select {
     background-color: #F3F4F0;
-    width: 300px;
+    width: 280px;
     border-radius: 5px;
-    padding: 4px;
-}
-
-.trip-select-traj{
-    background-color: #F3F4F0;
-    width: 300px;
-    border-radius: 5px;
-    padding: 4px;    
-}
-
-.trip-select{
-    background-color: #F3F4F0;
-    width: 250px;
-    border-radius: 5px;
-    padding: 4px;    
-}
-
-.btn-novo{
-    background-color: var(--color4);
-    width: 150px;
-    color: var(--color0);
-    font-weight: bold;
-    border-radius: 6px;
-    margin-right: 80px;
-    padding: 3px 15px 3px 15px;
-    cursor: pointer;
-}
-
-.btn-copiar{
-    background-color: var(--color4);
-    width: 150px;
-    color: var(--color0);
-    font-weight: bold;
-    border-radius: 6px;
-    margin-right: 5px;
-    padding: 3px 15px 3px 15px;
-    cursor: pointer;
+    padding: 4px;  
 }
 
 .btn-salv{
@@ -223,6 +175,18 @@ section{
     border-radius: 6px;
     margin-right: 5px;
     padding: 3px 5px 3px 5px;
+    cursor: pointer;
+}
+
+.btn-importar{
+    background-color: blue;
+    color: var(--color0);
+    font-size: 12px;
+    width: 280px;
+    font-weight: bold;
+    border-radius: 6px;
+    margin-right: 5px;
+    padding: 5px 20px 5px 20px;
     cursor: pointer;
 }
 

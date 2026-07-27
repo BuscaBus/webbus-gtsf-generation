@@ -29,6 +29,7 @@ $trip = $stmt->get_result()->fetch_assoc();
 if (!$trip) {
     die("Trip não encontrada.");
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -42,7 +43,7 @@ if (!$trip) {
     <link rel="shortcut icon" href="../img/logo-icon2.png">
     <link rel="stylesheet" href="../css/style.css?v=1.2">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
-    <link rel="stylesheet" href="../css/shape.css?v=1.7">
+    <link rel="stylesheet" href="../css/shape.css?v=1.8">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css">
 
@@ -70,17 +71,24 @@ if (!$trip) {
                     <?= htmlspecialchars($trip['route_short_name']) ?> - <?= htmlspecialchars($trip['route_long_name']) ?>
                 </h2>
                 <br>
-                <label> Copiar trajeto: </label>
-                <select id="trip-copy-select">
+                <label class="lb-copy-select"> Copiar trajeto: </label>
+                <select id="trip-copy-select" class="trip-copy-select">
                     <option value=""> Selecione uma Viagem</option>
                 </select>
+                <br><br><br>
+                <p>
+                    <input type="file" id="arquivoKmz" accept=".kmz,.kml" style="display:none;">
+                    <button type="button" id="btnImportarKmz" class="btn-importar"> IMPORTAR KMZ </button>
+                </p>
                 <br><br>
                 <button type="button" id="btnSalvar" class="btn-salv"> SALVAR </button>
-                <button class="btn-reg-canc"> <a href="../route/list.php" class="a-btn-canc"> CANCELAR </a> </button>
+                <button 
+                       type="button" class="btn-reg-canc" onclick="window.location='../trips/register.php?id=<?= urlencode($trip['route_id']) ?>'"> CANCELAR  
+                </button>
                 <br><br>
                 <p>
                     <button class="btn-seq-par">
-                        <a href="shape_stops.php?shape_id=<?= htmlspecialchars($trip['shape_id']) ?>" class="a-btn-seq-par"> SEQUÊNCIA DE PARADAS </a>
+                        <a href="shape_stops.php?trip_id=<?= $trip['trip_id'] ?>" class="a-btn-seq-par"> SEQUÊNCIA DE PARADAS </a>
                     </button>
                 </p>
             </section>
@@ -284,11 +292,12 @@ if (!$trip) {
                                         );
 
                                         // caso tenha criado novo shape
-                                        if (!SHAPE_ID && data.shape_id) { SHAPE_ID = data.shape_id;
+                                        if (!SHAPE_ID && data.shape_id) {
+                                            SHAPE_ID = data.shape_id;
                                             document.getElementById("shapeAtual").innerHTML = SHAPE_ID;
 
                                             // atualiza link sequência
-                                            document.querySelector(".a-btn-seq-par").href = "shape_stops.php?shape_id=" +           SHAPE_ID;
+                                            document.querySelector(".a-btn-seq-par").href = "shape_stops.php?shape_id=" + SHAPE_ID;
                                         }
                                     } else {
                                         alert(
@@ -359,6 +368,63 @@ if (!$trip) {
                                 );
                             });
                     });
+
+                // Abrir o seletor de arquivos
+                document.getElementById("btnImportarKmz")
+                    .addEventListener("click", function() {
+
+                        document.getElementById("arquivoKmz").click();
+
+                    });
+
+                // Ler o arquivo
+                document.getElementById("arquivoKmz")
+                    .addEventListener("change", function() {
+
+                        let arquivo = this.files[0];
+
+                        if (!arquivo) {
+                            return;
+                        }
+
+                        let formData = new FormData();
+
+                        formData.append("arquivo", arquivo);
+
+                        fetch("importar_kmz.php", {
+
+                                method: "POST",
+
+                                body: formData
+
+                            })
+                            .then(r => r.json())
+                            .then(dados => {
+
+                                carregarShapeImportado(dados);
+
+                            });
+
+                    });
+
+                // Exibir no mapa
+                function carregarShapeImportado(coords) {
+
+                    drawnItems.clearLayers();
+
+                    let linha = L.polyline(coords, {
+
+                        color: "#0000ff",
+
+                        weight: 5
+
+                    });
+
+                    drawnItems.addLayer(linha);
+
+                    map.fitBounds(linha.getBounds());
+
+                }
             </script>
         </main>
         <footer>
