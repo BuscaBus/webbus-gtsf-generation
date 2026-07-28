@@ -63,7 +63,7 @@ if (!$trip) {
 <body class="body-mptp">
     <div>
         <header>
-            <h1>Trajeto da Trip</h1>
+            <h1>Trajeto da Viagem</h1>
         </header>
         <main class="main-mptp">
             <section class="sect-reg-traj">
@@ -166,7 +166,7 @@ if (!$trip) {
                             let linha = L.polyline(
                                 coords, {
                                     color: '#0000ff',
-                                    weight: 5,
+                                    weight: 3,
                                     opacity: 0.8
                                 }
                             );

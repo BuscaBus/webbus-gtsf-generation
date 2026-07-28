@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . "/../connection.php";
 
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
 // Trás a trip_id 
 $trip_id = isset($_GET['trip_id']) ? (int)$_GET['trip_id'] : 0;
 
@@ -8,7 +10,40 @@ if ($trip_id <= 0) {
     die("Trip inválida.");
 }
 
+$sql = "
+    SELECT
+        t.trip_id,
+        t.route_id,
+        t.shape_id,
+        t.trip_headsign,
+        t.trip_short_name,
+        r.route_short_name,
+        r.route_long_name
+    FROM trips t
+    INNER JOIN routes r
+    ON r.route_id = t.route_id
+    WHERE t.trip_id = ?
+";
+
+$stmt = $conexao->prepare($sql);
+$stmt->bind_param("i", $trip_id);
+$stmt->execute();
+
+$trip = $stmt->get_result()->fetch_assoc();
+
+if (!$trip) {
+    die("Trip não encontrada.");
+}
+
+// <<< AQUI >>>
+$route_id = $trip['route_id'];
+$shape_id = $trip['shape_id'];
+
 ?>
+
+<script>
+    const TRIP_ID = <?= (int)$trip['trip_id'] ?>;
+</script>
 
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -48,21 +83,6 @@ if ($trip_id <= 0) {
         <main class="main-shst">
             <!-- Section para tabela com o pontos do trajeto -->
             <section class="sect-tab-traj" id="scroll-area">
-                <p>
-                    <select id="trip-select" class="trip-select">
-                        <option value="">Selecione um trajeto</option>
-                        <?php
-                        $sql_select = "SELECT DISTINCT mt.shape_id FROM maps_trips mt WHERE mt.trip_id = '$trip_id' ORDER BY mt.shape_id ASC";
-
-                        $result_selec = mysqli_query($conexao, $sql_select);
-
-                        while ($dados = mysqli_fetch_assoc($result_selec)) {
-                            $tracado = $dados['shape_id'];
-                            echo "<option value='$tracado'>$tracado</option>";
-                        }
-                        ?>
-                    </select>
-                </p>
                 <br>
                 <table>
                     <caption>Pontos do Trajeto</caption>
@@ -87,6 +107,11 @@ if ($trip_id <= 0) {
             </section>
 
             <script>
+                const SHAPE_ID = "<?= $shape_id ?>";
+                window.onload = function() {
+                    carregarTabelaStops(SHAPE_ID);
+                };
+
                 const ROUTE_ID = "<?= $trip_id ?>";
             </script>
 
@@ -389,9 +414,6 @@ if ($trip_id <= 0) {
                 // Função para carregar os pontos na tabela vindos do banco de dados 
                 function carregarStopsTabela(shapeId) {
 
-                    const tr = document.createElement("tr");
-                    tr.setAttribute("data-code", stop.codigo);
-
                     fetch("get_stops_sequence.php?shape_id=" + shapeId)
                         .then(res => res.json())
                         .then(stops => {
@@ -404,26 +426,39 @@ if ($trip_id <= 0) {
 
                                 const tr = document.createElement("tr");
 
+                                tr.setAttribute("data-code", stop.codigo);
+
                                 tr.innerHTML = `
-                <td style="display:none">${stop.id}</td>
-                <td style="display:none">${stop.stop_id}</td>
-                <td>
-    <input
-        type="number"
-        class="seq-input"
-        value="${stop.seq}"
-        min="1"
-        onchange="reposicionarLinha(this)">
-</td>
-                <td>${stop.codigo}</td>
-                <td>${stop.ponto}</td>
-                <td>
-                    <input type="time" value="${stop.intervalo ?? ''}">
-                </td>
-                <td>
-                    <button class="btn-excluir" onclick="removerLinha(this)">EXCLUIR</button>
-                </td>
-            `;
+                    <td style="display:none">${stop.id}</td>
+                    <td style="display:none">${stop.stop_id}</td>
+
+                    <td>
+                        <input
+                            type="number"
+                            class="seq-input"
+                            value="${stop.seq}"
+                            min="1"
+                            onchange="reposicionarLinha(this)">
+                    </td>
+
+                    <td>${stop.codigo}</td>
+
+                    <td>${stop.ponto}</td>
+
+                    <td>
+                        <input 
+                            type="time" 
+                            value="${stop.intervalo ?? ''}">
+                    </td>
+
+                    <td>
+                        <button 
+                            class="btn-excluir" 
+                            onclick="removerLinha(this)">
+                            EXCLUIR
+                        </button>
+                    </td>
+                `;
 
                                 tbody.appendChild(tr);
 
@@ -438,6 +473,54 @@ if ($trip_id <= 0) {
 
                 }
 
+                const tr = document.createElement("tr");
+                tr.setAttribute("data-code", stop.codigo);
+
+                fetch("get_stops_sequence.php?shape_id=" + shapeId)
+                    .then(res => res.json())
+                    .then(stops => {
+
+                        const tbody = document.getElementById("tbodyStops");
+
+                        tbody.innerHTML = "";
+
+                        stops.forEach(stop => {
+
+                            const tr = document.createElement("tr");
+
+                            tr.innerHTML = `
+                <td style="display:none">${stop.id}</td>
+                <td style="display:none">${stop.stop_id}</td>
+                <td>
+                <input
+                    type="number"
+                    class="seq-input"
+                    value="${stop.seq}"
+                    min="1"
+                    onchange="reposicionarLinha(this)">
+                </td>
+                <td>${stop.codigo}</td>
+                <td>${stop.ponto}</td>
+                <td>
+                    <input type="time" value="${stop.intervalo ?? ''}">
+                </td>
+                <td>
+                    <button class="btn-excluir" onclick="removerLinha(this)">EXCLUIR</button>
+                </td>
+            `;
+
+                            tbody.appendChild(tr);
+
+                        });
+
+                        atualizarSequencia();
+
+                    })
+                    .catch(err => {
+                        console.error("Erro ao carregar stops:", err);
+                    });
+
+            
                 // Definição de palheta para as cores do traçado
                 const SHAPE_COLORS = [
                     "#0066ff", // azul
@@ -494,15 +577,8 @@ if ($trip_id <= 0) {
                         });
                 }
 
-                // ===== SALVAR SHAPE =====
+                // Função para Salvar shape 
                 function salvarShape(layer) {
-
-                    var shapeId = document.getElementById("id-trip-traj").value.trim();
-
-                    if (!shapeId) {
-                        alert("Informe o código do trajeto antes de desenhar.");
-                        return;
-                    }
 
                     var geojson = layer.toGeoJSON();
 
@@ -512,33 +588,28 @@ if ($trip_id <= 0) {
                     }
 
                     var coords = geojson.geometry.coordinates;
-
                     fetch("salvar_shape.php", {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json"
                             },
+
                             body: JSON.stringify({
-                                shape_id: shapeId,
+                                trip_id: TRIP_ID,
+                                shape_id: SHAPE_ID,
                                 route_id: ROUTE_ID,
-                                direction_id: 0,
                                 coords: coords
                             })
                         })
+
                         .then(res => res.json())
                         .then(data => {
-
-                            if (data.status === "ok") {
+                            console.log(data);
+                            if (data.status == "ok") {
                                 alert("Trajeto salvo com sucesso!");
                             } else {
-                                alert("Erro ao salvar o trajeto");
-                                console.error(data);
+                                alert(data.message);
                             }
-
-                        })
-                        .catch(err => {
-                            alert("Erro de comunicação com o servidor");
-                            console.error(err);
                         });
                 }
 
@@ -674,61 +745,73 @@ if ($trip_id <= 0) {
                 return;
             }
 
-            const shape_id = document.getElementById("trip-select").value;
-
-            if (!shape_id) {
-                alert("Selecione um trajeto (shape).");
-                return;
-            }
-
             let dados = [];
 
-            linhas.forEach((row, index) => {
+            linhas.forEach(function(row) {
 
-                const stop_id = row.cells[1].innerText;
+                const stop_id = row.cells[1].innerText.trim();
                 const seq = row.querySelector(".seq-input").value;
-                const codigo = row.cells[3].innerText;
-                const ponto = row.cells[4].innerText;
+                const codigo = row.cells[3].innerText.trim();
+                const ponto = row.cells[4].innerText.trim();
                 const intervalo = row.querySelector('input[type="time"]').value;
 
                 dados.push({
+
+                    trip_id: TRIP_ID,
                     stop_id: stop_id,
                     seq: seq,
                     codigo: codigo,
                     ponto: ponto,
-                    intervalo: intervalo,
-                    shape_id: shape_id
+                    intervalo: intervalo
+
                 });
 
             });
 
             fetch("salvar_sequencia.php", {
+
                     method: "POST",
+
                     headers: {
                         "Content-Type": "application/json"
                     },
+
                     body: JSON.stringify(dados)
+
                 })
+
                 .then(res => res.json())
+
                 .then(resp => {
 
+                    console.log(resp);
+
                     if (resp.status === "ok") {
-                        alert("Sequência salva com sucesso!");
+
+                        alert(resp.message);
+
                         location.reload();
+
                     } else {
-                        alert("Erro ao salvar.");
+
+                        alert(resp.message);
+
                     }
 
                 })
+
                 .catch(err => {
+
                     console.error(err);
-                    alert("Erro no servidor.");
+
+                    alert("Erro de comunicação com o servidor.");
+
                 });
 
         });
 
-    
-        <!--Script para o botão editar-- >
+
+       <!--Script para o botão editar-- >
         document.getElementById("btnEditar").addEventListener("click", function() {
 
             const linhas = document.querySelectorAll("#tbodyStops tr");
@@ -799,7 +882,6 @@ if ($trip_id <= 0) {
 </body>
 
 </html>
-
 <!-- Script em JS para destaque do imput ao clicar no botão novo -->
 <script>
     document.getElementById("btnNovo").addEventListener("click", function(e) {
@@ -846,9 +928,11 @@ if ($trip_id <= 0) {
         carregarSelectShapes();
     });
 
+
     document.getElementById("id-trip-traj").addEventListener("input", function() {
         this.classList.remove("input-destaque");
     });
+
     document.getElementById("trip-select").addEventListener("change", function() {
         this.classList.remove("input-destaque");
     });

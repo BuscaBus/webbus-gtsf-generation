@@ -83,7 +83,7 @@ $result = mysqli_query($conexao, $sql);
     <title>Sistema WebBus</title>
     <link rel="shortcut icon" href="../img/logo-icon2.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/style.css?v=1.2">
-    <link rel="stylesheet" href="../css/route.css?v=2.4">
+    <link rel="stylesheet" href="../css/route.css?v=2.5">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
 </head>
 
@@ -199,8 +199,7 @@ $result = mysqli_query($conexao, $sql);
                                 <td><?php echo $data ?></td>
                                 <td>
                                     <form action="delete.php" method="POST">
-                                        <input type="hidden" name="id" value="<?php echo $id ?>">
-                                         <a href="../shape/maps_trips.php?route_id=<?= $sql_result['route_id'] ?>" class="a-trajeto" id="a-trajeto">TRAJETO</a>
+                                        <input type="hidden" name="id" value="<?php echo $id ?>">                                         
                                         <a href="../trips/register.php?id=<?= $sql_result['route_id'] ?>" class="a-viagem" id="a-viag">VIAGENS</a>                                       
                                         <a href="edit.php?id=<?= $sql_result['route_id'] ?>" class="a-editar" id="a-edit">EDITAR</a>
                                         <button class="btn-excluir" onclick="return deletar()">EXCLUIR</button>
