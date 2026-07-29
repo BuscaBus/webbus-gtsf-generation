@@ -55,7 +55,7 @@ $shape_id = $trip['shape_id'];
     <link rel="shortcut icon" href="../img/logo-icon2.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/style.css?v=1.2">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
-    <link rel="stylesheet" href="../css/shape.css?v=1.9">
+    <link rel="stylesheet" href="../css/shape.css?v=2.1">
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
@@ -288,7 +288,7 @@ $shape_id = $trip['shape_id'];
                         </td>
                     `;
 
-                    const existe = [...tbody.rows].some(row => row.cells[2].innerText == stop.code);
+                    const existe = [...tbody.rows].some(row => row.cells[3].innerText.trim() === stop.code);
                     if (existe) {
                         const confirmar = confirm("Este ponto já foi adicionado.\nDeseja cadastrar novamente mesmo assim?");
 
@@ -412,11 +412,15 @@ $shape_id = $trip['shape_id'];
                 }
 
                 // Função para carregar os pontos na tabela vindos do banco de dados 
-                function carregarStopsTabela(shapeId) {
+                function carregarStopsTabela() {
 
-                    fetch("get_stops_sequence.php?shape_id=" + shapeId)
+                    console.log("Carregando stops da trip:", TRIP_ID);
+
+                    fetch("get_stops_sequence.php?trip_id=" + TRIP_ID)
                         .then(res => res.json())
                         .then(stops => {
+
+                            console.log(stops);
 
                             const tbody = document.getElementById("tbodyStops");
 
@@ -446,14 +450,14 @@ $shape_id = $trip['shape_id'];
                     <td>${stop.ponto}</td>
 
                     <td>
-                        <input 
-                            type="time" 
+                        <input
+                            type="time"
                             value="${stop.intervalo ?? ''}">
                     </td>
 
                     <td>
-                        <button 
-                            class="btn-excluir" 
+                        <button
+                            class="btn-excluir"
                             onclick="removerLinha(this)">
                             EXCLUIR
                         </button>
@@ -468,59 +472,17 @@ $shape_id = $trip['shape_id'];
 
                         })
                         .catch(err => {
-                            console.error("Erro ao carregar stops:", err);
+                            console.error(err);
                         });
 
                 }
 
-                const tr = document.createElement("tr");
-                tr.setAttribute("data-code", stop.codigo);
+                window.addEventListener("DOMContentLoaded", function() {
 
-                fetch("get_stops_sequence.php?shape_id=" + shapeId)
-                    .then(res => res.json())
-                    .then(stops => {
+                    carregarStopsTabela();
 
-                        const tbody = document.getElementById("tbodyStops");
+                });
 
-                        tbody.innerHTML = "";
-
-                        stops.forEach(stop => {
-
-                            const tr = document.createElement("tr");
-
-                            tr.innerHTML = `
-                <td style="display:none">${stop.id}</td>
-                <td style="display:none">${stop.stop_id}</td>
-                <td>
-                <input
-                    type="number"
-                    class="seq-input"
-                    value="${stop.seq}"
-                    min="1"
-                    onchange="reposicionarLinha(this)">
-                </td>
-                <td>${stop.codigo}</td>
-                <td>${stop.ponto}</td>
-                <td>
-                    <input type="time" value="${stop.intervalo ?? ''}">
-                </td>
-                <td>
-                    <button class="btn-excluir" onclick="removerLinha(this)">EXCLUIR</button>
-                </td>
-            `;
-
-                            tbody.appendChild(tr);
-
-                        });
-
-                        atualizarSequencia();
-
-                    })
-                    .catch(err => {
-                        console.error("Erro ao carregar stops:", err);
-                    });
-
-            
                 // Definição de palheta para as cores do traçado
                 const SHAPE_COLORS = [
                     "#0066ff", // azul
@@ -535,47 +497,42 @@ $shape_id = $trip['shape_id'];
                 // Carregar shape salvo
                 function carregarShape() {
 
-                    fetch("get_shape.php?route_id=" + ROUTE_ID)
-                        .then(res => res.json())
-                        .then(shapes => {
+                    fetch("get_shape_by_trip.php?trip_id=" + TRIP_ID)
 
-                            if (!shapes || Object.keys(shapes).length === 0) return;
+                        .then(res => res.json())
+
+                        .then(coords => {
 
                             drawnItems.clearLayers();
 
-                            let bounds = [];
-                            let colorIndex = 0;
+                            if (!coords || coords.length === 0) {
+                                return;
+                            }
 
-                            Object.keys(shapes).forEach(shapeId => {
-
-                                const color = SHAPE_COLORS[colorIndex % SHAPE_COLORS.length];
-
-                                const polyline = L.polyline(shapes[shapeId], {
-                                    color: color,
-                                    weight: 5,
-                                    opacity: 0.85
-                                });
-
-                                polyline.bindTooltip(
-                                    "Trajeto: " + shapeId, {
-                                        sticky: true
-                                    }
-                                );
-
-                                drawnItems.addLayer(polyline);
-                                bounds.push(...polyline.getLatLngs());
-
-                                colorIndex++;
+                            const polyline = L.polyline(coords, {
+                                color: "#0066ff",
+                                weight: 3,
+                                opacity: 0.85
                             });
 
-                            if (bounds.length > 0) {
-                                map.fitBounds(bounds);
-                            }
+                            drawnItems.addLayer(polyline);
+
+                            map.fitBounds(polyline.getBounds());
+
                         })
+
                         .catch(err => {
-                            console.error("Erro ao carregar shapes:", err);
+                            console.error("Erro ao carregar shape:", err);
                         });
+
                 }
+
+                window.addEventListener("DOMContentLoaded", function() {
+
+                    carregarShape();
+                    carregarStopsTabela();
+
+                });
 
                 // Função para Salvar shape 
                 function salvarShape(layer) {
@@ -611,6 +568,14 @@ $shape_id = $trip['shape_id'];
                                 alert(data.message);
                             }
                         });
+
+                    if (data.status === "ok") {
+
+                        alert("Trajeto salvo com sucesso!");
+
+                        carregarShape();
+
+                    }
                 }
 
                 // ===== EVENTOS DO DRAW =====
@@ -694,35 +659,37 @@ $shape_id = $trip['shape_id'];
 
             <!-- Script para selecionar um shape e carregar no mapa -->
             <script>
-                document.getElementById("trip-select").addEventListener("change", function() {
+                function carregarShapeMapa() {
 
-                    const shapeId = this.value;
+                    fetch("get_shape_by_trip.php?trip_id=" + TRIP_ID)
 
-                    if (!shapeId) return;
-
-                    carregarStopsTabela(shapeId);
-
-                    fetch("get_shape_by_id.php?shape_id=" + shapeId)
                         .then(res => res.json())
+
                         .then(coords => {
 
                             drawnItems.clearLayers();
 
+                            if (!coords || coords.length === 0) {
+                                return;
+                            }
+
                             const polyline = L.polyline(coords, {
-                                color: "#0000ff",
-                                weight: 3,
-                                opacity: 0.5
+                                color: "#0066ff",
+                                weight: 4,
+                                opacity: 0.9
                             });
 
                             drawnItems.addLayer(polyline);
+
                             map.fitBounds(polyline.getBounds());
 
                         })
+
                         .catch(err => {
-                            console.error("Erro ao carregar shape:", err);
+                            console.error(err);
                         });
 
-                });
+                }
             </script>
 
             </section>
@@ -810,8 +777,7 @@ $shape_id = $trip['shape_id'];
 
         });
 
-
-       <!--Script para o botão editar-- >
+        // Script para o botão editar
         document.getElementById("btnEditar").addEventListener("click", function() {
 
             const linhas = document.querySelectorAll("#tbodyStops tr");
@@ -882,6 +848,7 @@ $shape_id = $trip['shape_id'];
 </body>
 
 </html>
+
 <!-- Script em JS para destaque do imput ao clicar no botão novo -->
 <script>
     document.getElementById("btnNovo").addEventListener("click", function(e) {

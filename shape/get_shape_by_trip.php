@@ -1,11 +1,10 @@
 <?php
+
 require_once __DIR__ . "/../connection.php";
 
 header("Content-Type: application/json; charset=utf-8");
 
-mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-
-$trip_id = isset($_GET['trip_id']) ? (int)$_GET['trip_id'] : 0;
+$trip_id = isset($_GET["trip_id"]) ? (int)$_GET["trip_id"] : 0;
 
 if ($trip_id <= 0) {
     echo json_encode([]);
@@ -22,7 +21,6 @@ $stmt = $conexao->prepare("
     SELECT shape_id
     FROM trips
     WHERE trip_id = ?
-    LIMIT 1
 ");
 
 $stmt->bind_param("i", $trip_id);
@@ -31,36 +29,36 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result->num_rows == 0) {
+
     echo json_encode([]);
     exit;
+
 }
 
 $trip = $result->fetch_assoc();
 
-$shape_id = $trip['shape_id'];
+if (empty($trip["shape_id"])) {
 
-if (empty($shape_id)) {
     echo json_encode([]);
     exit;
+
 }
+
+$shape_id = $trip["shape_id"];
 
 /*
 |--------------------------------------------------------------------------
-| Busca a sequência de paradas
+| Busca os pontos
 |--------------------------------------------------------------------------
 */
 
 $stmt = $conexao->prepare("
     SELECT
-        Id,
-        seq,
-        stop_id,
-        codigo,
-        ponto,
-        intervalo
-    FROM shape_stops
+        shape_pt_lat,
+        shape_pt_lon
+    FROM shapes
     WHERE shape_id = ?
-    ORDER BY seq ASC
+    ORDER BY shape_pt_sequence
 ");
 
 $stmt->bind_param("s", $shape_id);
@@ -68,14 +66,15 @@ $stmt->execute();
 
 $result = $stmt->get_result();
 
-$dados = [];
+$coords = [];
 
 while ($row = $result->fetch_assoc()) {
 
-    $row['id'] = (int)$row['Id'];
-    $row['seq'] = (int)$row['seq'];
+    $coords[] = [
+        (float)$row["shape_pt_lat"],
+        (float)$row["shape_pt_lon"]
+    ];
 
-    $dados[] = $row;
 }
 
-echo json_encode($dados);
+echo json_encode($coords);
