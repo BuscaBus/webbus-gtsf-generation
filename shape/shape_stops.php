@@ -81,8 +81,13 @@ $shape_id = $trip['shape_id'];
             <h1>Sequencia de paradas</h1>
         </header>
         <main class="main-shst">
-            <!-- Section para tabela com o pontos do trajeto -->
+            <!-- Section para tabela com o pontos do trajeto -->            
             <section class="sect-tab-traj" id="scroll-area">
+                <p>
+                    <select id="trip-select" class="trip-select">
+                        <option value="">Selecione um trajeto</option>                        
+                    </select>
+                </p>    
                 <br>
                 <table>
                     <caption>Pontos do Trajeto</caption>
@@ -91,6 +96,7 @@ $shape_id = $trip['shape_id'];
                         <th class="th-cod">Código</th>
                         <th class="th-ponto">Ponto</th>
                         <th class="th-inter">Intervalo</th>
+                        <th class="th-inter">Destino</th>
                         <th class="th-acoes">Ação</th>
                     </thead>
                     <tbody id="tbodyStops"></tbody>
@@ -245,14 +251,7 @@ $shape_id = $trip['shape_id'];
                     }
 
                 });
-
-                map.on("moveend", function() {
-
-                    if (map.getZoom() >= 17) {
-                        carregarStops();
-                    }
-
-                });
+                
 
                 // ===== FUNÇÃO PARA ADICIONAR STOP NA TABELA =====
                 function adicionarStopNaTabela(stop) {
@@ -282,6 +281,9 @@ $shape_id = $trip['shape_id'];
                         <td>${stop.name}</td>
                         <td>
                             <input type="time" name="interval[]">
+                        </td>
+                        <td>
+                            <input type="text" name="">                        
                         </td>
                         <td>
                             <button class="btn-excluir" onclick="removerLinha(this)">EXCLUIR</button>
@@ -481,18 +483,7 @@ $shape_id = $trip['shape_id'];
 
                     carregarStopsTabela();
 
-                });
-
-                // Definição de palheta para as cores do traçado
-                const SHAPE_COLORS = [
-                    "#0066ff", // azul
-                    "#ff0000", // vermelho
-                    "#00aa00", // verde
-                    "#800080", // roxo
-                    "#ff9900", // laranja
-                    "#ffff00", // amarelo
-                    "#8a2be2" // violeta
-                ];
+                });                
 
                 // Carregar shape salvo
                 function carregarShape() {
@@ -567,33 +558,8 @@ $shape_id = $trip['shape_id'];
                             } else {
                                 alert(data.message);
                             }
-                        });
-
-                    if (data.status === "ok") {
-
-                        alert("Trajeto salvo com sucesso!");
-
-                        carregarShape();
-
-                    }
-                }
-
-                // ===== EVENTOS DO DRAW =====
-                map.on(L.Draw.Event.CREATED, function(e) {
-                    drawnItems.clearLayers();
-                    drawnItems.addLayer(e.layer);
-                    salvarShape(e.layer);
-                });
-
-                map.on(L.Draw.Event.EDITED, function(e) {
-                    e.layers.eachLayer(function(layer) {
-                        salvarShape(layer);
-                    });
-                });
-
-                map.on(L.Draw.Event.DELETED, function() {
-                    drawnItems.clearLayers();
-                });
+                        });                    
+                }                
 
                 // ===== BOTÃO SALVAR (regrava shape desenhado) =====
                 document.getElementById("btnSalvar").addEventListener("click", function() {
@@ -608,89 +574,7 @@ $shape_id = $trip['shape_id'];
                 setTimeout(() => {
                     map.invalidateSize();
                 }, 300);
-            </script>
-
-            <!-- Script para carregar select Shape -->
-            <script>
-                function carregarSelectShapes() {
-
-                    fetch("get_shapes_route.php?route_id=" + ROUTE_ID)
-                        .then(res => res.json())
-                        .then(shapes => {
-
-                            const select = document.getElementById("trip-select");
-                            select.innerHTML = '<option value="">Selecione</option>';
-
-                            shapes.forEach(shapeId => {
-                                const opt = document.createElement("option");
-                                opt.value = shapeId;
-                                opt.textContent = shapeId;
-                                select.appendChild(opt);
-                            });
-
-                        })
-                        .catch(err => {
-                            console.error("Erro ao carregar shapes:", err);
-                        });
-                }
-            </script>
-
-            <!-- Script para o botão novo -->
-            <script>
-                document.getElementById("btnNovo").addEventListener("click", function(e) {
-
-                    e.preventDefault(); // evita abrir nova aba
-
-                    modoNovo = true;
-
-                    // limpa mapa
-                    drawnItems.clearLayers();
-
-                    // limpa código
-                    document.getElementById("id-trip-traj").value = "";
-
-                    // carrega shapes para copiar
-                    carregarSelectShapes();
-
-                    alert("Modo novo trajeto ativado. Selecione um trajeto para copiar ou desenhe um novo.");
-
-                });
-            </script>
-
-            <!-- Script para selecionar um shape e carregar no mapa -->
-            <script>
-                function carregarShapeMapa() {
-
-                    fetch("get_shape_by_trip.php?trip_id=" + TRIP_ID)
-
-                        .then(res => res.json())
-
-                        .then(coords => {
-
-                            drawnItems.clearLayers();
-
-                            if (!coords || coords.length === 0) {
-                                return;
-                            }
-
-                            const polyline = L.polyline(coords, {
-                                color: "#0066ff",
-                                weight: 4,
-                                opacity: 0.9
-                            });
-
-                            drawnItems.addLayer(polyline);
-
-                            map.fitBounds(polyline.getBounds());
-
-                        })
-
-                        .catch(err => {
-                            console.error(err);
-                        });
-
-                }
-            </script>
+            </script>                   
 
             </section>
         </main>
@@ -849,58 +733,3 @@ $shape_id = $trip['shape_id'];
 
 </html>
 
-<!-- Script em JS para destaque do imput ao clicar no botão novo -->
-<script>
-    document.getElementById("btnNovo").addEventListener("click", function(e) {
-
-        e.preventDefault();
-
-        modoNovo = true;
-
-        drawnItems.clearLayers();
-
-        const input = document.getElementById("id-trip-traj");
-        const select = document.getElementById("trip-select");
-
-        input.value = "";
-        select.value = "";
-
-        // remove destaque do select
-        select.classList.remove("input-destaque");
-
-        // adiciona destaque no input
-        input.classList.add("input-destaque");
-
-        input.focus();
-
-        carregarSelectShapes();
-    });
-
-    // Script em JS para destaque do trip-select ao clicar no botão copiar 
-    document.getElementById("btnCopiar").addEventListener("click", function(e) {
-
-        e.preventDefault();
-
-        const input = document.getElementById("id-trip-traj");
-        const select = document.getElementById("trip-select");
-
-        // remove destaque do input
-        input.classList.remove("input-destaque");
-
-        // adiciona destaque no select
-        select.classList.add("input-destaque");
-
-        select.focus();
-
-        carregarSelectShapes();
-    });
-
-
-    document.getElementById("id-trip-traj").addEventListener("input", function() {
-        this.classList.remove("input-destaque");
-    });
-
-    document.getElementById("trip-select").addEventListener("change", function() {
-        this.classList.remove("input-destaque");
-    });
-</script>
