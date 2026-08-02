@@ -328,10 +328,14 @@ table{
 }
 
 .th-ponto{
-    padding-right: 260px;
+    padding-right: 235px;
 }
 
 .th-inter{
+    padding-right: 15px;
+}
+
+.th-destino{
     padding-right: 15px;
 }
 

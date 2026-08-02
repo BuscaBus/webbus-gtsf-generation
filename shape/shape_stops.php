@@ -43,6 +43,7 @@ $shape_id = $trip['shape_id'];
 
 <script>
     const TRIP_ID = <?= (int)$trip['trip_id'] ?>;
+    let tripAtual = TRIP_ID;    
 </script>
 
 <!DOCTYPE html>
@@ -55,7 +56,7 @@ $shape_id = $trip['shape_id'];
     <link rel="shortcut icon" href="../img/logo-icon2.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/style.css?v=1.2">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
-    <link rel="stylesheet" href="../css/shape.css?v=2.1">
+    <link rel="stylesheet" href="../css/shape.css?v=2.2">
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
@@ -81,22 +82,53 @@ $shape_id = $trip['shape_id'];
             <h1>Sequencia de paradas</h1>
         </header>
         <main class="main-shst">
-            <!-- Section para tabela com o pontos do trajeto -->            
+            <!-- Section para tabela com o pontos do trajeto -->
             <section class="sect-tab-traj" id="scroll-area">
                 <p>
                     <select id="trip-select" class="trip-select">
-                        <option value="">Selecione um trajeto</option>                        
+                        <option value="">Selecione um trajeto</option>
+                        // Consulta no banco de dados e traz as viagens cadastradas
+                        <?php
+                        $sqlTrips = "
+                                    SELECT
+                                        trip_id,
+                                        trip_short_name,
+                                        trip_headsign,
+                                        shape_id
+                                    FROM trips
+                                    WHERE route_id = ?
+                                    ORDER BY trip_short_name, trip_headsign
+                                ";
+
+                        $stmtTrips = $conexao->prepare($sqlTrips);
+                        $stmtTrips->bind_param("i", $route_id);
+                        $stmtTrips->execute();
+                        $resultTrips = $stmtTrips->get_result();
+
+                        while ($t = $resultTrips->fetch_assoc()) {
+
+                            $selected = ($t['trip_id'] == $trip_id) ? 'selected' : '';
+
+                            $nome = trim($t['trip_short_name']);
+
+                            if (!empty($t['trip_headsign'])) {
+                                $nome .= ' - ' . $t['trip_headsign'];
+                            }
+
+                            echo "<option value='{$t['trip_id']}' data-shape='{$t['shape_id']}' {$selected}>{$nome}</option>";
+                        }
+                        ?>
                     </select>
-                </p>    
+                </p>
                 <br>
                 <table>
                     <caption>Pontos do Trajeto</caption>
                     <thead>
                         <th class="th-seq">Seq.</th>
-                        <th class="th-cod">Código</th>
+                        <th class="th-cod">Cod</th>
                         <th class="th-ponto">Ponto</th>
                         <th class="th-inter">Intervalo</th>
-                        <th class="th-inter">Destino</th>
+                        <th class="th-destino">Destino</th>
                         <th class="th-acoes">Ação</th>
                     </thead>
                     <tbody id="tbodyStops"></tbody>
@@ -113,11 +145,7 @@ $shape_id = $trip['shape_id'];
             </section>
 
             <script>
-                const SHAPE_ID = "<?= $shape_id ?>";
-                window.onload = function() {
-                    carregarTabelaStops(SHAPE_ID);
-                };
-
+                const SHAPE_ID = "<?= $shape_id ?>";              
                 const ROUTE_ID = "<?= $trip_id ?>";
             </script>
 
@@ -250,8 +278,7 @@ $shape_id = $trip['shape_id'];
                         stopsLayer.clearLayers();
                     }
 
-                });
-                
+                });                
 
                 // ===== FUNÇÃO PARA ADICIONAR STOP NA TABELA =====
                 function adicionarStopNaTabela(stop) {
@@ -283,7 +310,7 @@ $shape_id = $trip['shape_id'];
                             <input type="time" name="interval[]">
                         </td>
                         <td>
-                            <input type="text" name="">                        
+                            <input type="text" name=""stop_headsign[]"">                        
                         </td>
                         <td>
                             <button class="btn-excluir" onclick="removerLinha(this)">EXCLUIR</button>
@@ -416,16 +443,12 @@ $shape_id = $trip['shape_id'];
                 // Função para carregar os pontos na tabela vindos do banco de dados 
                 function carregarStopsTabela() {
 
-                    console.log("Carregando stops da trip:", TRIP_ID);
+                    fetch("get_stops_sequence.php?trip_id=" + tripAtual)
 
-                    fetch("get_stops_sequence.php?trip_id=" + TRIP_ID)
                         .then(res => res.json())
                         .then(stops => {
 
-                            console.log(stops);
-
                             const tbody = document.getElementById("tbodyStops");
-
                             tbody.innerHTML = "";
 
                             stops.forEach(stop => {
@@ -448,7 +471,6 @@ $shape_id = $trip['shape_id'];
                     </td>
 
                     <td>${stop.codigo}</td>
-
                     <td>${stop.ponto}</td>
 
                     <td>
@@ -458,8 +480,11 @@ $shape_id = $trip['shape_id'];
                     </td>
 
                     <td>
-                        <button
-                            class="btn-excluir"
+                            <input type="text" name=""stop_headsign[]"">                        
+                    </td>
+
+                    <td>
+                        <button class="btn-excluir"
                             onclick="removerLinha(this)">
                             EXCLUIR
                         </button>
@@ -467,38 +492,25 @@ $shape_id = $trip['shape_id'];
                 `;
 
                                 tbody.appendChild(tr);
-
                             });
 
                             atualizarSequencia();
 
-                        })
-                        .catch(err => {
-                            console.error(err);
                         });
-
                 }
-
-                window.addEventListener("DOMContentLoaded", function() {
-
-                    carregarStopsTabela();
-
-                });                
 
                 // Carregar shape salvo
                 function carregarShape() {
 
-                    fetch("get_shape_by_trip.php?trip_id=" + TRIP_ID)
+                    fetch("get_shape_by_trip.php?trip_id=" + tripAtual)
 
                         .then(res => res.json())
-
                         .then(coords => {
 
                             drawnItems.clearLayers();
 
-                            if (!coords || coords.length === 0) {
+                            if (!coords.length)
                                 return;
-                            }
 
                             const polyline = L.polyline(coords, {
                                 color: "#0066ff",
@@ -510,15 +522,18 @@ $shape_id = $trip['shape_id'];
 
                             map.fitBounds(polyline.getBounds());
 
-                        })
-
-                        .catch(err => {
-                            console.error("Erro ao carregar shape:", err);
                         });
 
                 }
 
-                window.addEventListener("DOMContentLoaded", function() {
+                const selectTrip = document.getElementById("trip-select");
+
+                selectTrip.addEventListener("change", function() {
+
+                    if (!this.value)
+                        return;
+
+                    tripAtual = this.value;
 
                     carregarShape();
                     carregarStopsTabela();
@@ -543,7 +558,7 @@ $shape_id = $trip['shape_id'];
                             },
 
                             body: JSON.stringify({
-                                trip_id: TRIP_ID,
+                                trip_id: tripAtual,
                                 shape_id: SHAPE_ID,
                                 route_id: ROUTE_ID,
                                 coords: coords
@@ -558,8 +573,8 @@ $shape_id = $trip['shape_id'];
                             } else {
                                 alert(data.message);
                             }
-                        });                    
-                }                
+                        });
+                }
 
                 // ===== BOTÃO SALVAR (regrava shape desenhado) =====
                 document.getElementById("btnSalvar").addEventListener("click", function() {
@@ -574,7 +589,7 @@ $shape_id = $trip['shape_id'];
                 setTimeout(() => {
                     map.invalidateSize();
                 }, 300);
-            </script>                   
+            </script>
 
             </section>
         </main>
@@ -608,7 +623,7 @@ $shape_id = $trip['shape_id'];
 
                 dados.push({
 
-                    trip_id: TRIP_ID,
+                    trip_id: tripAtual,
                     stop_id: stop_id,
                     seq: seq,
                     codigo: codigo,
@@ -714,17 +729,8 @@ $shape_id = $trip['shape_id'];
         // ===== CARREGA AUTOMATICAMENTE O PRIMEIRO TRAJETO =====
         window.addEventListener("DOMContentLoaded", function() {
 
-            const select = document.getElementById("trip-select");
-
-            // verifica se existe algum trajeto
-            if (select.options.length > 1) {
-
-                // seleciona o primeiro trajeto válido
-                select.selectedIndex = 1;
-
-                // dispara automaticamente o change
-                select.dispatchEvent(new Event("change"));
-            }
+            carregarShape();
+            carregarStopsTabela();
 
         });
     </script>
@@ -732,4 +738,3 @@ $shape_id = $trip['shape_id'];
 </body>
 
 </html>
-

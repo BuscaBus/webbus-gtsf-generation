@@ -82,8 +82,8 @@ if (!$trip) {
                 </p>
                 <br><br>
                 <button type="button" id="btnSalvar" class="btn-salv"> SALVAR </button>
-                <button 
-                       type="button" class="btn-reg-canc" onclick="window.location='../trips/register.php?id=<?= urlencode($trip['route_id']) ?>'"> CANCELAR  
+                <button
+                    type="button" class="btn-reg-canc" onclick="window.location='../trips/register.php?id=<?= urlencode($trip['route_id']) ?>'"> CANCELAR
                 </button>
                 <br><br>
                 <p>
@@ -318,22 +318,20 @@ if (!$trip) {
                     );
                 // Carregar as Trips automaticamente
                 function carregarTripsComShape() {
-                    fetch("get_trips_com_shape.php")
+                    fetch("get_trips_com_shape.php?route_id=" + ROUTE_ID)
                         .then(res => res.json())
                         .then(trips => {
-                            let select =
-                                document.getElementById(
-                                    "trip-copy-select"
-                                );
+
+                            let select = document.getElementById("trip-copy-select");
+                            select.innerHTML = '<option value="">Selecione uma Viagem</option>';
+
                             trips.forEach(trip => {
-                                let option =
-                                    document.createElement("option");
-                                option.value =
-                                    trip.shape_id;
-                                option.textContent =
-                                    trip.nome;
+                                let option = document.createElement("option");
+                                option.value = trip.shape_id;
+                                option.textContent = trip.nome;
                                 select.appendChild(option);
                             });
+
                         });
                 }
 
@@ -357,7 +355,7 @@ if (!$trip) {
                                     L.polyline(
                                         coords, {
                                             color: "#0000ff",
-                                            weight: 5
+                                            weight: 3
                                         }
                                     );
 
