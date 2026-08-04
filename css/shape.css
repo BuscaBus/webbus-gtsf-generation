@@ -319,8 +319,13 @@ table{
 }
 
 .th-seq{
-    padding-right: 10px;  
-    margin-left: 2px;        
+    padding-right: 7px;  
+    margin-left: 1px;        
+}
+
+.seq-input{
+    width: 33px;
+    text-align: center;
 }
 
 .th-cod{
@@ -328,7 +333,7 @@ table{
 }
 
 .th-ponto{
-    padding-right: 235px;
+    padding-right: 170px;
 }
 
 .th-inter{
@@ -340,7 +345,7 @@ table{
 }
 
 .th-acoes{
-    padding-right: 35px;
+    padding-right: 27px;
 }
 
 .btn-excluir{

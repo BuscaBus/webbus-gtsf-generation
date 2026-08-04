@@ -43,7 +43,7 @@ $shape_id = $trip['shape_id'];
 
 <script>
     const TRIP_ID = <?= (int)$trip['trip_id'] ?>;
-    let tripAtual = TRIP_ID;    
+    let tripAtual = TRIP_ID;
 </script>
 
 <!DOCTYPE html>
@@ -56,7 +56,7 @@ $shape_id = $trip['shape_id'];
     <link rel="shortcut icon" href="../img/logo-icon2.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/style.css?v=1.2">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
-    <link rel="stylesheet" href="../css/shape.css?v=2.2">
+    <link rel="stylesheet" href="../css/shape.css?v=2.4">
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
@@ -68,10 +68,6 @@ $shape_id = $trip['shape_id'];
         #div-map {
             width: 100%;
             height: 100%;
-        }
-
-        .seq-input {
-            width: 33px;
         }
     </style>
 </head>
@@ -145,7 +141,7 @@ $shape_id = $trip['shape_id'];
             </section>
 
             <script>
-                const SHAPE_ID = "<?= $shape_id ?>";              
+                const SHAPE_ID = "<?= $shape_id ?>";
                 const ROUTE_ID = "<?= $trip_id ?>";
             </script>
 
@@ -278,7 +274,7 @@ $shape_id = $trip['shape_id'];
                         stopsLayer.clearLayers();
                     }
 
-                });                
+                });
 
                 // ===== FUNÇÃO PARA ADICIONAR STOP NA TABELA =====
                 function adicionarStopNaTabela(stop) {
@@ -310,7 +306,10 @@ $shape_id = $trip['shape_id'];
                             <input type="time" name="interval[]">
                         </td>
                         <td>
-                            <input type="text" name=""stop_headsign[]"">                        
+                            <input
+                                type="text"
+                                name="stop_headsign[]"
+                                value="${stop.stop_headsign ?? ''}">                        
                         </td>
                         <td>
                             <button class="btn-excluir" onclick="removerLinha(this)">EXCLUIR</button>
@@ -480,7 +479,10 @@ $shape_id = $trip['shape_id'];
                     </td>
 
                     <td>
-                            <input type="text" name=""stop_headsign[]"">                        
+                        <input
+                            type="text"
+                            name="stop_headsign[]"
+                            value="${stop.stop_headsign ?? ''}">                        
                     </td>
 
                     <td>
@@ -620,6 +622,7 @@ $shape_id = $trip['shape_id'];
                 const codigo = row.cells[3].innerText.trim();
                 const ponto = row.cells[4].innerText.trim();
                 const intervalo = row.querySelector('input[type="time"]').value;
+                const destino = row.querySelector('input[name="stop_headsign[]"]').value;
 
                 dados.push({
 
@@ -628,7 +631,8 @@ $shape_id = $trip['shape_id'];
                     seq: seq,
                     codigo: codigo,
                     ponto: ponto,
-                    intervalo: intervalo
+                    intervalo: intervalo,
+                    destino: destino
 
                 });
 
@@ -692,10 +696,12 @@ $shape_id = $trip['shape_id'];
 
                 const id = row.cells[0].innerText;
                 const intervalo = row.querySelector("input").value;
+                const destino = row.querySelector('input[name="stop_headsign[]"]').value;
 
                 dados.push({
                     id: id,
-                    intervalo: intervalo
+                    intervalo: intervalo,
+                    destino: destino
                 });
 
             });
@@ -731,6 +737,60 @@ $shape_id = $trip['shape_id'];
 
             carregarShape();
             carregarStopsTabela();
+
+        });
+    </script>
+
+    // Script para prenchimento automático dos destinos na tabela de pontos
+    <script>
+        function configurarDestinoAutomatico() {
+
+            document.addEventListener("blur", function(e) {
+
+                if (!e.target.matches('input[name="stop_headsign[]"]')) {
+                    return;
+                }
+
+                const campos = document.querySelectorAll('input[name="stop_headsign[]"]');
+
+                // Apenas o primeiro campo dispara a pergunta
+                if (e.target !== campos[0]) {
+                    return;
+                }
+
+                const destino = e.target.value.trim();
+
+                if (destino === "") {
+                    return;
+                }
+
+                // Verifica se existe algum campo vazio
+                const existeVazio = [...campos].slice(1).some(c => c.value.trim() === "");
+
+                if (!existeVazio) {
+                    return;
+                }
+
+                if (confirm(`Deseja preencher todos os destinos com "${destino}"?`)) {
+
+                    [...campos].slice(1).forEach(campo => {
+                        if (campo.value.trim() === "") {
+                            campo.value = destino;
+                        }
+                    });
+
+                }
+
+            }, true);
+
+        }
+
+        window.addEventListener("DOMContentLoaded", function() {
+
+            carregarShape();
+            carregarStopsTabela();
+
+            configurarDestinoAutomatico();
 
         });
     </script>

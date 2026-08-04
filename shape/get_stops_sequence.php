@@ -57,7 +57,8 @@ $stmt = $conexao->prepare("
         stop_id,
         codigo,
         ponto,
-        intervalo
+        intervalo,
+        stop_headsign
     FROM shape_stops
     WHERE shape_id = ?
     ORDER BY seq ASC

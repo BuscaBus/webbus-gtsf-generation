@@ -1,5 +1,5 @@
 <?php
-include("../connection.php");
+require_once __DIR__ . "/../connection.php";
 
 $data = json_decode(file_get_contents("php://input"), true);
 
@@ -12,9 +12,10 @@ foreach ($data as $item) {
 
     $id = mysqli_real_escape_string($conexao, $item['id']);
     $intervalo = mysqli_real_escape_string($conexao, $item['intervalo']);
+    $destino = mysqli_real_escape_string($conexao, $item['destino']);
 
     $sql = "UPDATE shape_stops 
-            SET intervalo = '$intervalo' 
+            SET intervalo = '$intervalo', stop_headsign = '$destino'
             WHERE Id = '$id'";
 
     mysqli_query($conexao, $sql);

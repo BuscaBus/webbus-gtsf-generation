@@ -87,11 +87,12 @@ try {
             seq,
             codigo,
             ponto,
-            intervalo
+            intervalo,
+            stop_headsign
         )
         VALUES
         (
-            ?, ?, ?, ?, ?, ?
+            ?, ?, ?, ?, ?, ?, ?
         )
     ");
 
@@ -102,15 +103,17 @@ try {
         $codigo    = trim($item['codigo']);
         $ponto     = trim($item['ponto']);
         $intervalo = trim($item['intervalo']);
+        $destino = trim($item['destino']);
 
         $stmtInsert->bind_param(
-            "siisss",
+            "siissss",
             $shape_id,
             $stop_id,
             $seq,
             $codigo,
             $ponto,
-            $intervalo
+            $intervalo,
+            $destino
         );
 
         $stmtInsert->execute();
