@@ -56,7 +56,7 @@ $shape_id = $trip['shape_id'];
     <link rel="shortcut icon" href="../img/logo-icon2.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/style.css?v=1.2">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
-    <link rel="stylesheet" href="../css/shape.css?v=2.4">
+    <link rel="stylesheet" href="../css/shape.css?v=2.5">
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
@@ -482,6 +482,7 @@ $shape_id = $trip['shape_id'];
                         <input
                             type="text"
                             name="stop_headsign[]"
+                            class="input-destino"
                             value="${stop.stop_headsign ?? ''}">                        
                     </td>
 
@@ -695,7 +696,7 @@ $shape_id = $trip['shape_id'];
             linhas.forEach(row => {
 
                 const id = row.cells[0].innerText;
-                const intervalo = row.querySelector("input").value;
+                const intervalo = row.querySelector('input[type="time"]').value;
                 const destino = row.querySelector('input[name="stop_headsign[]"]').value;
 
                 dados.push({
@@ -741,8 +742,8 @@ $shape_id = $trip['shape_id'];
         });
     </script>
 
-    // Script para prenchimento automático dos destinos na tabela de pontos
     <script>
+         // Script para prenchimento automático dos destinos na tabela de pontos
         function configurarDestinoAutomatico() {
 
             document.addEventListener("blur", function(e) {

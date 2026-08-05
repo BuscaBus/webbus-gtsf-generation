@@ -326,6 +326,7 @@ table{
 .seq-input{
     width: 33px;
     text-align: center;
+    padding: 2px;
 }
 
 .th-cod{
@@ -346,6 +347,10 @@ table{
 
 .th-acoes{
     padding-right: 27px;
+}
+
+.input-destino{
+    padding: 2px;
 }
 
 .btn-excluir{
