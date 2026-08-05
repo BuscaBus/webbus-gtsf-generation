@@ -139,8 +139,6 @@ section{
     padding: 4px;
 }
 
-
-
 .inpt-reg-hrpart{
     background-color: #F3F4F0;
     width: 310px;
@@ -153,7 +151,18 @@ section{
     justify-content: center;
 }
 
-.btn-reg-cad{
+.btn-reg-importar{
+    background-color: blue;
+    color: var(--color0);
+    width: 150px;
+    font-weight: bold;
+    border-radius: 6px;
+    margin-right: 5px;
+    padding: 3px 15px 3px 15px;
+    cursor: pointer;
+}
+
+.btn-reg-salvar{
     background-color: var(--color4);
     color: var(--color0);
     font-weight: bold;
@@ -163,19 +172,13 @@ section{
     cursor: pointer;
 }
 
-.btn-reg-canc{
-    background-color: red;
-    color: var(--color0);
-    font-weight: bold;
-    border-radius: 6px;
-    margin-right: 5px;
-    padding: 3px 15px 3px 15px;
-    cursor: pointer;
-}
-
-.a-btn-canc{
-    text-decoration: none;
-    color: inherit;
+.txt-lista-horarios{
+    width:440px;
+    height:180px;
+    padding:8px;
+    font-size:16px;
+    resize:none;
+    font-family:monospace;
 }
 
 /*Configurações da tabela de listagem de horários*/
@@ -184,46 +187,23 @@ table{
     margin: auto;
 }
 
-.th-seq{
-    padding-right: 5px;
+.th-hor{
+    padding-right: 240px;    
 }
 
-.th-ponto{
-    padding-right: 300px;
+.th-acoes{
+    padding-right: 10px;
 }
 
-.th-cheg{
-    padding-right: 15px;    
-}
-
-.th-part{
-    padding-right: 15px;    
-}
-
-.th-inter{
-    padding-right: 15px;    
-}
-
-.th-dest{
-    padding-right: 200px;    
-}
-
-.th-prev{
-    padding-right: 5px;    
-}
-
-.headsign{    
-    width: 250px;
-    padding: 2px;
-} 
-
-.btn-gerHor{
-    background-color: var(--color4);
+.btn-excluir{
+    background-color: red;
     color: var(--color0);
+    font-size: 10px;
     font-weight: bold;
+    padding: 3px;
+    padding: 2px 4px 2px 4px;
     border-radius: 6px;
-    margin-right: 5px;
-    padding: 3px 15px 3px 15px;
     cursor: pointer;
 }
+
 
