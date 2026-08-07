@@ -20,28 +20,45 @@ if(!$data){
 mysqli_begin_transaction($conexao);
 
 try{
-
-    foreach($data as $item){
-
-        $trip_id=$item['trip_id'];
-        $service_id=$item['service_id'];
-        $departure_time=$item['departure_time'];
-
-        mysqli_query($conexao,"
-            INSERT INTO trip_departures
-            (
+    $sql = "INSERT INTO trip_departures (
                 trip_id,
                 service_id,
-                departure_time
-            )
-            VALUES
-            (
-                '$trip_id',
-                '$service_id',
-                '$departure_time'
-            )
-        ");
+                departure_time,
+                wheelchair_accessible,
+                timepoint
+            ) VALUES (?, ?, ?, ?, ?)";
 
+    $stmt = mysqli_prepare($conexao, $sql);
+
+    if (!$stmt) {
+        throw new Exception(mysqli_error($conexao));
+    }
+
+    foreach ($data as $item) {
+
+        $trip_id = (int) $item['trip_id'];
+        $service_id = $item['service_id'];
+        $departure_time = $item['departure_time'];
+
+        $wheelchair_accessible =
+            !empty($item['wheelchair_accessible']) ? 1 : 0;
+
+        $timepoint =
+            !empty($item['timepoint']) ? 1 : 0;
+
+        mysqli_stmt_bind_param(
+            $stmt,
+            "issii",
+            $trip_id,
+            $service_id,
+            $departure_time,
+            $wheelchair_accessible,
+            $timepoint
+        );
+
+        if (!mysqli_stmt_execute($stmt)) {
+            throw new Exception(mysqli_stmt_error($stmt));
+        }
     }
 
     mysqli_query($conexao,"

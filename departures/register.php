@@ -63,7 +63,7 @@ $result_calendar = mysqli_query($conexao, $sql_calendar);
     <link rel="shortcut icon" href="../img/logo-icon2.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/style.css?v=1.3">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
-    <link rel="stylesheet" href="../css/departures.css?v=1.1">
+    <link rel="stylesheet" href="../css/departures.css?v=1.5">
 </head>
 
 <body>
@@ -94,7 +94,7 @@ $result_calendar = mysqli_query($conexao, $sql_calendar);
                     <p class="p-estilo">
                         <label class="lb-reg-serv">Serviço:</label>
                         <select id="id-serv" name="service_id" class="selec-reg-serv">
-                            <option>Selecione um serviço</option>
+                            <option value="" selected disabled>Selecione um serviço</option>
                             <?php while ($service = mysqli_fetch_assoc($result_calendar)) { ?>
                                 <option value="<?= $service['service_id'] ?>">
                                     <?= htmlspecialchars($service['service_id']) ?>
@@ -104,7 +104,7 @@ $result_calendar = mysqli_query($conexao, $sql_calendar);
                     </p>
                     <p class="p-estilo">
                         <label class="lb-reg-hrpart">Partida:</label>
-                        <input type="time" name="horario" class="inpt-reg-hrpart">
+                        <input type="time" id="inpt-reg-hrpart" name="horario" class="inpt-reg-hrpart">
                     </p>
 
                     <p class="p-estilo">
@@ -112,12 +112,12 @@ $result_calendar = mysqli_query($conexao, $sql_calendar);
                         <textarea id="lista-horarios" class="txt-lista-horarios" rows="30"></textarea>
                     </p>
                     <p>
-                        <button type="button" id="btn-importar" class="btn-reg-importar">IMPORTAR LISTA </button>
+                        <button type="button" id="btn-importar" class="btn-reg-importar">ADICIONAR LISTA </button>
                     </p>
                 </form>
                 <br>
                 <P>
-                    <button type="button" id="btn-salvar" class="btn-reg-salvar">SALVAR</button>
+                    <button type="button" id="btn-adic" class="btn-reg-adic">ADICIONAR</button>
                 </P>
             </section>
 
@@ -125,25 +125,20 @@ $result_calendar = mysqli_query($conexao, $sql_calendar);
             <section class="sect-list-hor">
                 <br>
                 <table>
-                    <br><br>
                     <thead>
-                        <th class="th-hor">Horário</th>
-                        <th class="th-acoes">Ação</th>
-                    </thead>
-                    <tbody id="tbodyHorarios">
                         <tr>
-                            <td>
-
-                            </td>
-                            <td>
-                                <button class="btn-excluir" onclick="removerLinha(this)">EXCLUIR</button>
-                            </td>
+                            <th class="th-hor">Horários</th>
+                            <th class="th-fixo">Fixo</th>
+                            <th class="th-adaptado">Adaptado</th>                            
+                            <th class="th-acoes">Ação</th>
                         </tr>
-
-                    </tbody>
+                    </thead>
+                    <tbody id="tbodyHorarios"></tbody>
                 </table>
                 <br>
-
+                <P>
+                    <button type="button" id="btn-salvar" class="btn-reg-salvar">SALVAR</button>
+                </P>
             </section>
 
         </main>
@@ -153,10 +148,28 @@ $result_calendar = mysqli_query($conexao, $sql_calendar);
             </p>
         </footer>
     </div>
-
-    // Script ao clicar em IMPORTAR LISTA
+    
     <script>
+        // Script de função reutilizável para botões de adicionar na lista de horários
+        function validarServico() {
+
+            const service = document.getElementById("id-serv");
+
+            if (service.value === "") {
+                alert("Selecione um serviço antes de continuar.");
+                service.focus();
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+
+    <script>
+        // Script ao clicar em ADICIONAR LISTA
         document.getElementById("btn-importar").addEventListener("click", function() {
+
+            if (!validarServico()) return;
 
             const texto =
                 document.getElementById("lista-horarios").value.trim();
@@ -180,16 +193,30 @@ $result_calendar = mysqli_query($conexao, $sql_calendar);
                 const tr = document.createElement("tr");
 
                 tr.innerHTML = `
-            <td>${horario}</td>
+                <td>${horario}</td>
 
-            <td>
-                <button
-                    class="btn-excluir"
-                    onclick="removerLinha(this)">
-                    EXCLUIR
-                </button>
-            </td>
-        `;
+                <td>
+                    <input
+                        type="checkbox"
+                        class="check-fixo"
+                        checked>
+                </td>
+
+                <td>
+                    <input
+                        type="checkbox"
+                        class="check-adaptado" checked>
+                </td>               
+
+                <td>
+                    <button
+                        type="button"
+                        class="btn-excluir"
+                        onclick="removerLinha(this)">
+                        EXCLUIR
+                    </button>
+                </td>
+            `;
 
                 tbody.appendChild(tr);
 
@@ -200,8 +227,72 @@ $result_calendar = mysqli_query($conexao, $sql_calendar);
         });
     </script>
 
-    // Script ao clicar em SALVAR
     <script>
+        // Script do botão ADICIONAR
+        document.getElementById("btn-adic").addEventListener("click", function() {
+
+            if (!validarServico()) return;
+
+            const input = document.getElementById("inpt-reg-hrpart");
+            const horario = input.value.trim();
+
+            if (horario === "") {
+                alert("Informe um horário.");
+                input.focus();
+                return;
+            }
+
+            const tbody = document.getElementById("tbodyHorarios");
+
+            // Evita horários repetidos
+            const existe = [...tbody.querySelectorAll("tr")].some(function(tr) {
+                return tr.cells[0].innerText.trim() === horario;
+            });
+
+            if (existe) {
+                alert("Este horário já foi adicionado.");
+                return;
+            }
+
+            const tr = document.createElement("tr");
+
+            tr.innerHTML = `
+            <td>${horario}</td>
+
+            <td>
+                <input
+                    type="checkbox"
+                    class="check-fixo"
+                    title="Marcado: horário fixo. Desmarcado: horário previsto" checked>
+            </td>
+
+            <td>
+                <input
+                    type="checkbox"
+                    class="check-adaptado"
+                    title="Marque se a partida é adaptada para cadeirante" checked>
+            </td>            
+
+            <td>
+                <button
+                    type="button"
+                    class="btn-excluir"
+                    onclick="removerLinha(this)">
+                    EXCLUIR
+                </button>
+            </td>
+        `;
+
+            tbody.appendChild(tr);
+
+            input.value = "";
+            input.focus();
+
+        });
+    </script>
+
+    <script>
+        // Script ao clicar em SALVAR
         document.getElementById("btn-salvar").addEventListener("click", function() {
 
             const trip_id =
@@ -214,17 +305,24 @@ $result_calendar = mysqli_query($conexao, $sql_calendar);
                 document.querySelectorAll("#tbodyHorarios tr");
 
             let dados = [];
-
             linhas.forEach(function(row) {
 
+                const adaptado =
+                    row.querySelector(".check-adaptado").checked ? 1 : 0;
+
+                const horarioFixo =
+                    row.querySelector(".check-fixo").checked ? 1 : 0;
+
                 dados.push({
-
                     trip_id: trip_id,
-
                     service_id: service_id,
+                    departure_time: row.cells[0].innerText.trim(),
 
-                    departure_time: row.cells[0].innerText.trim()
+                    // Marcado = 1, desmarcado = 0
+                    wheelchair_accessible: adaptado,
 
+                    // GTFS: 1 = exato, 0 = aproximado
+                    timepoint: horarioFixo
                 });
 
             });
@@ -253,6 +351,80 @@ $result_calendar = mysqli_query($conexao, $sql_calendar);
                 });
 
         });
+    </script>
+
+    <script>
+        // Script para carregar os horários
+        const viagem = document.getElementById("id-viag");
+        const servico = document.getElementById("id-serv");
+
+        viagem.addEventListener("change", carregarHorarios);
+        servico.addEventListener("change", carregarHorarios);
+
+        function carregarHorarios() {
+
+            const trip_id = viagem.value;
+            const service_id = servico.value;
+
+            if (trip_id === "" || service_id === "")
+                return;
+
+            fetch(`buscar_departures.php?trip_id=${trip_id}&service_id=${service_id}`)
+                .then(r => r.json())
+                .then(lista => {
+
+                    const tbody = document.getElementById("tbodyHorarios");
+
+                    tbody.innerHTML = "";
+
+                    lista.forEach(function (item) {
+
+                        const tr = document.createElement("tr");
+
+                        const adaptadoMarcado =
+                            Number(item.wheelchair_accessible) === 1
+                                ? "checked"
+                                : "";
+
+                        const fixoMarcado =
+                            Number(item.timepoint) === 1
+                                ? "checked"
+                                : "";
+
+                        tr.innerHTML = `
+                            <td>${item.departure_time.substring(0, 5)}</td>
+
+                            <td>
+                                <input
+                                    type="checkbox"
+                                    class="check-adaptado"
+                                    ${adaptadoMarcado}>
+                            </td>
+
+                            <td>
+                                <input
+                                    type="checkbox"
+                                    class="check-fixo"
+                                    ${fixoMarcado}>
+                            </td>
+
+                            <td>
+                                <button
+                                    type="button"
+                                    class="btn-excluir"
+                                    onclick="removerLinha(this)">
+                                    EXCLUIR
+                                </button>
+                            </td>
+                        `;
+
+                        tbody.appendChild(tr);
+
+                        });
+
+                });
+
+        }
     </script>
 
 </body>

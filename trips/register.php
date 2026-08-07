@@ -127,7 +127,7 @@ $result_id = mysqli_fetch_assoc($result);
                     GROUP BY 
                       route_id, trip_headsign, trip_short_name, direction_id, departure_location
                     ORDER BY 
-                      service_id ASC, direction_id ASC";
+                      direction_id ASC";
 
                         $result = mysqli_query($conexao, $sql);
 
