@@ -2,21 +2,43 @@
     require_once __DIR__ . "/../connection.php";
 
     // Declaração da variavel para receber o ID
-    $id = $_GET['id'];
+    $pattern_id = (int) $_GET['pattern_id'];
     
     // Consulta o ID no banco de dados
-    $sql = "SELECT *, direction_id,
-                CASE 
-                    WHEN direction_id = '0' THEN 'Ida'
-                    WHEN direction_id = '1' THEN 'Volta'
+    $sql = "
+            SELECT
+                *,
+                CASE
+                    WHEN direction_id = 0 THEN 'Ida'
+                    WHEN direction_id = 1 THEN 'Volta'
                 END AS direction_format
-            FROM trips 
-            WHERE trip_id = '$id'";
-    
-    $result = mysqli_query($conexao, $sql);
 
-    // Variavel que recebe o ID do banco de dados    
+            FROM trip_patterns
+
+            WHERE pattern_id = ?
+        ";
+    
+    $stmt = mysqli_prepare($conexao, $sql);
+
+    if (!$stmt) {
+        die("Erro ao preparar consulta: " . mysqli_error($conexao));
+    }
+
+    mysqli_stmt_bind_param(
+        $stmt,
+        "i",
+        $pattern_id
+    );
+
+    mysqli_stmt_execute($stmt);
+
+    $result = mysqli_stmt_get_result($stmt);
+
     $result_id = mysqli_fetch_assoc($result);
+
+    if (!$result_id) {
+        die("Padrão de viagem não encontrado.");
+    }
   
     mysqli_close($conexao);
     
@@ -45,7 +67,7 @@
         <form action="edit_result.php" method="POST" autocomplete="off">
             <hr>
             <input type="hidden" name="id_route" value="<?=$result_id['route_id']?>">
-            <input type="hidden" name="id_trip" value="<?=$result_id['trip_id']?>">
+            <input type="hidden" name="pattern_id" value="<?= $result_id['pattern_id'] ?>">
             <p class="p-estilo">
                 <label for="id-edt-origem" class="lb-edt-origem">Origem:</label>
                 <input type="text" name="origem" class="inpt-edt-origem" id="id-edt-origem" value="<?=$result_id['trip_short_name']?>">

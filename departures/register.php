@@ -43,16 +43,6 @@ $result_calendar = mysqli_query($conexao, $sql_calendar);
 
 ?>
 
-<!--Script para confirmar a exclusão-->
-<script>
-    function deletar() {
-        if (confirm("Deseja exluir esse item?"))
-            document.forms[0].submit();
-        else
-            return false
-    }
-</script>
-
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -149,20 +139,33 @@ $result_calendar = mysqli_query($conexao, $sql_calendar);
         </footer>
     </div>
     
-    <script>
-        // Script de função reutilizável para botões de adicionar na lista de horários
-        function validarServico() {
+        <script>
+            // Função reutilizável para validar o serviço
+            function validarServico() {
 
-            const service = document.getElementById("id-serv");
+                const service = document.getElementById("id-serv");
 
-            if (service.value === "") {
-                alert("Selecione um serviço antes de continuar.");
-                service.focus();
-                return false;
+                if (service.value === "") {
+                    alert("Selecione um serviço antes de continuar.");
+                    service.focus();
+                    return false;
+                }
+
+                return true;
             }
 
-            return true;
-        }
+
+            // Função para excluir um horário da lista
+            function removerLinha(botao) {
+
+                if (!confirm("Deseja excluir este horário?")) {
+                    return;
+                }
+
+                const linha = botao.closest("tr");
+
+                linha.remove();
+            }
     </script>
 
     <script>
@@ -397,15 +400,15 @@ $result_calendar = mysqli_query($conexao, $sql_calendar);
                             <td>
                                 <input
                                     type="checkbox"
-                                    class="check-adaptado"
-                                    ${adaptadoMarcado}>
+                                    class="check-fixo"
+                                    ${fixoMarcado}>
                             </td>
 
                             <td>
                                 <input
                                     type="checkbox"
-                                    class="check-fixo"
-                                    ${fixoMarcado}>
+                                    class="check-adaptado"
+                                    ${adaptadoMarcado}>
                             </td>
 
                             <td>

@@ -20,10 +20,7 @@ $result_id = mysqli_fetch_assoc($result);
 <!--Script para confirmar a exclusão-->
 <script>
     function deletar() {
-        if (confirm("Deseja exluir essa viagem?"))
-            document.forms[0].submit();
-        else
-            return false
+        return confirm("Deseja excluir essa viagem?");
     }
 </script>
 
@@ -116,29 +113,43 @@ $result_id = mysqli_fetch_assoc($result);
                         </thead>
                         <?php
                         
-                        $sql = "
-                    SELECT 
-                        MIN(trip_id) AS trip_id, route_id, trip_headsign, trip_short_name, direction_id, shape_id, departure_location,
-                        CASE 
-                            WHEN direction_id = '0' THEN 'Ida'
-                            WHEN direction_id = '1' THEN 'Volta'
-                        END AS direction_format
-                    FROM trips WHERE route_id = $id 
-                    GROUP BY 
-                      route_id, trip_headsign, trip_short_name, direction_id, departure_location
-                    ORDER BY 
-                      direction_id ASC";
+                        $sql = "                    
+                            SELECT
+                                pattern_id,
+                                route_id,
+                                trip_headsign,
+                                trip_short_name,
+                                direction_id,
+                                shape_id,
+                                departure_location,
 
-                        $result = mysqli_query($conexao, $sql);
+                                CASE
+                                    WHEN direction_id = 0 THEN 'Ida'
+                                    WHEN direction_id = 1 THEN 'Volta'
+                                END AS direction_format
 
-                        $first_trip_id = null; // salvar a primeira viagem
+                            FROM trip_patterns
 
-                        while ($sql_result = mysqli_fetch_array($result)) {
-                            if ($first_trip_id === null) {
-                                $first_trip_id = $sql_result['trip_id']; // guarda a primeira
-                            }
+                            WHERE route_id = ?
 
-                            $id_trip   = $sql_result['trip_id'];
+                            ORDER BY direction_id ASC
+                        ";
+
+                       $stmt = mysqli_prepare($conexao, $sql);
+
+                        mysqli_stmt_bind_param(
+                            $stmt,
+                            "i",
+                            $id
+                        );
+
+                        mysqli_stmt_execute($stmt);
+
+                        $result = mysqli_stmt_get_result($stmt);                        
+
+                        while ($sql_result = mysqli_fetch_array($result)) {                            
+
+                            $pattern_id = $sql_result['pattern_id'];
                             $id_route  = $sql_result['route_id'];
                             $destino   = $sql_result['trip_headsign'];
                             $origem    = $sql_result['trip_short_name'];
@@ -153,11 +164,11 @@ $result_id = mysqli_fetch_assoc($result);
                                     <td><?= $partida ?></td>
                                     <td>
                                         <form action="delete.php" method="POST">
-                                            <input type="hidden" name="id" value="<?= $id_trip ?>">
+                                            <input type="hidden" name="pattern_id" value="<?= $pattern_id ?>">
                                             <input type="hidden" name="id-route" value="<?= $id_route ?>">
-                                            <a href="../shape/maps_trips.php?trip_id=<?= $id_trip ?>" class="a-trajeto" id="a-hor">TRAJETO</a>
-                                            <a href="../departures/register.php?trip_id=<?= $id_trip ?>" class="a-horario" id="a-hor">HORARIO</a>
-                                            <a href="edit.php?id=<?= $id_trip ?>" class="a-editar" id="a-edit">EDITAR</a>
+                                            <a href="../shape/maps_trips.php?pattern_id=<?= $pattern_id ?>" class="a-trajeto" id="a-traj">TRAJETO</a>
+                                            <a href="../departures/register.php?pattern_id=<?= $pattern_id ?>" class="a-horario" id="a-hor">HORARIO</a>
+                                            <a href="edit.php?pattern_id=<?= $pattern_id ?>" class="a-editar" id="a-edit">EDITAR</a>
                                             <button class="btn-excluir" onclick="return deletar()">EXCLUIR</button>
                                         </form>
                                     </td>

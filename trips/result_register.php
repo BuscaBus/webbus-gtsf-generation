@@ -1,42 +1,39 @@
 <?php
-   require_once __DIR__ . "/../connection.php";
 
-    // Recebe as variaveis
-    $route_id = $_POST['id'];   
-    $origem = $_POST['origem'];
-    $destino = $_POST['destino'];
-    $sentido = $_POST['sentido'];   
-    $partida = $_POST['partida'];
-    $tracado = $_POST['tracado'];
-    
-    // Altera no banco de dados
-    $sql = "INSERT INTO trips (
-                route_id, 
-                trip_short_name,
-                trip_headsign,
-                direction_id,                
-                departure_location, 
-                shape_id               
-            ) 
-            VALUES (
-                '$route_id',                 
-                '$origem',
-                '$destino',
-                '$sentido',                
-                '$partida',  
-                '$tracado'              
-            )";
-    $query = mysqli_query($conexao, $sql);
+require_once __DIR__ . "/../connection.php";
 
-    //if(mysqli_query($conexao, $sql)){
-      //echo "Operadora editada com sucesso";        
-    //}
-    //else{
-      // echo "Erro ao editar".mysqli_connect_error($conexao);
-    //}
+$route_id = (int) $_POST['id'];
+$origem   = trim($_POST['origem']);
+$destino  = trim($_POST['destino']);
+$sentido  = (int) $_POST['sentido'];
+$partida  = trim($_POST['partida']);
 
-    // Redireciona para a página anterior passando o id
-    header("Location: register.php?id=$route_id");
-    exit;
+$sql = "
+    INSERT INTO trip_patterns (
+        route_id,
+        trip_short_name,
+        trip_headsign,
+        direction_id,
+        departure_location
+    )
+    VALUES (?, ?, ?, ?, ?)
+";
 
-?>
+$stmt = mysqli_prepare($conexao, $sql);
+
+mysqli_stmt_bind_param(
+    $stmt,
+    "issis",
+    $route_id,
+    $origem,
+    $destino,
+    $sentido,
+    $partida
+);
+
+if (!mysqli_stmt_execute($stmt)) {
+    die("Erro ao cadastrar padrão: " . mysqli_stmt_error($stmt));
+}
+
+header("Location: register.php?id=" . $route_id);
+exit;

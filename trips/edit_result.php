@@ -1,34 +1,56 @@
 <?php
-   require_once __DIR__ . "/../connection.php";
 
-    // Recebe as variaveis
-    $id_route = $_POST['id_route'];  
-    $id_trip = $_POST['id_trip'];   
-    $origem = $_POST['origem'];
-    $destino = $_POST['destino']; 
-    $local_partida = $_POST['partida'];    
+require_once __DIR__ . "/../connection.php";
 
-    // Altera no banco de dados
-    $sql = "UPDATE trips SET 
-               trip_short_name = '$origem',                              
-               trip_headsign = '$destino',
-               departure_location = '$local_partida'               
-            WHERE 
-               trip_id = '$id_trip'";
-    $query = mysqli_query($conexao, $sql);
+if (
+    !isset(
+        $_POST['id_route'],
+        $_POST['pattern_id'],
+        $_POST['origem'],
+        $_POST['destino'],
+        $_POST['partida']
+    )
+) {
+    die("Dados inválidos.");
+}
 
-    //if(mysqli_query($conexao, $sql)){
-       //echo "Operadora editada com sucesso";        
-    //}
-    //else{
-       //echo "Erro ao editar".mysqli_connect_error($conexao);
-    //}
+$id_route       = (int) $_POST['id_route'];
+$pattern_id     = (int) $_POST['pattern_id'];
+$origem         = trim($_POST['origem']);
+$destino        = trim($_POST['destino']);
+$local_partida  = trim($_POST['partida']);
 
-    // Redireciona para a página trips
-    header("Location: register.php?id=$id_route");
-    exit;
+$sql = "
+    UPDATE trip_patterns
 
-    
-   mysqli_close($conexao);
-    
-?>
+    SET
+        trip_short_name = ?,
+        trip_headsign = ?,
+        departure_location = ?
+
+    WHERE pattern_id = ?
+";
+
+$stmt = mysqli_prepare($conexao, $sql);
+
+if (!$stmt) {
+    die("Erro ao preparar edição: " . mysqli_error($conexao));
+}
+
+mysqli_stmt_bind_param(
+    $stmt,
+    "sssi",
+    $origem,
+    $destino,
+    $local_partida,
+    $pattern_id
+);
+
+if (!mysqli_stmt_execute($stmt)) {
+    die("Erro ao editar padrão: " . mysqli_stmt_error($stmt));
+}
+
+mysqli_stmt_close($stmt);
+
+header("Location: register.php?id=" . $id_route);
+exit;
