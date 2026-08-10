@@ -1,49 +1,61 @@
 <?php
+
 require_once __DIR__ . "/../connection.php";
 
-mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+mysqli_report(
+    MYSQLI_REPORT_ERROR |
+    MYSQLI_REPORT_STRICT
+);
 
-// Trás a trip_id 
-$trip_id = isset($_GET['trip_id']) ? (int)$_GET['trip_id'] : 0;
+$pattern_id = isset($_GET['pattern_id'])
+    ? (int) $_GET['pattern_id']
+    : 0;
 
-if ($trip_id <= 0) {
-    die("Trip inválida.");
+if ($pattern_id <= 0) {
+    die("Padrão de viagem inválido.");
 }
 
 $sql = "
     SELECT
-        t.trip_id,
-        t.route_id,
-        t.shape_id,
-        t.trip_headsign,
-        t.trip_short_name,
+        tp.pattern_id,
+        tp.route_id,
+        tp.shape_id,
+        tp.trip_headsign,
+        tp.trip_short_name,
+        tp.direction_id,
         r.route_short_name,
         r.route_long_name
-    FROM trips t
+    FROM trip_patterns tp
     INNER JOIN routes r
-    ON r.route_id = t.route_id
-    WHERE t.trip_id = ?
+        ON r.route_id = tp.route_id
+    WHERE tp.pattern_id = ?
 ";
 
 $stmt = $conexao->prepare($sql);
-$stmt->bind_param("i", $trip_id);
+
+$stmt->bind_param(
+    "i",
+    $pattern_id
+);
+
 $stmt->execute();
 
-$trip = $stmt->get_result()->fetch_assoc();
+$pattern = $stmt
+    ->get_result()
+    ->fetch_assoc();
 
-if (!$trip) {
-    die("Trip não encontrada.");
+if (!$pattern) {
+    die("Padrão de viagem não encontrado.");
 }
 
-// <<< AQUI >>>
-$route_id = $trip['route_id'];
-$shape_id = $trip['shape_id'];
+$route_id = (int) $pattern['route_id'];
+$shape_id = $pattern['shape_id'];
 
 ?>
 
 <script>
-    const TRIP_ID = <?= (int)$trip['trip_id'] ?>;
-    let tripAtual = TRIP_ID;
+    const PATTERN_ID = <?= (int) $pattern['pattern_id'] ?>;
+    let patternAtual = PATTERN_ID;
 </script>
 
 <!DOCTYPE html>
@@ -81,38 +93,72 @@ $shape_id = $trip['shape_id'];
             <!-- Section para tabela com o pontos do trajeto -->
             <section class="sect-tab-traj" id="scroll-area">
                 <p>
-                    <select id="trip-select" class="trip-select">
+                    <select id="pattern-select" class="trip-select">
                         <option value="">Selecione um trajeto</option>
                         // Consulta no banco de dados e traz as viagens cadastradas
                         <?php
-                        $sqlTrips = "
-                                    SELECT
-                                        trip_id,
-                                        trip_short_name,
-                                        trip_headsign,
-                                        shape_id
-                                    FROM trips
-                                    WHERE route_id = ?
-                                    ORDER BY trip_short_name, trip_headsign
+                        $sqlPatterns = "
+                            SELECT
+                                pattern_id,
+                                trip_short_name,
+                                trip_headsign,
+                                shape_id
+
+                            FROM trip_patterns
+
+                            WHERE route_id = ?
+
+                            ORDER BY
+                                trip_short_name,
+                                trip_headsign
+                        ";
+
+                        $stmtPatterns =
+                            $conexao->prepare(
+                                $sqlPatterns
+                            );
+
+                        $stmtPatterns->bind_param(
+                            "i",
+                            $route_id
+                        );
+
+                        $stmtPatterns->execute();
+
+                        $resultPatterns =
+                            $stmtPatterns->get_result();
+
+                        while (
+                                $p = $resultPatterns->fetch_assoc()
+                            ) {
+
+                                $selected =
+                                    ($p['pattern_id'] == $pattern_id)
+                                        ? 'selected'
+                                        : '';
+
+                                $nome =
+                                    trim($p['trip_short_name']);
+
+                                if (
+                                    !empty($p['trip_headsign'])
+                                ) {
+
+                                    $nome .=
+                                        ' - ' .
+                                        $p['trip_headsign'];
+                                }
+
+                                echo "
+                                    <option
+                                        value='{$p['pattern_id']}'
+                                        data-shape='{$p['shape_id']}'
+                                        {$selected}
+                                    >
+                                        {$nome}
+                                    </option>
                                 ";
-
-                        $stmtTrips = $conexao->prepare($sqlTrips);
-                        $stmtTrips->bind_param("i", $route_id);
-                        $stmtTrips->execute();
-                        $resultTrips = $stmtTrips->get_result();
-
-                        while ($t = $resultTrips->fetch_assoc()) {
-
-                            $selected = ($t['trip_id'] == $trip_id) ? 'selected' : '';
-
-                            $nome = trim($t['trip_short_name']);
-
-                            if (!empty($t['trip_headsign'])) {
-                                $nome .= ' - ' . $t['trip_headsign'];
                             }
-
-                            echo "<option value='{$t['trip_id']}' data-shape='{$t['shape_id']}' {$selected}>{$nome}</option>";
-                        }
                         ?>
                     </select>
                 </p>
@@ -141,8 +187,8 @@ $shape_id = $trip['shape_id'];
             </section>
 
             <script>
-                const SHAPE_ID = "<?= $shape_id ?>";
-                const ROUTE_ID = "<?= $trip_id ?>";
+                let SHAPE_ID = <?= json_encode($shape_id ?? '') ?>;
+                const ROUTE_ID = <?= (int) $route_id ?>;
             </script>
 
             <script>
@@ -264,17 +310,7 @@ $shape_id = $trip['shape_id'];
                         carregarStops();
                     }
 
-                });
-
-                map.on("zoomend", function() {
-
-                    if (map.getZoom() >= 17) {
-                        carregarStops();
-                    } else {
-                        stopsLayer.clearLayers();
-                    }
-
-                });
+                });                
 
                 // ===== FUNÇÃO PARA ADICIONAR STOP NA TABELA =====
                 function adicionarStopNaTabela(stop) {
@@ -441,13 +477,20 @@ $shape_id = $trip['shape_id'];
 
                 // Função para carregar os pontos na tabela vindos do banco de dados 
                 function carregarStopsTabela() {
-
-                    fetch("get_stops_sequence.php?trip_id=" + tripAtual)
+                    fetch(
+                        "get_stops_sequence.php?pattern_id=" +
+                        patternAtual
+                    )
 
                         .then(res => res.json())
+
                         .then(stops => {
 
-                            const tbody = document.getElementById("tbodyStops");
+                            const tbody =
+                                document.getElementById(
+                                    "tbodyStops"
+                                );
+
                             tbody.innerHTML = "";
 
                             stops.forEach(stop => {
@@ -505,7 +548,7 @@ $shape_id = $trip['shape_id'];
                 // Carregar shape salvo
                 function carregarShape() {
 
-                    fetch("get_shape_by_trip.php?trip_id=" + tripAtual)
+                    fetch("get_shape_by_pattern.php?pattern_id=" +patternAtual)
 
                         .then(res => res.json())
                         .then(coords => {
@@ -529,19 +572,30 @@ $shape_id = $trip['shape_id'];
 
                 }
 
-                const selectTrip = document.getElementById("trip-select");
+                const selectPattern = document.getElementById("pattern-select");
 
-                selectTrip.addEventListener("change", function() {
+                selectPattern.addEventListener("change",
+                    function() {
 
-                    if (!this.value)
-                        return;
+                        if (!this.value) {
+                            return;
+                        }
 
-                    tripAtual = this.value;
+                        patternAtual =
+                            this.value;
 
-                    carregarShape();
-                    carregarStopsTabela();
+                        const option =
+                            this.options[
+                                this.selectedIndex
+                            ];
 
-                });
+                        SHAPE_ID =
+                            option.dataset.shape || "";
+
+                        carregarShape();
+                        carregarStopsTabela();
+                    }
+                );
 
                 // Função para Salvar shape 
                 function salvarShape(layer) {
@@ -561,10 +615,11 @@ $shape_id = $trip['shape_id'];
                             },
 
                             body: JSON.stringify({
-                                trip_id: tripAtual,
+
+                                pattern_id: patternAtual,
                                 shape_id: SHAPE_ID,
-                                route_id: ROUTE_ID,
                                 coords: coords
+
                             })
                         })
 
@@ -627,7 +682,7 @@ $shape_id = $trip['shape_id'];
 
                 dados.push({
 
-                    trip_id: tripAtual,
+                    pattern_id: patternAtual,
                     stop_id: stop_id,
                     seq: seq,
                     codigo: codigo,
@@ -731,17 +786,7 @@ $shape_id = $trip['shape_id'];
 
         });
     </script>
-
-    <script>
-        // ===== CARREGA AUTOMATICAMENTE O PRIMEIRO TRAJETO =====
-        window.addEventListener("DOMContentLoaded", function() {
-
-            carregarShape();
-            carregarStopsTabela();
-
-        });
-    </script>
-
+ 
     <script>
          // Script para prenchimento automático dos destinos na tabela de pontos
         function configurarDestinoAutomatico() {

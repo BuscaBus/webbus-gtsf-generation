@@ -1,55 +1,106 @@
 <?php
+
 require_once __DIR__ . "/../connection.php";
 
-header("Content-Type: application/json");
+header("Content-Type: application/json; charset=utf-8");
 
-// Faz o mysqli lançar exceções em caso de erro
-mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+mysqli_report(
+    MYSQLI_REPORT_ERROR |
+    MYSQLI_REPORT_STRICT
+);
+
 
 try {
 
-    $data = json_decode(file_get_contents("php://input"), true);
+    $data = json_decode(
+        file_get_contents("php://input"),
+        true
+    );
 
-    if (!$data || !is_array($data) || count($data) == 0) {
-        throw new Exception("Nenhum dado recebido.");
+
+    if (
+        !$data ||
+        !is_array($data) ||
+        count($data) === 0
+    ) {
+
+        throw new Exception(
+            "Nenhum dado recebido."
+        );
     }
 
-    // Recebe a Trip
-    $trip_id = (int)$data[0]['trip_id'];
-
-    if ($trip_id <= 0) {
-        throw new Exception("Trip inválida.");
-    }
 
     /*
     |--------------------------------------------------------------------------
-    | Busca o Shape da Trip
+    | Recebe o Pattern
+    |--------------------------------------------------------------------------
+    */
+
+    $pattern_id =
+        (int) ($data[0]['pattern_id'] ?? 0);
+
+
+    if ($pattern_id <= 0) {
+
+        throw new Exception(
+            "Padrão de viagem inválido."
+        );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Busca o Shape do Pattern
     |--------------------------------------------------------------------------
     */
 
     $stmt = $conexao->prepare("
         SELECT shape_id
-        FROM trips
-        WHERE trip_id = ?
+
+        FROM trip_patterns
+
+        WHERE pattern_id = ?
+
         LIMIT 1
     ");
 
-    $stmt->bind_param("i", $trip_id);
+
+    $stmt->bind_param(
+        "i",
+        $pattern_id
+    );
+
+
     $stmt->execute();
 
-    $result = $stmt->get_result();
 
-    if ($result->num_rows == 0) {
-        throw new Exception("Trip não encontrada.");
+    $result =
+        $stmt->get_result();
+
+
+    if ($result->num_rows === 0) {
+
+        throw new Exception(
+            "Padrão de viagem não encontrado."
+        );
     }
 
-    $trip = $result->fetch_assoc();
 
-    $shape_id = $trip['shape_id'];
+    $pattern =
+        $result->fetch_assoc();
+
+
+    $shape_id =
+        $pattern['shape_id'];
+
 
     if (empty($shape_id)) {
-        throw new Exception("A Trip ainda não possui um Shape.");
+
+        throw new Exception(
+            "O padrão de viagem ainda não possui um Shape."
+        );
     }
+
 
     /*
     |--------------------------------------------------------------------------
@@ -57,7 +108,10 @@ try {
     |--------------------------------------------------------------------------
     */
 
-    mysqli_begin_transaction($conexao);
+    mysqli_begin_transaction(
+        $conexao
+    );
+
 
     /*
     |--------------------------------------------------------------------------
@@ -65,13 +119,21 @@ try {
     |--------------------------------------------------------------------------
     */
 
-    $stmtDelete = $conexao->prepare("
-        DELETE FROM shape_stops
-        WHERE shape_id = ?
-    ");
+    $stmtDelete =
+        $conexao->prepare("
+            DELETE FROM shape_stops
+            WHERE shape_id = ?
+        ");
 
-    $stmtDelete->bind_param("s", $shape_id);
+
+    $stmtDelete->bind_param(
+        "s",
+        $shape_id
+    );
+
+
     $stmtDelete->execute();
+
 
     /*
     |--------------------------------------------------------------------------
@@ -79,31 +141,52 @@ try {
     |--------------------------------------------------------------------------
     */
 
-    $stmtInsert = $conexao->prepare("
-        INSERT INTO shape_stops
-        (
-            shape_id,
-            stop_id,
-            seq,
-            codigo,
-            ponto,
-            intervalo,
-            stop_headsign
-        )
-        VALUES
-        (
-            ?, ?, ?, ?, ?, ?, ?
-        )
-    ");
+    $stmtInsert =
+        $conexao->prepare("
+            INSERT INTO shape_stops
+            (
+                shape_id,
+                stop_id,
+                seq,
+                codigo,
+                ponto,
+                intervalo,
+                stop_headsign
+            )
+
+            VALUES
+            (
+                ?, ?, ?, ?, ?, ?, ?
+            )
+        ");
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Salva sequência
+    |--------------------------------------------------------------------------
+    */
 
     foreach ($data as $item) {
 
-        $stop_id   = (int)$item['stop_id'];
-        $seq       = (int)$item['seq'];
-        $codigo    = trim($item['codigo']);
-        $ponto     = trim($item['ponto']);
-        $intervalo = trim($item['intervalo']);
-        $destino = trim($item['destino']);
+        $stop_id =
+            (int) $item['stop_id'];
+
+        $seq =
+            (int) $item['seq'];
+
+        $codigo =
+            trim($item['codigo']);
+
+        $ponto =
+            trim($item['ponto']);
+
+        $intervalo =
+            trim($item['intervalo']);
+
+        $destino =
+            trim($item['destino']);
+
 
         $stmtInsert->bind_param(
             "siissss",
@@ -116,24 +199,33 @@ try {
             $destino
         );
 
+
         $stmtInsert->execute();
     }
 
-    mysqli_commit($conexao);
+
+    mysqli_commit(
+        $conexao
+    );
+
 
     echo json_encode([
         "status" => "ok",
-        "message" => "Sequência salva com sucesso."
+        "message" =>
+            "Sequência salva com sucesso."
     ]);
 
-} catch (Exception $e) {
+}
+catch (Throwable $e) {
 
-    if ($conexao) {
-        mysqli_rollback($conexao);
-    }
+    mysqli_rollback(
+        $conexao
+    );
+
 
     echo json_encode([
         "status" => "erro",
-        "message" => $e->getMessage()
+        "message" =>
+            $e->getMessage()
     ]);
 }

@@ -1,33 +1,46 @@
 <?php
 require_once __DIR__ . "/../connection.php";
 
-$trip_id = isset($_GET['trip_id']) ? (int)$_GET['trip_id'] : 0;
+$pattern_id = isset($_GET['pattern_id'])
+    ? (int) $_GET['pattern_id']
+    : 0;
 
-if ($trip_id <= 0) {
-    die("Trip inválida.");
+if ($pattern_id <= 0) {
+    die("Padrão de viagem inválido.");
 }
 
-// Buscar Trip
-$sql = "SELECT
-    t.trip_id,
-    t.route_id,
-    t.shape_id,
-    r.route_short_name,
-    r.route_long_name
-FROM trips t
-INNER JOIN routes r
-    ON r.route_id = t.route_id
-WHERE t.trip_id = ?
+// Buscar Pattern
+$sql = "
+    SELECT
+        tp.pattern_id,
+        tp.route_id,
+        tp.shape_id,
+        tp.trip_short_name,
+        tp.trip_headsign,
+        tp.direction_id,
+        r.route_short_name,
+        r.route_long_name
+    FROM trip_patterns tp
+    INNER JOIN routes r
+        ON r.route_id = tp.route_id
+    WHERE tp.pattern_id = ?
 ";
 
 $stmt = $conexao->prepare($sql);
-$stmt->bind_param("i", $trip_id);
+
+$stmt->bind_param(
+    "i",
+    $pattern_id
+);
+
 $stmt->execute();
 
-$trip = $stmt->get_result()->fetch_assoc();
+$pattern = $stmt
+    ->get_result()
+    ->fetch_assoc();
 
-if (!$trip) {
-    die("Trip não encontrada.");
+if (!$pattern) {
+    die("Padrão de viagem não encontrado.");
 }
 
 ?>
@@ -68,11 +81,11 @@ if (!$trip) {
         <main class="main-mptp">
             <section class="sect-reg-traj">
                 <h2 class="h2-rota">
-                    <?= htmlspecialchars($trip['route_short_name']) ?> - <?= htmlspecialchars($trip['route_long_name']) ?>
+                    <?= htmlspecialchars($pattern['route_short_name']) ?> - <?= htmlspecialchars($pattern['route_long_name']) ?>
                 </h2>
                 <br>
                 <label class="lb-copy-select"> Copiar trajeto: </label>
-                <select id="trip-copy-select" class="trip-copy-select">
+                <select id="pattern-copy-select" class="trip-copy-select">
                     <option value=""> Selecione uma Viagem</option>
                 </select>
                 <br><br><br>
@@ -83,12 +96,12 @@ if (!$trip) {
                 <br><br>
                 <button type="button" id="btnSalvar" class="btn-salv"> SALVAR </button>
                 <button
-                    type="button" class="btn-reg-canc" onclick="window.location='../trips/register.php?id=<?= urlencode($trip['route_id']) ?>'"> CANCELAR
+                    type="button" class="btn-reg-canc" onclick="window.location='../trips/register.php?id=<?= urlencode($pattern['route_id']) ?>'"> CANCELAR
                 </button>
                 <br><br>
                 <p>
                     <button class="btn-seq-par">
-                        <a href="shape_stops.php?trip_id=<?= $trip['trip_id'] ?>" class="a-btn-seq-par"> SEQUÊNCIA DE PARADAS </a>
+                        <a href="shape_stops.php?pattern_id=<?= $pattern['pattern_id'] ?>" class="a-btn-seq-par"> SEQUÊNCIA DE PARADAS </a>
                     </button>
                 </p>
             </section>
@@ -97,10 +110,10 @@ if (!$trip) {
                 <div id="div-map"></div>
             </section>
 
-            <script>
-                const TRIP_ID = <?= $trip['trip_id'] ?>;
-                const ROUTE_ID = <?= $trip['route_id'] ?>;
-                let SHAPE_ID = "<?= $trip['shape_id'] ?>";
+            <script>               
+                const PATTERN_ID = <?= (int) $pattern['pattern_id'] ?>;
+                const ROUTE_ID = <?= (int) $pattern['route_id'] ?>;
+                let SHAPE_ID = <?= json_encode($pattern['shape_id'] ?? '') ?>;
             </script>
 
             <script>
@@ -190,7 +203,7 @@ if (!$trip) {
                 // QUANDO ABRE A PÁGINA
                 window.onload = function() {
                     carregarShapeExistente();
-                    carregarTripsComShape();
+                    carregarPatternsComShape();
                     setTimeout(() => {
                         map.invalidateSize();
                     }, 300);
@@ -264,10 +277,8 @@ if (!$trip) {
                                 return;
                             }
                             let dados = {
-                                trip_id: TRIP_ID,
-                                route_id: ROUTE_ID,
+                                pattern_id: PATTERN_ID,
                                 shape_id: SHAPE_ID,
-                                direction_id: 0,
                                 coords: coords
                             };
 
@@ -293,11 +304,10 @@ if (!$trip) {
 
                                         // caso tenha criado novo shape
                                         if (!SHAPE_ID && data.shape_id) {
-                                            SHAPE_ID = data.shape_id;
-                                            document.getElementById("shapeAtual").innerHTML = SHAPE_ID;
+                                            SHAPE_ID = data.shape_id;                                           
 
                                             // atualiza link sequência
-                                            document.querySelector(".a-btn-seq-par").href = "shape_stops.php?shape_id=" + SHAPE_ID;
+                                            document.querySelector(".a-btn-seq-par").href = "shape_stops.php?pattern_id=" + PATTERN_ID;
                                         }
                                     } else {
                                         alert(
@@ -317,12 +327,12 @@ if (!$trip) {
 
                     );
                 // Carregar as Trips automaticamente
-                function carregarTripsComShape() {
-                    fetch("get_trips_com_shape.php?route_id=" + ROUTE_ID)
+                function carregarPatternsComShape() {
+                    fetch("get_patterns_com_shape.php?route_id=" + ROUTE_ID + "&pattern_id=" + PATTERN_ID)
                         .then(res => res.json())
                         .then(trips => {
 
-                            let select = document.getElementById("trip-copy-select");
+                            let select = document.getElementById("pattern-copy-select");
                             select.innerHTML = '<option value="">Selecione uma Viagem</option>';
 
                             trips.forEach(trip => {
@@ -336,7 +346,7 @@ if (!$trip) {
                 }
 
                 // Ao escolher uma Trip, carregar o trajeto
-                document.getElementById("trip-copy-select").addEventListener(
+                document.getElementById("pattern-copy-select").addEventListener(
                     "change",
                     function() {
                         let shape_id = this.value;
