@@ -239,7 +239,7 @@ section{
     width: 100px;
     height: 580px;
     flex: 0 0 45%;
-    padding: 0px;    
+    padding: 0px;     
 }
 
 .sect-map-seq {
@@ -315,7 +315,7 @@ section{
 /* Configurações tabela da página shape_stops.php */
 
 table{
-    margin: auto;
+    margin: auto;   
 }
 
 .th-seq{
@@ -330,7 +330,7 @@ table{
 }
 
 .th-cod{
-    padding-right: 15px;
+    padding-right: 5px;
 }
 
 .th-ponto{
@@ -338,15 +338,45 @@ table{
 }
 
 .th-inter{
-    padding-right: 15px;
+    padding-right: 5px;
+}
+
+.th-timepoint {
+    width: 25px;
+    min-width: 25px;
+    padding-left: 2px;
+    padding-right: 2px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.th-timepoint input {
+    margin-left: 1px;
+    vertical-align: middle;
+}
+
+.td-timepoint {
+    width: 25px;
+    min-width: 25px;
+    padding-left: 2px;
+    padding-right: 2px;
+    text-align: center;
+}
+
+.td-timepoint input {
+    margin: 0;
+}
+
+.td-timepoint input {
+    margin: 0;
 }
 
 .th-destino{
-    padding-right: 15px;
+    padding-right: 10px;
 }
 
 .th-acoes{
-    padding-right: 27px;
+    padding-right: 20px;
 }
 
 .input-destino{

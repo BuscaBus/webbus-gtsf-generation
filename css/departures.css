@@ -198,7 +198,11 @@ table{
 }
 
 .th-hor{
-    padding-right: 50px;    
+    padding-right: 15px;    
+}
+
+.th-viagem{
+    padding-right: 200px;    
 }
 
 .th-adaptado{
@@ -210,7 +214,7 @@ table{
 }
 
 .th-acoes{
-    padding-right: 12px;
+    padding-right: 30px;
 }
 
 .btn-excluir{

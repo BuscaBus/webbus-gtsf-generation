@@ -68,7 +68,7 @@ $shape_id = $pattern['shape_id'];
     <link rel="shortcut icon" href="../img/logo-icon2.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/style.css?v=1.2">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
-    <link rel="stylesheet" href="../css/shape.css?v=2.5">
+    <link rel="stylesheet" href="../css/shape.css?v=2.8">
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
@@ -170,6 +170,10 @@ $shape_id = $pattern['shape_id'];
                         <th class="th-cod">Cod</th>
                         <th class="th-ponto">Ponto</th>
                         <th class="th-inter">Intervalo</th>
+                        <th class="th-timepoint"> 
+                            <input
+                                type="checkbox" id="checkTodosTimepoint" title="Marcar ou desmarcar todos como horário fixo">
+                        </th>
                         <th class="th-destino">Destino</th>
                         <th class="th-acoes">Ação</th>
                     </thead>
@@ -340,6 +344,13 @@ $shape_id = $pattern['shape_id'];
                         <td>${stop.name}</td>
                         <td>
                             <input type="time" name="interval[]">
+                        </td>
+                        <td class="td-timepoint">
+                            <input
+                                type="checkbox"
+                                class="check-timepoint"
+                                title="Horário fixo nesta parada"
+                            >
                         </td>
                         <td>
                             <input
@@ -521,6 +532,15 @@ $shape_id = $pattern['shape_id'];
                             value="${stop.intervalo ?? ''}">
                     </td>
 
+                    <td class="td-timepoint">
+                        <input
+                            type="checkbox"
+                            class="check-timepoint"
+                            title="Horário fixo nesta parada"
+                            ${Number(stop.timepoint) === 1 ? "checked" : ""}
+                        >
+                    </td>
+
                     <td>
                         <input
                             type="text"
@@ -541,6 +561,8 @@ $shape_id = $pattern['shape_id'];
                             });
 
                             atualizarSequencia();
+
+                            atualizarCheckTodosTimepoint();
 
                         });
                 }
@@ -653,7 +675,9 @@ $shape_id = $pattern['shape_id'];
         </main>
 
         <footer>
-            <p><a href="../route/list.php">Voltar</a></p>
+            <p>
+                <a href="../trips/register.php?id=<?= $route_id ?>"> &lt; Voltar </a>
+            </p>
         </footer>
     </div>
 
@@ -678,6 +702,7 @@ $shape_id = $pattern['shape_id'];
                 const codigo = row.cells[3].innerText.trim();
                 const ponto = row.cells[4].innerText.trim();
                 const intervalo = row.querySelector('input[type="time"]').value;
+                const timepoint = row.querySelector(".check-timepoint").checked ? 1 : 0;
                 const destino = row.querySelector('input[name="stop_headsign[]"]').value;
 
                 dados.push({
@@ -688,6 +713,7 @@ $shape_id = $pattern['shape_id'];
                     codigo: codigo,
                     ponto: ponto,
                     intervalo: intervalo,
+                    timepoint: timepoint,
                     destino: destino
 
                 });
@@ -752,11 +778,13 @@ $shape_id = $pattern['shape_id'];
 
                 const id = row.cells[0].innerText;
                 const intervalo = row.querySelector('input[type="time"]').value;
+                const timepoint = row.querySelector(".check-timepoint").checked ? 1 : 0;
                 const destino = row.querySelector('input[name="stop_headsign[]"]').value;
 
                 dados.push({
                     id: id,
                     intervalo: intervalo,
+                    timepoint: timepoint,
                     destino: destino
                 });
 
@@ -839,6 +867,69 @@ $shape_id = $pattern['shape_id'];
             configurarDestinoAutomatico();
 
         });
+    </script>
+
+    <script>       
+        // MARCAR / DESMARCAR TODOS OS TIMEPOINTS
+        const checkTodosTimepoint =
+            document.getElementById("checkTodosTimepoint");
+
+        checkTodosTimepoint.addEventListener("change", function() {
+
+            const checkboxes =
+                document.querySelectorAll(
+                    "#tbodyStops .check-timepoint"
+                );
+
+            checkboxes.forEach(function(checkbox) {
+
+                checkbox.checked =
+                    checkTodosTimepoint.checked;
+            });
+
+        });
+    </script>
+
+    <script>    
+        // SINCRONIZA CHECKBOX MESTRE
+        document
+            .getElementById("tbodyStops")
+            .addEventListener("change", function(event) {
+
+                if (
+                    !event.target.classList.contains(
+                        "check-timepoint"
+                    )
+                ) {
+                    return;
+                }
+
+                atualizarCheckTodosTimepoint();
+
+            });
+
+        function atualizarCheckTodosTimepoint() {
+
+            const checkboxes =
+                document.querySelectorAll(
+                    "#tbodyStops .check-timepoint"
+                );
+
+            if (checkboxes.length === 0) {
+
+                checkTodosTimepoint.checked = false;
+
+                return;
+            }
+
+            const todosMarcados =
+                [...checkboxes].every(
+                    checkbox => checkbox.checked
+                );
+
+            checkTodosTimepoint.checked =
+                todosMarcados;
+        }
     </script>
 
 </body>

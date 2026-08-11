@@ -2,36 +2,81 @@
 require_once __DIR__ . "/../connection.php";
 
 // Declaração da variavel para receber o ID
-if (!isset($_GET['trip_id']) || !is_numeric($_GET['trip_id'])) {
-    die("Erro: ID não informado ou inválido.");
+if (
+    !isset($_GET['pattern_id']) ||
+    !is_numeric($_GET['pattern_id'])
+) {
+
+    die("Erro: padrão de viagem não informado ou inválido.");
 }
 
-$id = (int) $_GET['trip_id'];
+$pattern_id =
+    (int) $_GET['pattern_id'];
 
 if (isset($_GET['success'])) {
     echo "<script>alert('Horários cadastrados com sucesso!');</script>";
 }
 
-// Consulta as trips (viagens) no banco de dados
-$sql = "SELECT route_id, trip_id, trip_headsign, trip_short_name FROM trips WHERE trip_id = $id";
-$result = mysqli_query($conexao, $sql);
+// Consulta no banco de dados
+$sql = "
+    SELECT
+        pattern_id,
+        route_id,
+        trip_headsign,
+        trip_short_name
+    FROM trip_patterns
+    WHERE pattern_id = ?
+";
 
-// Variavel que recebe o ID do banco de dados    
-$result_id = mysqli_fetch_assoc($result);
+$stmt =
+    $conexao->prepare($sql);
 
-$route_id = $result_id['route_id'];
+$stmt->bind_param(
+    "i",
+    $pattern_id
+);
 
-// Consulta no banco para trazer as trips (viagens)
-$sql_trips = "SELECT
-                trip_id,
-                service_id,
-                trip_short_name,
-                trip_headsign
-              FROM trips
-              WHERE route_id = '$route_id'
-              ORDER BY trip_short_name, trip_headsign";
+$stmt->execute();
 
-$result_trips = mysqli_query($conexao, $sql_trips);
+$result_id =
+    $stmt
+    ->get_result()
+    ->fetch_assoc();
+
+if (!$result_id) {
+
+    die("Padrão de viagem não encontrado.");
+}
+
+$route_id = (int) $result_id['route_id'];
+
+// montar o select das viagens/patterns da mesma rota:
+$sql_patterns = "
+    SELECT
+        pattern_id,
+        trip_short_name,
+        trip_headsign
+    FROM trip_patterns
+    WHERE route_id = ?
+    ORDER BY
+        trip_short_name,
+        trip_headsign
+";
+
+$stmtPatterns =
+    $conexao->prepare(
+        $sql_patterns
+    );
+
+$stmtPatterns->bind_param(
+    "i",
+    $route_id
+);
+
+$stmtPatterns->execute();
+
+$result_patterns =
+    $stmtPatterns->get_result();
 
 // Consulta no banco para trazer os serviços (dias da semana)
 $sql_calendar = "SELECT
@@ -53,7 +98,7 @@ $result_calendar = mysqli_query($conexao, $sql_calendar);
     <link rel="shortcut icon" href="../img/logo-icon2.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/style.css?v=1.3">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
-    <link rel="stylesheet" href="../css/departures.css?v=1.5">
+    <link rel="stylesheet" href="../css/departures.css?v=1.6">
 </head>
 
 <body>
@@ -68,15 +113,21 @@ $result_calendar = mysqli_query($conexao, $sql_calendar);
                 <br>
                 <form action="result_register.php" method="POST" autocomplete="off" class="form-cad-vig">
                     <input type="hidden" name="route_id" id="id-route" value="<?= $route_id ?>">
-                    <input type="hidden" name="trip_id" id="id-trip" value="<?= $id ?>">
                     <p class="p-estilo">
                         <label for="id-viag" class="lb-reg-viag">Viagem:</label>
-                        <select id="id-viag" name="trip_id" class="selec-reg-viag">
-                            <?php while ($trip = mysqli_fetch_assoc($result_trips)) { ?>
-                                <option value="<?= $trip['trip_id'] ?>"
-                                    <?= ($trip['trip_id'] == $id) ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($trip['trip_short_name']) ?> -
-                                    <?= htmlspecialchars($trip['trip_headsign']) ?>
+                        <select id="id-pattern" name="pattern_id" class="selec-reg-viag">
+                            <?php
+                            while ($pattern = $result_patterns->fetch_assoc()) { ?>
+                                <option value="<?= (int) $pattern['pattern_id'] ?>" <?=
+                                                                                    (
+                                                                                        (int) $pattern['pattern_id'] === $pattern_id
+                                                                                    )
+                                                                                        ? 'selected'
+                                                                                        : ''
+                                                                                    ?>>
+                                    <?= htmlspecialchars($pattern['trip_short_name']) ?> - <?= htmlspecialchars(
+                                                                                                $pattern['trip_headsign']
+                                                                                            ) ?>
                                 </option>
                             <?php } ?>
                         </select>
@@ -113,13 +164,14 @@ $result_calendar = mysqli_query($conexao, $sql_calendar);
 
             <!-- Section para listar os horários -->
             <section class="sect-list-hor">
+                <h1 class="h1-cad-hor">Tabela de Horários</h1>
                 <br>
                 <table>
                     <thead>
                         <tr>
                             <th class="th-hor">Horários</th>
-                            <th class="th-fixo">Fixo</th>
-                            <th class="th-adaptado">Adaptado</th>                            
+                            <th class="th-viagem">Viagem</th>
+                            <th class="th-adaptado">Adaptado</th>
                             <th class="th-acoes">Ação</th>
                         </tr>
                     </thead>
@@ -138,34 +190,42 @@ $result_calendar = mysqli_query($conexao, $sql_calendar);
             </p>
         </footer>
     </div>
-    
-        <script>
-            // Função reutilizável para validar o serviço
-            function validarServico() {
 
-                const service = document.getElementById("id-serv");
+    <script>
+        // Função para obter nome da viagem 
+        function obterNomeViagem() {
 
-                if (service.value === "") {
-                    alert("Selecione um serviço antes de continuar.");
-                    service.focus();
-                    return false;
-                }
+            const select = document.getElementById("id-pattern");
+            const option = select.options[select.selectedIndex];
 
-                return true;
+            return option ? option.text.trim(): "";
+}
+        // Função reutilizável para validar o serviço
+        function validarServico() {
+
+            const service = document.getElementById("id-serv");
+
+            if (service.value === "") {
+                alert("Selecione um serviço antes de continuar.");
+                service.focus();
+                return false;
             }
 
+            return true;
+        }
 
-            // Função para excluir um horário da lista
-            function removerLinha(botao) {
 
-                if (!confirm("Deseja excluir este horário?")) {
-                    return;
-                }
+        // Função para excluir um horário da lista
+        function removerLinha(botao) {
 
-                const linha = botao.closest("tr");
-
-                linha.remove();
+            if (!confirm("Deseja excluir este horário?")) {
+                return;
             }
+
+            const linha = botao.closest("tr");
+
+            linha.remove();
+        }
     </script>
 
     <script>
@@ -184,8 +244,6 @@ $result_calendar = mysqli_query($conexao, $sql_calendar);
 
             const tbody = document.getElementById("tbodyHorarios");
 
-            tbody.innerHTML = "";
-
             texto.split(/\r?\n/).forEach(function(horario) {
 
                 horario = horario.trim();
@@ -195,14 +253,14 @@ $result_calendar = mysqli_query($conexao, $sql_calendar);
 
                 const tr = document.createElement("tr");
 
+                const nomeViagem = obterNomeViagem();
+
                 tr.innerHTML = `
+
                 <td>${horario}</td>
 
-                <td>
-                    <input
-                        type="checkbox"
-                        class="check-fixo"
-                        checked>
+                <td class="td-viagem">
+                    ${nomeViagem}
                 </td>
 
                 <td>
@@ -259,14 +317,14 @@ $result_calendar = mysqli_query($conexao, $sql_calendar);
 
             const tr = document.createElement("tr");
 
+            const nomeViagem = obterNomeViagem();
+
             tr.innerHTML = `
+
             <td>${horario}</td>
 
-            <td>
-                <input
-                    type="checkbox"
-                    class="check-fixo"
-                    title="Marcado: horário fixo. Desmarcado: horário previsto" checked>
+            <td class="td-viagem">
+                ${nomeViagem}
             </td>
 
             <td>
@@ -296,137 +354,172 @@ $result_calendar = mysqli_query($conexao, $sql_calendar);
 
     <script>
         // Script ao clicar em SALVAR
-        document.getElementById("btn-salvar").addEventListener("click", function() {
+        document.getElementById("btn-salvar").addEventListener("click",
+            function() {
+                if (!validarServico()) {
+                    return;
+                }
+                const pattern_id = document.getElementById("id-pattern").value;
+                const service_id = document.getElementById("id-serv").value;
+                const linhas = document.querySelectorAll("#tbodyHorarios tr");
 
-            const trip_id =
-                document.getElementById("id-viag").value;
+                if (linhas.length === 0) {
+                    alert(
+                        "Adicione pelo menos um horário."
+                    );
 
-            const service_id =
-                document.getElementById("id-serv").value;
+                    return;
+                }
 
-            const linhas =
-                document.querySelectorAll("#tbodyHorarios tr");
+                let dados = [];
 
-            let dados = [];
-            linhas.forEach(function(row) {
+                linhas.forEach(
+                    function(row) {
+                        const adaptado =
+                            row
+                            .querySelector(
+                                ".check-adaptado"
+                            )
+                            .checked ?
+                            1 :
+                            2;
 
-                const adaptado =
-                    row.querySelector(".check-adaptado").checked ? 1 : 0;
+                        dados.push({
+                            pattern_id: pattern_id,
+                            service_id: service_id,
+                            departure_time: row.cells[0].innerText.trim(),
+                            wheelchair_accessible: adaptado
+                        });
+                    }
+                );
 
-                const horarioFixo =
-                    row.querySelector(".check-fixo").checked ? 1 : 0;
+                fetch(
+                        "salvar_departures.php", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify(
+                                dados
+                            )
+                        }
+                    )
 
-                dados.push({
-                    trip_id: trip_id,
-                    service_id: service_id,
-                    departure_time: row.cells[0].innerText.trim(),
+                    .then(
+                        r => r.json()
+                    )
 
-                    // Marcado = 1, desmarcado = 0
-                    wheelchair_accessible: adaptado,
+                    .then(
+                        resp => {
 
-                    // GTFS: 1 = exato, 0 = aproximado
-                    timepoint: horarioFixo
-                });
+                            alert(
+                                resp.message
+                            );
 
-            });
+                            if (
+                                resp.status === "ok"
+                            ) {
 
-            fetch("salvar_departures.php", {
+                                carregarHorarios();
+                            }
 
-                    method: "POST",
+                        }
+                    )
 
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
+                    .catch(
+                        erro => {
+                            console.error(
+                                erro
+                            );
 
-                    body: JSON.stringify(dados)
-
-                })
-
-                .then(r => r.json())
-
-                .then(resp => {
-
-                    alert(resp.message);
-
-                    if (resp.status == "ok")
-                        location.reload();
-
-                });
-
-        });
+                            alert(
+                                "Erro de comunicação com o servidor."
+                            );
+                        }
+                    );
+            }
+        );
     </script>
 
     <script>
         // Script para carregar os horários
-        const viagem = document.getElementById("id-viag");
+        const pattern = document.getElementById("id-pattern");
         const servico = document.getElementById("id-serv");
 
-        viagem.addEventListener("change", carregarHorarios);
-        servico.addEventListener("change", carregarHorarios);
+        pattern.addEventListener(
+            "change",
+            carregarHorarios
+        );
+
+        servico.addEventListener(
+            "change",
+            carregarHorarios
+        );
 
         function carregarHorarios() {
 
-            const trip_id = viagem.value;
+            const pattern_id = pattern.value;
             const service_id = servico.value;
 
-            if (trip_id === "" || service_id === "")
+            if (
+                pattern_id === "" || service_id === ""
+            ) {
+                document.getElementById("tbodyHorarios").innerHTML = "";
                 return;
+            }
 
-            fetch(`buscar_departures.php?trip_id=${trip_id}&service_id=${service_id}`)
-                .then(r => r.json())
-                .then(lista => {
+            fetch(
+                    "buscar_departures.php" + "?pattern_id=" + encodeURIComponent(pattern_id) + "&service_id=" + encodeURIComponent(
+                        service_id
+                    )
+                )
 
-                    const tbody = document.getElementById("tbodyHorarios");
+                .then(
+                    r => r.json()
+                )
 
-                    tbody.innerHTML = "";
+                .then(
+                    lista => {
 
-                    lista.forEach(function (item) {
+                        const tbody = document.getElementById(
+                            "tbodyHorarios"
+                        );
 
-                        const tr = document.createElement("tr");
+                        tbody.innerHTML = "";
 
-                        const adaptadoMarcado =
-                            Number(item.wheelchair_accessible) === 1
-                                ? "checked"
-                                : "";
+                        lista.forEach(
+                            function(item) {
+                                const tr = document.createElement(
+                                    "tr"
+                                );
 
-                        const fixoMarcado =
-                            Number(item.timepoint) === 1
-                                ? "checked"
-                                : "";
+                                const adaptadoMarcado = Number(item.wheelchair_accessible) === 1 ?
+                                    "checked" :
+                                    "";
 
-                        tr.innerHTML = `
-                            <td>${item.departure_time.substring(0, 5)}</td>
+                                tr.innerHTML = `
 
                             <td>
-                                <input
-                                    type="checkbox"
-                                    class="check-fixo"
-                                    ${fixoMarcado}>
+                                ${item.departure_time.substring(0, 5)}
                             </td>
 
                             <td>
-                                <input
-                                    type="checkbox"
-                                    class="check-adaptado"
-                                    ${adaptadoMarcado}>
+                                <input type="checkbox" class="check-adaptado" ${adaptadoMarcado}>
                             </td>
 
                             <td>
-                                <button
-                                    type="button"
-                                    class="btn-excluir"
-                                    onclick="removerLinha(this)">
+                                <button type="button" class="btn-excluir" onclick="removerLinha(this)">
                                     EXCLUIR
                                 </button>
                             </td>
                         `;
-
-                        tbody.appendChild(tr);
-
-                        });
-
-                });
-
+                                tbody.appendChild(
+                                    tr
+                                );
+                            }
+                        );
+                    }
+                );
         }
     </script>
 

@@ -136,72 +136,79 @@ try {
 
 
     /*
-    |--------------------------------------------------------------------------
-    | Prepara INSERT
-    |--------------------------------------------------------------------------
-    */
+|--------------------------------------------------------------------------
+| Prepara INSERT
+|--------------------------------------------------------------------------
+*/
 
-    $stmtInsert =
-        $conexao->prepare("
-            INSERT INTO shape_stops
-            (
-                shape_id,
-                stop_id,
-                seq,
-                codigo,
-                ponto,
-                intervalo,
-                stop_headsign
-            )
+$stmtInsert =
+    $conexao->prepare("
+        INSERT INTO shape_stops
+        (
+            shape_id,
+            stop_id,
+            seq,
+            codigo,
+            ponto,
+            intervalo,
+            timepoint,
+            stop_headsign
+        )
 
-            VALUES
-            (
-                ?, ?, ?, ?, ?, ?, ?
-            )
-        ");
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Salva sequência
-    |--------------------------------------------------------------------------
-    */
-
-    foreach ($data as $item) {
-
-        $stop_id =
-            (int) $item['stop_id'];
-
-        $seq =
-            (int) $item['seq'];
-
-        $codigo =
-            trim($item['codigo']);
-
-        $ponto =
-            trim($item['ponto']);
-
-        $intervalo =
-            trim($item['intervalo']);
-
-        $destino =
-            trim($item['destino']);
+        VALUES
+        (
+            ?, ?, ?, ?, ?, ?, ?, ?
+        )
+    ");
 
 
-        $stmtInsert->bind_param(
-            "siissss",
-            $shape_id,
-            $stop_id,
-            $seq,
-            $codigo,
-            $ponto,
-            $intervalo,
-            $destino
-        );
+/*
+|--------------------------------------------------------------------------
+| Salva sequência
+|--------------------------------------------------------------------------
+*/
+
+foreach ($data as $item) {
+
+    $stop_id =
+        (int) $item['stop_id'];
+
+    $seq =
+        (int) $item['seq'];
+
+    $codigo =
+        trim($item['codigo']);
+
+    $ponto =
+        trim($item['ponto']);
+
+    $intervalo =
+        trim($item['intervalo']);
+
+    $timepoint =
+        !empty($item['timepoint'])
+            ? 1
+            : 0;
+
+    $destino =
+        trim($item['destino']);
 
 
-        $stmtInsert->execute();
-    }
+    $stmtInsert->bind_param(
+        "siisssis",
+        $shape_id,
+        $stop_id,
+        $seq,
+        $codigo,
+        $ponto,
+        $intervalo,
+        $timepoint,
+        $destino
+    );
+
+
+    $stmtInsert->execute();
+}
 
 
     mysqli_commit(

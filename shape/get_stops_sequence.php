@@ -48,7 +48,8 @@ $stmt->bind_param(
 $stmt->execute();
 
 
-$result = $stmt->get_result();
+$result =
+    $stmt->get_result();
 
 
 if ($result->num_rows === 0) {
@@ -81,12 +82,13 @@ if (empty($shape_id)) {
 
 $stmt = $conexao->prepare("
     SELECT
-        Id,
+        id,
         seq,
         stop_id,
         codigo,
         ponto,
         intervalo,
+        timepoint,
         stop_headsign
 
     FROM shape_stops
@@ -113,15 +115,27 @@ $result =
 $dados = [];
 
 
+/*
+|--------------------------------------------------------------------------
+| Monta retorno
+|--------------------------------------------------------------------------
+*/
+
 while (
     $row = $result->fetch_assoc()
 ) {
 
     $row['id'] =
-        (int) $row['Id'];
+        (int) $row['id'];
 
     $row['seq'] =
         (int) $row['seq'];
+
+    $row['stop_id'] =
+        (int) $row['stop_id'];
+
+    $row['timepoint'] =
+        (int) $row['timepoint'];
 
 
     $dados[] =
