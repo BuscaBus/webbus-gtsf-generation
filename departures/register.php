@@ -98,7 +98,7 @@ $result_calendar = mysqli_query($conexao, $sql_calendar);
     <link rel="shortcut icon" href="../img/logo-icon2.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/style.css?v=1.3">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
-    <link rel="stylesheet" href="../css/departures.css?v=1.6">
+    <link rel="stylesheet" href="../css/departures.css?v=1.7">
 </head>
 
 <body>
@@ -114,7 +114,7 @@ $result_calendar = mysqli_query($conexao, $sql_calendar);
                 <form action="result_register.php" method="POST" autocomplete="off" class="form-cad-vig">
                     <input type="hidden" name="route_id" id="id-route" value="<?= $route_id ?>">
                     <p class="p-estilo">
-                        <label for="id-viag" class="lb-reg-viag">Viagem:</label>
+                        <label for="id-pattern" class="lb-reg-viag">Viagem:</label>
                         <select id="id-pattern" name="pattern_id" class="selec-reg-viag">
                             <?php
                             while ($pattern = $result_patterns->fetch_assoc()) { ?>
@@ -171,7 +171,16 @@ $result_calendar = mysqli_query($conexao, $sql_calendar);
                         <tr>
                             <th class="th-hor">Horários</th>
                             <th class="th-viagem">Viagem</th>
-                            <th class="th-adaptado">Adaptado</th>
+                            <th class="th-adaptado">
+                                <div class="adaptado-header">
+                                    <span>Adaptado</span>
+                                    <input
+                                        type="checkbox"
+                                        id="checkTodosAdaptado"
+                                        title="Marcar ou desmarcar todos"
+                                    >
+                                </div>
+                            </th>
                             <th class="th-acoes">Ação</th>
                         </tr>
                     </thead>
@@ -198,8 +207,9 @@ $result_calendar = mysqli_query($conexao, $sql_calendar);
             const select = document.getElementById("id-pattern");
             const option = select.options[select.selectedIndex];
 
-            return option ? option.text.trim(): "";
-}
+            return option ? option.text.trim() : "";
+        }
+
         // Função reutilizável para validar o serviço
         function validarServico() {
 
@@ -214,17 +224,104 @@ $result_calendar = mysqli_query($conexao, $sql_calendar);
             return true;
         }
 
-
         // Função para excluir um horário da lista
         function removerLinha(botao) {
 
-            if (!confirm("Deseja excluir este horário?")) {
+            const linha =
+                botao.closest("tr");
+
+            const trip_id =
+                linha.dataset.tripId;
+
+
+            if (
+                !confirm(
+                    "Deseja excluir este horário?"
+                )
+            ) {
                 return;
             }
 
-            const linha = botao.closest("tr");
 
-            linha.remove();
+            /*
+            |--------------------------------------------------------------------------
+            | HORÁRIO AINDA NÃO SALVO
+            |--------------------------------------------------------------------------
+            |
+            | Se não existe trip_id, a linha só existe na tela.
+            |
+            */
+
+            if (!trip_id) {
+
+                linha.remove();
+
+                atualizarCheckTodosAdaptado();
+
+                return;
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | HORÁRIO JÁ SALVO
+            |--------------------------------------------------------------------------
+            */
+
+            fetch(
+                    "excluir_departure.php", {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            trip_id: trip_id
+                        })
+                    }
+                )
+
+                .then(
+                    response =>
+                    response.json()
+                )
+
+                .then(
+                    resp => {
+
+                        if (
+                            resp.status === "ok"
+                        ) {
+
+                            linha.remove();
+
+                            atualizarCheckTodosAdaptado();
+
+                        } else {
+
+                            alert(
+                                resp.message ||
+                                "Erro ao excluir horário."
+                            );
+                        }
+
+                    }
+                )
+
+                .catch(
+                    erro => {
+
+                        console.error(
+                            erro
+                        );
+
+                        alert(
+                            "Erro de comunicação com o servidor."
+                        );
+
+                    }
+                );
         }
     </script>
 
@@ -257,16 +354,20 @@ $result_calendar = mysqli_query($conexao, $sql_calendar);
 
                 tr.innerHTML = `
 
-                <td>${horario}</td>
+                <td class="td-horario">
+                    ${horario}
+                </td>
 
                 <td class="td-viagem">
                     ${nomeViagem}
                 </td>
 
-                <td>
+                <td class="td-adaptado">
                     <input
                         type="checkbox"
-                        class="check-adaptado" checked>
+                        class="check-adaptado"
+                        checked
+                    >
                 </td>               
 
                 <td>
@@ -280,6 +381,8 @@ $result_calendar = mysqli_query($conexao, $sql_calendar);
             `;
 
                 tbody.appendChild(tr);
+
+                atualizarCheckTodosAdaptado();
 
             });
 
@@ -321,18 +424,22 @@ $result_calendar = mysqli_query($conexao, $sql_calendar);
 
             tr.innerHTML = `
 
-            <td>${horario}</td>
+            <td class="td-horario">
+                ${horario}
+            </td>
 
             <td class="td-viagem">
                 ${nomeViagem}
             </td>
 
-            <td>
+            <td class="td-adaptado">
                 <input
                     type="checkbox"
                     class="check-adaptado"
-                    title="Marque se a partida é adaptada para cadeirante" checked>
-            </td>            
+                    title="Marque se a partida é adaptada para cadeirante"
+                    checked
+                >
+            </td>       
 
             <td>
                 <button
@@ -345,6 +452,8 @@ $result_calendar = mysqli_query($conexao, $sql_calendar);
         `;
 
             tbody.appendChild(tr);
+
+            atualizarCheckTodosAdaptado();
 
             input.value = "";
             input.focus();
@@ -387,7 +496,7 @@ $result_calendar = mysqli_query($conexao, $sql_calendar);
                         dados.push({
                             pattern_id: pattern_id,
                             service_id: service_id,
-                            departure_time: row.cells[0].innerText.trim(),
+                            departure_time: row.querySelector(".td-horario").innerText.trim(),
                             wheelchair_accessible: adaptado
                         });
                     }
@@ -489,38 +598,151 @@ $result_calendar = mysqli_query($conexao, $sql_calendar);
 
                         lista.forEach(
                             function(item) {
-                                const tr = document.createElement(
-                                    "tr"
-                                );
 
-                                const adaptadoMarcado = Number(item.wheelchair_accessible) === 1 ?
+                                const tr =
+                                    document.createElement("tr");
+
+                                tr.dataset.tripId = item.trip_id;
+
+                                const nomeViagem =
+                                    obterNomeViagem();
+
+                                const adaptadoMarcado =
+                                    Number(
+                                        item.wheelchair_accessible
+                                    ) === 1 ?
                                     "checked" :
                                     "";
 
                                 tr.innerHTML = `
 
-                            <td>
+                            <td class="td-horario">
                                 ${item.departure_time.substring(0, 5)}
                             </td>
 
-                            <td>
-                                <input type="checkbox" class="check-adaptado" ${adaptadoMarcado}>
+                            <td class="td-viagem">
+                                ${nomeViagem}
+                            </td>
+
+                            <td class="td-adaptado">
+                                <input
+                                    type="checkbox"
+                                    class="check-adaptado"
+                                    ${adaptadoMarcado}
+                                >
                             </td>
 
                             <td>
-                                <button type="button" class="btn-excluir" onclick="removerLinha(this)">
+                                <button
+                                    type="button"
+                                    class="btn-excluir"
+                                    onclick="removerLinha(this)"
+                                >
                                     EXCLUIR
                                 </button>
                             </td>
                         `;
-                                tbody.appendChild(
-                                    tr
-                                );
+
+                                tbody.appendChild(tr);
                             }
                         );
+
+                        atualizarCheckTodosAdaptado();
                     }
                 );
         }
+    </script>
+
+    <script>
+        //Script para o checkbox de adaptado
+        const checkTodosAdaptado =
+            document.getElementById(
+                "checkTodosAdaptado"
+            );
+
+        /*
+        |--------------------------------------------------------------------------
+        | MARCAR / DESMARCAR TODOS
+        |--------------------------------------------------------------------------
+        */
+
+        checkTodosAdaptado.addEventListener(
+            "change",
+            function() {
+
+                const checkboxes =
+                    document.querySelectorAll(
+                        "#tbodyHorarios .check-adaptado"
+                    );
+
+
+                checkboxes.forEach(
+                    function(check) {
+
+                        check.checked =
+                            checkTodosAdaptado.checked;
+
+                    }
+                );
+            }
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | ATUALIZA CHECKBOX DO CABEÇALHO
+        |--------------------------------------------------------------------------
+        */
+
+        function atualizarCheckTodosAdaptado() {
+
+            const checkboxes =
+                document.querySelectorAll(
+                    "#tbodyHorarios .check-adaptado"
+                );
+
+
+            if (checkboxes.length === 0) {
+
+                checkTodosAdaptado.checked =
+                    false;
+
+                return;
+            }
+
+
+            checkTodosAdaptado.checked = [...checkboxes].every(
+                checkbox =>
+                checkbox.checked
+            );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | QUANDO ALTERAR UM CHECKBOX INDIVIDUAL
+        |--------------------------------------------------------------------------
+        */
+
+        document
+            .getElementById(
+                "tbodyHorarios"
+            )
+            .addEventListener(
+                "change",
+                function(event) {
+
+                    if (
+                        event.target.classList.contains(
+                            "check-adaptado"
+                        )
+                    ) {
+
+                        atualizarCheckTodosAdaptado();
+                    }
+
+                }
+            );
     </script>
 
 </body>

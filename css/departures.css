@@ -205,8 +205,49 @@ table{
     padding-right: 200px;    
 }
 
-.th-adaptado{
-    padding-right: 2px;    
+/* Cabeçalho Adaptado */
+.th-adaptado {
+    width: 120px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Texto + checkbox mestre lado a lado */
+.th-adaptado .adaptado-header {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    white-space: nowrap;
+}
+
+/* Checkbox mestre */
+.th-adaptado #checkTodosAdaptado {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+/* Células da coluna Adaptado */
+.td-adaptado {
+    width: 120px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Somente os checkboxes das linhas */
+.td-adaptado .check-adaptado {
+    display: block;
+    width: 14px;
+    height: 14px;
+    margin: 0 auto;
+    padding: 0;
+    cursor: pointer;
 }
 
 .th-fixo{
