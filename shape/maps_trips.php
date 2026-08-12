@@ -56,7 +56,7 @@ if (!$pattern) {
     <link rel="shortcut icon" href="../img/logo-icon2.png">
     <link rel="stylesheet" href="../css/style.css?v=1.2">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
-    <link rel="stylesheet" href="../css/shape.css?v=1.8">
+    <link rel="stylesheet" href="../css/shape.css?v=1.9">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css">
 
@@ -93,6 +93,12 @@ if (!$pattern) {
                     <input type="file" id="arquivoKmz" accept=".kmz,.kml" style="display:none;">
                     <button type="button" id="btnImportarKmz" class="btn-importar"> IMPORTAR KMZ </button>
                 </p>
+                <p>
+                    <button type="button" id="btnAjustarVia" class="btn-ajustar-via">AJUSTAR TRAÇADO</button>
+                </p>
+                <p>
+                    <button type="button" id="btnExcluirShape" class="btn-excluir-shape">EXCLUIR TRAÇADO</button>
+                </p>
                 <br><br>
                 <button type="button" id="btnSalvar" class="btn-salv"> SALVAR </button>
                 <button
@@ -110,7 +116,7 @@ if (!$pattern) {
                 <div id="div-map"></div>
             </section>
 
-            <script>               
+            <script>
                 const PATTERN_ID = <?= (int) $pattern['pattern_id'] ?>;
                 const ROUTE_ID = <?= (int) $pattern['route_id'] ?>;
                 let SHAPE_ID = <?= json_encode($pattern['shape_id'] ?? '') ?>;
@@ -304,7 +310,7 @@ if (!$pattern) {
 
                                         // caso tenha criado novo shape
                                         if (!SHAPE_ID && data.shape_id) {
-                                            SHAPE_ID = data.shape_id;                                           
+                                            SHAPE_ID = data.shape_id;
 
                                             // atualiza link sequência
                                             document.querySelector(".a-btn-seq-par").href = "shape_stops.php?pattern_id=" + PATTERN_ID;
@@ -434,10 +440,252 @@ if (!$pattern) {
 
                 }
             </script>
+
+            <script>
+                // EXCLUIR SHAPE
+                document
+                    .getElementById("btnExcluirShape")
+                    .addEventListener("click", function() {
+
+                        if (!SHAPE_ID) {
+
+                            alert("Este padrão de viagem não possui trajeto salvo.");
+
+                            return;
+                        }
+
+                        let confirmar = confirm(
+                            "Deseja realmente excluir este traçado?\n\n" +
+                            "Essa ação removerá o trajeto do banco de dados."
+                        );
+
+                        if (!confirmar) {
+                            return;
+                        }
+
+                        fetch("excluir_shape.php", {
+
+                                method: "POST",
+
+                                headers: {
+                                    "Content-Type": "application/json"
+                                },
+
+                                body: JSON.stringify({
+                                    pattern_id: PATTERN_ID,
+                                    shape_id: SHAPE_ID
+                                })
+
+                            })
+
+                            .then(res => res.json())
+
+                            .then(data => {
+
+                                if (data.status === "ok") {
+
+                                    // Remove o desenho do mapa
+                                    drawnItems.clearLayers();
+
+                                    // O pattern deixa de ter shape
+                                    SHAPE_ID = "";
+
+                                    alert(
+                                        "Traçado excluído com sucesso!"
+                                    );
+
+                                    // Atualiza lista de patterns disponíveis
+                                    carregarPatternsComShape();
+
+                                } else {
+
+                                    alert(
+                                        data.mensagem ||
+                                        "Erro ao excluir o traçado."
+                                    );
+
+                                }
+
+                            })
+
+                            .catch(err => {
+
+                                console.error(
+                                    "Erro ao excluir shape:",
+                                    err
+                                );
+
+                                alert(
+                                    "Erro de comunicação com o servidor."
+                                );
+
+                            });
+
+                    });
+            </script>
+
+            <script>
+                // Script para ajustar traçado a via 
+                document
+                    .getElementById("btnAjustarVia")
+                    .addEventListener("click", function() {
+
+                        let coords =
+                            obterCoordenadasShape();
+
+                        if (!coords) {
+
+                            alert(
+                                "Nenhum trajeto disponível para ajustar."
+                            );
+
+                            return;
+                        }
+
+
+                        let btn = this;
+
+                        btn.disabled = true;
+                        btn.textContent = "AJUSTANDO...";
+
+
+                        fetch(
+                                "ajustar_shape_via.php", {
+
+                                    method: "POST",
+
+                                    headers: {
+                                        "Content-Type": "application/json"
+                                    },
+
+                                    body: JSON.stringify({
+                                        coords: coords
+                                    })
+
+                                }
+                            )
+
+                            .then(async res => {
+
+                                let texto =
+                                    await res.text();
+
+                                try {
+
+                                    return JSON.parse(texto);
+
+                                } catch (e) {
+
+                                    console.error(
+                                        "Resposta PHP:",
+                                        texto
+                                    );
+
+                                    throw new Error(
+                                        "Resposta inválida do servidor."
+                                    );
+                                }
+
+                            })
+
+                            .then(data => {
+
+                                if (data.status !== "ok") {
+
+                                    alert(
+                                        data.mensagem ||
+                                        "Não foi possível ajustar o trajeto."
+                                    );
+
+                                    return;
+                                }
+
+
+                                /*
+                                 * Remove traçado antigo
+                                 */
+                                drawnItems.clearLayers();
+
+
+                                /*
+                                 * Adiciona traçado ajustado
+                                 */
+                                let linha =
+                                    L.polyline(
+                                        data.coords, {
+                                            color: "#0000ff",
+                                            weight: 5,
+                                            opacity: 0.8
+                                        }
+                                    );
+
+
+                                drawnItems.addLayer(
+                                    linha
+                                );
+
+
+                                map.fitBounds(
+                                    linha.getBounds()
+                                );
+
+
+                                let mensagem =
+                                    "Traçado ajustado às vias.";
+
+
+                                if (
+                                    data.confianca !== null &&
+                                    data.confianca !== undefined
+                                ) {
+
+                                    let percentual =
+                                        Math.round(
+                                            data.confianca * 100
+                                        );
+
+
+                                    mensagem +=
+                                        "\nConfiança: " +
+                                        percentual +
+                                        "%";
+                                }
+
+
+                                mensagem +=
+                                    "\nPontos gerados: " +
+                                    data.pontos;
+
+
+                                alert(mensagem);
+
+                            })
+
+                            .catch(err => {
+
+                                console.error(err);
+
+                                alert(
+                                    "Erro ao ajustar o trajeto."
+                                );
+
+                            })
+
+                            .finally(() => {
+
+                                btn.disabled = false;
+
+                                btn.textContent =
+                                    "AJUSTAR À VIA";
+
+                            });
+
+                    });
+            </script>
         </main>
         <footer>
             <p>
-                <a href="../route/list.php"> Voltar </a>
+                <a href="../trips/register.php?id=<?= urlencode($pattern['route_id']) ?>">Voltar</a>
             </p>
         </footer>
     </div>
