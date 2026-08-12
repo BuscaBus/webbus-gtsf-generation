@@ -164,8 +164,8 @@ $result_calendar = mysqli_query($conexao, $sql_calendar);
 
             <!-- Section para listar os horários -->
             <section class="sect-list-hor">
-                <h1 class="h1-cad-hor">Tabela de Horários</h1>
-                <br>
+                <h1 class="h1-cad-hor">Tabela de Horários <br><span id="titulo-servico"></span></h1>  
+                <br>              
                 <table>
                     <thead>
                         <tr>
@@ -562,7 +562,13 @@ $result_calendar = mysqli_query($conexao, $sql_calendar);
 
         servico.addEventListener(
             "change",
-            carregarHorarios
+            function() {
+
+                atualizarTituloServico();
+
+                carregarHorarios();
+
+            }
         );
 
         function carregarHorarios() {
@@ -650,6 +656,26 @@ $result_calendar = mysqli_query($conexao, $sql_calendar);
                         atualizarCheckTodosAdaptado();
                     }
                 );
+        }
+
+        // Script para atualizar titulo do serviço
+        function atualizarTituloServico() {
+
+            const tituloServico =
+                document.getElementById("titulo-servico");
+
+            if (servico.value === "") {
+
+                tituloServico.textContent = "";
+
+                return;
+            }
+
+            const option =
+                servico.options[servico.selectedIndex];
+
+            tituloServico.textContent =
+                "" + option.text.trim();
         }
     </script>
 

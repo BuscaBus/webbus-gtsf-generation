@@ -262,7 +262,7 @@ section{
     background-color: var(--color2); 
     width: 100px;
     height: 580px;
-    flex: 0 0 45%;
+    flex: 0 0 46%;
     padding: 0px;     
 }
 
@@ -343,12 +343,11 @@ table{
 }
 
 .th-seq{
-    padding-right: 7px;  
-    margin-left: 1px;        
+    padding-right: 10px;           
 }
 
 .seq-input{
-    width: 33px;
+    width: 37px;
     text-align: center;
     padding: 2px;
 }

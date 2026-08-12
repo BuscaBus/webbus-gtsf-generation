@@ -68,7 +68,7 @@ $shape_id = $pattern['shape_id'];
     <link rel="shortcut icon" href="../img/logo-icon2.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/style.css?v=1.2">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
-    <link rel="stylesheet" href="../css/shape.css?v=2.8">
+    <link rel="stylesheet" href="../css/shape.css?v=2.9">
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
@@ -359,7 +359,7 @@ $shape_id = $pattern['shape_id'];
                                 value="${stop.stop_headsign ?? ''}">                        
                         </td>
                         <td>
-                            <button class="btn-excluir" onclick="removerLinha(this)">EXCLUIR</button>
+                            <button type="button" class="btn-excluir" onclick="removerLinha(this)">EXCLUIR</button>
                         </td>
                     `;
 
@@ -445,46 +445,167 @@ $shape_id = $pattern['shape_id'];
                 // Função para remover linha atulizar sequencia
                 function removerLinha(btn) {
 
-                    const row = btn.closest("tr");
+    const row = btn.closest("tr");
 
-                    const id = row.cells[0].innerText;
+    if (!row) {
+        alert("Não foi possível localizar a linha.");
+        return;
+    }
 
-                    if (!confirm("Deseja excluir este ponto?")) return;
+    const id = parseInt(
+        row.cells[0].textContent.trim(),
+        10
+    ) || 0;
 
-                    fetch("delete_shape_stop.php", {
+    if (!confirm("Deseja excluir este ponto?")) {
+        return;
+    }
 
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-                            body: JSON.stringify({
-                                id: id
-                            })
 
-                        })
-                        .then(res => res.json())
-                        .then(resp => {
+    /*
+    |--------------------------------------------------------------------------
+    | PONTO AINDA NÃO SALVO NO BANCO
+    |--------------------------------------------------------------------------
+    |
+    | Se ID = 0, significa que a parada foi adicionada na tela,
+    | mas ainda não existe na tabela shape_stops.
+    |
+    | Portanto não precisamos chamar delete_shape_stop.php.
+    |
+    */
 
-                            if (resp.status === "ok") {
+    if (id <= 0) {
 
-                                row.remove();
-                                atualizarSequencia();
+        row.remove();
 
-                            } else {
+        atualizarSequencia();
+        atualizarCheckTodosTimepoint();
 
-                                alert("Erro ao excluir.");
+        return;
+    }
 
-                            }
 
-                        })
-                        .catch(err => {
+    /*
+    |--------------------------------------------------------------------------
+    | PONTO JÁ EXISTENTE NO BANCO
+    |--------------------------------------------------------------------------
+    */
 
-                            console.error(err);
-                            alert("Erro no servidor.");
+    fetch("delete_shape_stop.php", {
 
-                        });
+        method: "POST",
 
-                }
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+            id: id
+        })
+
+    })
+
+    .then(async res => {
+
+        /*
+        |--------------------------------------------------------------------------
+        | LER RESPOSTA DO PHP
+        |--------------------------------------------------------------------------
+        */
+
+        const texto = await res.text();
+
+        console.log(
+            "Resposta delete_shape_stop.php:",
+            texto
+        );
+
+        if (!res.ok) {
+
+            throw new Error(
+                "HTTP " +
+                res.status +
+                " - " +
+                texto
+            );
+
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | CONVERTER PARA JSON
+        |--------------------------------------------------------------------------
+        */
+
+        try {
+
+            return JSON.parse(texto);
+
+        } catch (erro) {
+
+            throw new Error(
+                "Resposta inválida do servidor: " +
+                texto
+            );
+
+        }
+
+    })
+
+    .then(resp => {
+
+        console.log(
+            "Resposta exclusão:",
+            resp
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | EXCLUSÃO REALIZADA
+        |--------------------------------------------------------------------------
+        */
+
+        if (resp.status === "ok") {
+
+            row.remove();
+
+            atualizarSequencia();
+            atualizarCheckTodosTimepoint();
+
+            return;
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | ERRO RETORNADO PELO PHP
+        |--------------------------------------------------------------------------
+        */
+
+        alert(
+            resp.message ||
+            resp.mensagem ||
+            "Erro ao excluir o ponto."
+        );
+
+    })
+
+    .catch(err => {
+
+        console.error(
+            "Erro ao excluir:",
+            err
+        );
+
+        alert(
+            "Erro ao excluir o ponto.\n\n" +
+            err.message
+        );
+
+    });
+
+}
 
                 // Função para carregar os pontos na tabela vindos do banco de dados 
                 function carregarStopsTabela() {
@@ -550,7 +671,7 @@ $shape_id = $pattern['shape_id'];
                     </td>
 
                     <td>
-                        <button class="btn-excluir"
+                        <button type="button" class="btn-excluir"
                             onclick="removerLinha(this)">
                             EXCLUIR
                         </button>
