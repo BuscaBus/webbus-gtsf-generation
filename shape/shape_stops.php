@@ -68,7 +68,7 @@ $shape_id = $pattern['shape_id'];
     <link rel="shortcut icon" href="../img/logo-icon2.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/style.css?v=1.2">
     <link rel="stylesheet" href="../css/table.css?v=1.0">
-    <link rel="stylesheet" href="../css/shape.css?v=2.9">
+    <link rel="stylesheet" href="../css/shape.css?v=3.1">
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
@@ -163,8 +163,20 @@ $shape_id = $pattern['shape_id'];
                     </select>
                 </p>
                 <br>
+                <div class="calc-intervalos-box">
+                        <label for="velocidadeMedia">Velocidade média:</label>
+
+                        <input type="number" id="velocidadeMedia" min="1" max="120" step="0.5" value="25"                     style="width: 80px; padding-left: 5px;">      
+
+                        <span>km/h</span>
+
+                        <button
+                            type="button" id="btnCalcularIntervalos" class="btn-calc">
+                            CALCULAR
+                        </button>                        
+                </div>
                 <table>
-                    <caption>Pontos do Trajeto</caption>
+                    <caption>Pontos do Trajeto</caption>                  
                     <thead>
                         <th class="th-seq">Seq.</th>
                         <th class="th-cod">Cod</th>
@@ -181,8 +193,8 @@ $shape_id = $pattern['shape_id'];
                 </table>
                 <br>
                 <button type="button" id="btnCadastrar" class="btn-seq-cad">SALVAR</button>
-                <button type="button" id="btnEditar" class="btn-seq-edt">EDITAR</button>
-                </p>
+                <button type="button" id="btnEditar" class="btn-seq-edt">EDITAR</button>                             
+                
             </section>
 
             <!-- Section para o mapa com a sequencia de pontos do trajeto -->
@@ -1051,6 +1063,237 @@ $shape_id = $pattern['shape_id'];
             checkTodosTimepoint.checked =
                 todosMarcados;
         }
+    </script>
+
+
+    <script>
+        /*
+        |--------------------------------------------------------------------------
+        | CÁLCULO AUTOMÁTICO DOS INTERVALOS
+        |--------------------------------------------------------------------------
+        |
+        | Envia ao PHP a ordem atual das paradas da tabela.
+        | O servidor localiza cada parada no shape e calcula a distância
+        | acumulada a partir da primeira parada.
+        |
+        */
+
+        document
+            .getElementById("btnCalcularIntervalos")
+            .addEventListener("click", function() {
+
+                const linhas =
+                    document.querySelectorAll("#tbodyStops tr");
+
+                if (linhas.length < 2) {
+                    alert(
+                        "Adicione pelo menos duas paradas antes de calcular os intervalos."
+                    );
+                    return;
+                }
+
+                const velocidade =
+                    parseFloat(
+                        document.getElementById(
+                            "velocidadeMedia"
+                        ).value
+                    );
+
+                if (
+                    !Number.isFinite(velocidade) ||
+                    velocidade <= 0
+                ) {
+                    alert(
+                        "Informe uma velocidade média válida."
+                    );
+                    return;
+                }
+
+                const paradas = [];
+
+                linhas.forEach((row, index) => {
+
+                    const stopId =
+                        parseInt(
+                            row.cells[1].innerText.trim(),
+                            10
+                        );
+
+                    if (
+                        !Number.isInteger(stopId) ||
+                        stopId <= 0
+                    ) {
+                        return;
+                    }
+
+                    paradas.push({
+                        stop_id: stopId,
+                        seq: index + 1
+                    });
+
+                });
+
+
+                if (paradas.length !== linhas.length) {
+                    alert(
+                        "Existe uma parada inválida na tabela."
+                    );
+                    return;
+                }
+
+
+                const botao = this;
+
+                botao.disabled = true;
+                botao.textContent = "CALCULANDO...";
+
+
+                fetch("calcular_intervalos.php", {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        pattern_id:
+                            parseInt(patternAtual, 10),
+
+                        velocidade_media:
+                            velocidade,
+
+                        paradas:
+                            paradas
+
+                    })
+
+                })
+
+                .then(async response => {
+
+                    const texto =
+                        await response.text();
+
+                    let data;
+
+                    try {
+
+                        data =
+                            JSON.parse(texto);
+
+                    } catch (e) {
+
+                        console.error(
+                            "Resposta calcular_intervalos.php:",
+                            texto
+                        );
+
+                        throw new Error(
+                            "Resposta inválida do servidor."
+                        );
+                    }
+
+
+                    if (!response.ok) {
+
+                        throw new Error(
+                            data.message ||
+                            ("HTTP " + response.status)
+                        );
+                    }
+
+
+                    return data;
+
+                })
+
+                .then(data => {
+
+                    if (data.status !== "ok") {
+
+                        throw new Error(
+                            data.message ||
+                            "Não foi possível calcular os intervalos."
+                        );
+                    }
+
+
+                    const linhasAtuais =
+                        document.querySelectorAll(
+                            "#tbodyStops tr"
+                        );
+
+
+                    data.paradas.forEach(
+                        (item, index) => {
+
+                            const row =
+                                linhasAtuais[index];
+
+                            if (!row) {
+                                return;
+                            }
+
+
+                            const inputIntervalo =
+                                row.querySelector(
+                                    'input[type="time"]'
+                                );
+
+                            if (inputIntervalo) {
+
+                                inputIntervalo.value =
+                                    item.intervalo;
+                            }
+
+
+                            /*
+                             * Guarda a distância apenas para
+                             * inspeção/debug no navegador.
+                             */
+                            row.dataset.distanciaTrajeto =
+                                item.distancia_metros;
+
+                        }
+                    );
+
+
+                    alert(
+                        "Intervalos calculados com sucesso!\n\n" +
+                        "Velocidade média: " +
+                        data.velocidade_media +
+                        " km/h\n" +
+                        "Distância entre a primeira e a última parada: " +
+                        data.distancia_total_km +
+                        " km\n\n" +
+                        "Revise os tempos e clique em SALVAR ou EDITAR para gravar no banco."
+                    );
+
+                })
+
+                .catch(error => {
+
+                    console.error(error);
+
+                    alert(
+                        "Erro ao calcular intervalos.\n\n" +
+                        error.message
+                    );
+
+                })
+
+                .finally(() => {
+
+                    botao.disabled = false;
+
+                    botao.textContent =
+                        "CALCULADO";
+
+                });
+
+            });
     </script>
 
 </body>

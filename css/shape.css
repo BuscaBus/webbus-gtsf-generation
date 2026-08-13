@@ -417,6 +417,18 @@ table{
     cursor: pointer;
 }
 
+.btn-calc{
+    background-color: blue;
+    color: var(--color0);
+    width: 120px;
+    font-weight: bold;
+    border-radius: 6px;
+    margin-right: 5px;
+    margin-left: 5px;
+    padding: 3px 3px 3px 3px;
+    cursor: pointer;
+}
+
 #scroll-area {
    width: 2000px; 
    height: 580px;
@@ -426,6 +438,31 @@ table{
    padding: 1rem;
    border: 1px solid #ddd;
    border-radius: 8px;
+}
+
+.calc-intervalos-box {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
+    gap: 8px;
+
+    width: 100%;
+    margin: 10px 0 15px 0;
+}
+
+.calc-intervalos-box label,
+.calc-intervalos-box span,
+.calc-intervalos-box input,
+.calc-intervalos-box button {
+    display: inline-block !important;
+    flex: 0 0 auto;
+    margin: 0;
+}
+
+.calc-intervalos-box #velocidadeMedia {
+    width: 80px !important;
 }
 
 /* Configurações maps.php */
