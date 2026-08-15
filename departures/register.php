@@ -494,10 +494,20 @@ $result_calendar = mysqli_query($conexao, $sql_calendar);
                             2;
 
                         dados.push({
+                            trip_id: row.dataset.tripId
+                                ? parseInt(row.dataset.tripId)
+                                : null,
+
                             pattern_id: pattern_id,
                             service_id: service_id,
-                            departure_time: row.querySelector(".td-horario").innerText.trim(),
-                            wheelchair_accessible: adaptado
+
+                            departure_time:
+                                row.querySelector(
+                                    ".td-horario"
+                                ).innerText.trim(),
+
+                            wheelchair_accessible:
+                                adaptado
                         });
                     }
                 );

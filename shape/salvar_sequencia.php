@@ -2,6 +2,9 @@
 
 require_once __DIR__ . "/../connection.php";
 
+require_once __DIR__
+    . "/../stop_times/gerar_stop_times.php";
+
 header("Content-Type: application/json; charset=utf-8");
 
 mysqli_report(
@@ -209,6 +212,18 @@ foreach ($data as $item) {
 
     $stmtInsert->execute();
 }
+
+    /*
+    |--------------------------------------------------------------------------
+    | REGERA STOP_TIMES DO PATTERN
+    |--------------------------------------------------------------------------
+    */
+
+    $totalStopTimes =
+        gerarStopTimesPattern(
+            $conexao,
+            $pattern_id
+        );
 
 
     mysqli_commit(

@@ -915,6 +915,7 @@ $shape_id = $pattern['shape_id'];
                 const destino = row.querySelector('input[name="stop_headsign[]"]').value;
 
                 dados.push({
+                    pattern_id: patternAtual,
                     id: id,
                     intervalo: intervalo,
                     timepoint: timepoint,

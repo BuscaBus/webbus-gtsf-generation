@@ -2,7 +2,12 @@
 
 require_once __DIR__ . "/../connection.php";
 
-header("Content-Type: application/json; charset=utf-8");
+require_once __DIR__
+    . "/../stop_times/gerar_stop_times.php";
+
+header(
+    "Content-Type: application/json; charset=utf-8"
+);
 
 mysqli_report(
     MYSQLI_REPORT_ERROR |
@@ -39,14 +44,8 @@ if (
 
 /*
 |--------------------------------------------------------------------------
-| DADOS PRINCIPAIS
+| PATTERN E SERVIÇO
 |--------------------------------------------------------------------------
-|
-| Todos os horários enviados pela tela pertencem ao mesmo:
-|
-| pattern_id
-| service_id
-|
 */
 
 $pattern_id =
@@ -68,7 +67,8 @@ if (
 
     echo json_encode([
         "status" => "erro",
-        "message" => "Pattern ou serviço inválido."
+        "message" =>
+            "Pattern ou serviço inválido."
     ]);
 
     exit;
@@ -87,9 +87,6 @@ try {
     |--------------------------------------------------------------------------
     | 1. BUSCA O TRIP_PATTERN
     |--------------------------------------------------------------------------
-    |
-    | Esses dados serão copiados para cada nova trip.
-    |
     */
 
     $sqlPattern = "
@@ -169,46 +166,145 @@ try {
 
     /*
     |--------------------------------------------------------------------------
-    | 2. REMOVE AS TRIPS ANTIGAS DESSE PATTERN + SERVIÇO
+    | 2. BUSCA AS TRIPS QUE JÁ EXISTEM
     |--------------------------------------------------------------------------
-    |
-    | Como trips -> trip_departures possui ON DELETE CASCADE,
-    | ao excluir as trips os horários correspondentes também são removidos.
-    |
     */
 
-    $sqlDeleteTrips = "
-        DELETE FROM trips
+    $sqlExistentes = "
+        SELECT
+            t.trip_id,
+            td.departure_time,
+            t.wheelchair_accessible
 
-        WHERE pattern_id = ?
-        AND service_id = ?
+        FROM trips t
+
+        INNER JOIN trip_departures td
+            ON td.trip_id = t.trip_id
+
+        WHERE t.pattern_id = ?
+          AND t.service_id = ?
     ";
 
 
-    $stmtDeleteTrips =
+    $stmtExistentes =
         $conexao->prepare(
-            $sqlDeleteTrips
+            $sqlExistentes
         );
 
 
-    $stmtDeleteTrips->bind_param(
+    $stmtExistentes->bind_param(
         "is",
         $pattern_id,
         $service_id
     );
 
 
-    $stmtDeleteTrips->execute();
+    $stmtExistentes->execute();
+
+
+    $resultExistentes =
+        $stmtExistentes->get_result();
+
+
+    /*
+     * Guarda todos os trip_id existentes.
+     *
+     * No final, os que não forem encontrados
+     * no payload serão excluídos.
+     */
+
+    $tripsExistentes = [];
+
+
+    /*
+     * Também criamos um índice pelo horário.
+     *
+     * Serve como segurança caso alguma linha
+     * antiga da interface não envie trip_id.
+     */
+
+    $tripPorHorario = [];
+
+
+    while (
+        $row =
+        $resultExistentes->fetch_assoc()
+    ) {
+
+        $id =
+            (int) $row['trip_id'];
+
+
+        $hora =
+            $row['departure_time'];
+
+
+        $tripsExistentes[$id] = true;
+
+        $tripPorHorario[$hora] = $id;
+    }
 
 
 
     /*
     |--------------------------------------------------------------------------
-    | 3. PREPARA INSERT EM TRIPS
+    | 3. PREPARA UPDATE DA TRIP
     |--------------------------------------------------------------------------
     */
 
-    $sqlTrip = "
+    $sqlUpdateTrip = "
+        UPDATE trips
+
+        SET
+            route_id = ?,
+            service_id = ?,
+            trip_headsign = ?,
+            trip_short_name = ?,
+            direction_id = ?,
+            shape_id = ?,
+            wheelchair_accessible = ?
+
+        WHERE trip_id = ?
+          AND pattern_id = ?
+    ";
+
+
+    $stmtUpdateTrip =
+        $conexao->prepare(
+            $sqlUpdateTrip
+        );
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | 4. PREPARA UPDATE DO HORÁRIO
+    |--------------------------------------------------------------------------
+    */
+
+    $sqlUpdateDeparture = "
+        UPDATE trip_departures
+
+        SET departure_time = ?
+
+        WHERE trip_id = ?
+    ";
+
+
+    $stmtUpdateDeparture =
+        $conexao->prepare(
+            $sqlUpdateDeparture
+        );
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | 5. PREPARA INSERT EM TRIPS
+    |--------------------------------------------------------------------------
+    */
+
+    $sqlInsertTrip = "
         INSERT INTO trips
         (
             pattern_id,
@@ -228,20 +324,20 @@ try {
     ";
 
 
-    $stmtTrip =
+    $stmtInsertTrip =
         $conexao->prepare(
-            $sqlTrip
+            $sqlInsertTrip
         );
 
 
 
     /*
     |--------------------------------------------------------------------------
-    | 4. PREPARA INSERT EM TRIP_DEPARTURES
+    | 6. PREPARA INSERT DO HORÁRIO
     |--------------------------------------------------------------------------
     */
 
-    $sqlDeparture = "
+    $sqlInsertDeparture = "
         INSERT INTO trip_departures
         (
             trip_id,
@@ -255,32 +351,44 @@ try {
     ";
 
 
-    $stmtDeparture =
+    $stmtInsertDeparture =
         $conexao->prepare(
-            $sqlDeparture
+            $sqlInsertDeparture
         );
 
 
 
     /*
     |--------------------------------------------------------------------------
-    | 5. CRIA UMA TRIP PARA CADA HORÁRIO
+    | 7. CONTROLES
     |--------------------------------------------------------------------------
     */
 
-    $tripsCriadas = 0;
+    $tripsRecebidas = [];
+
+    $horariosRecebidos = [];
+
+    $criadas = 0;
+    $atualizadas = 0;
+    $excluidas = 0;
 
 
-    foreach ($data as $item) {
+
+    /*
+    |--------------------------------------------------------------------------
+    | 8. PROCESSA OS HORÁRIOS RECEBIDOS
+    |--------------------------------------------------------------------------
+    */
+
+    foreach (
+        $data as $item
+    ) {
 
 
         /*
         |--------------------------------------------------------------------------
-        | VALIDA O PATTERN E SERVIÇO RECEBIDOS
+        | VALIDA PATTERN / SERVIÇO
         |--------------------------------------------------------------------------
-        |
-        | Evita que um único payload misture horários de outros patterns.
-        |
         */
 
         $itemPatternId =
@@ -315,11 +423,15 @@ try {
 
         $departure_time =
             isset($item['departure_time'])
-                ? trim($item['departure_time'])
+                ? trim(
+                    $item['departure_time']
+                )
                 : '';
 
 
-        if ($departure_time === '') {
+        if (
+            $departure_time === ''
+        ) {
 
             throw new Exception(
                 "Horário de partida inválido."
@@ -327,23 +439,75 @@ try {
         }
 
 
+        /*
+         * Normaliza HH:MM para HH:MM:SS
+         */
+
+        if (
+            preg_match(
+                '/^\d{1,3}:\d{2}$/',
+                $departure_time
+            )
+        ) {
+
+            $departure_time .= ":00";
+        }
+
+
+        if (
+            !preg_match(
+                '/^\d{1,3}:[0-5]\d:[0-5]\d$/',
+                $departure_time
+            )
+        ) {
+
+            throw new Exception(
+                "Formato de horário inválido: "
+                . $departure_time
+            );
+        }
+
+
+        /*
+         * Evita duplicidade no mesmo envio.
+         */
+
+        if (
+            isset(
+                $horariosRecebidos[
+                    $departure_time
+                ]
+            )
+        ) {
+
+            throw new Exception(
+                "Horário duplicado: "
+                . $departure_time
+            );
+        }
+
+
+        $horariosRecebidos[
+            $departure_time
+        ] = true;
+
+
 
         /*
         |--------------------------------------------------------------------------
         | WHEELCHAIR_ACCESSIBLE
         |--------------------------------------------------------------------------
-        |
-        | GTFS:
-        |
-        | 0 = sem informação
-        | 1 = acessível
-        | 2 = não acessível
-        |
         */
 
         $wheelchair_accessible =
-            isset($item['wheelchair_accessible'])
-                ? (int) $item['wheelchair_accessible']
+            isset(
+                $item[
+                    'wheelchair_accessible'
+                ]
+            )
+                ? (int) $item[
+                    'wheelchair_accessible'
+                ]
                 : 0;
 
 
@@ -362,11 +526,120 @@ try {
 
         /*
         |--------------------------------------------------------------------------
-        | CRIA A TRIP
+        | TRIP_ID RECEBIDO
         |--------------------------------------------------------------------------
         */
 
-        $stmtTrip->bind_param(
+        $trip_id =
+            isset($item['trip_id'])
+                ? (int) $item['trip_id']
+                : 0;
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | FALLBACK PELO HORÁRIO
+        |--------------------------------------------------------------------------
+        |
+        | Se a tela não enviou trip_id mas o horário
+        | já existe, preservamos o trip_id existente.
+        |
+        */
+
+        if (
+            $trip_id <= 0 &&
+            isset(
+                $tripPorHorario[
+                    $departure_time
+                ]
+            )
+        ) {
+
+            $trip_id =
+                (int) $tripPorHorario[
+                    $departure_time
+                ];
+        }
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | TRIP JÁ EXISTE
+        |--------------------------------------------------------------------------
+        */
+
+        if (
+            $trip_id > 0 &&
+            isset(
+                $tripsExistentes[
+                    $trip_id
+                ]
+            )
+        ) {
+
+
+            /*
+             * Atualiza os dados derivados
+             * do pattern.
+             */
+
+            $stmtUpdateTrip->bind_param(
+                "isssisiii",
+                $route_id,
+                $service_id,
+                $trip_headsign,
+                $trip_short_name,
+                $direction_id,
+                $shape_id,
+                $wheelchair_accessible,
+                $trip_id,
+                $pattern_id
+            );
+
+
+            $stmtUpdateTrip->execute();
+
+
+
+            /*
+             * Atualiza o horário.
+             *
+             * Hoje sua tela não altera horário,
+             * mas deixamos preparado.
+             */
+
+            $stmtUpdateDeparture->bind_param(
+                "si",
+                $departure_time,
+                $trip_id
+            );
+
+
+            $stmtUpdateDeparture->execute();
+
+
+            $tripsRecebidas[
+                $trip_id
+            ] = true;
+
+
+            $atualizadas++;
+
+
+            continue;
+        }
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | NOVO HORÁRIO = NOVA TRIP
+        |--------------------------------------------------------------------------
+        */
+
+        $stmtInsertTrip->bind_param(
             "iisssisi",
             $pattern_id,
             $route_id,
@@ -379,23 +652,18 @@ try {
         );
 
 
-        $stmtTrip->execute();
+        $stmtInsertTrip->execute();
 
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | PEGA O TRIP_ID GERADO
-        |--------------------------------------------------------------------------
-        */
-
-        $trip_id =
+        $novoTripId =
             mysqli_insert_id(
                 $conexao
             );
 
 
-        if ($trip_id <= 0) {
+        if (
+            $novoTripId <= 0
+        ) {
 
             throw new Exception(
                 "Não foi possível gerar a Trip."
@@ -405,59 +673,143 @@ try {
 
 
         /*
-        |--------------------------------------------------------------------------
-        | CRIA O HORÁRIO DA TRIP
-        |--------------------------------------------------------------------------
-        */
+         * Cria o horário.
+         */
 
-        $stmtDeparture->bind_param(
+        $stmtInsertDeparture->bind_param(
             "is",
-            $trip_id,
+            $novoTripId,
             $departure_time
         );
 
 
-        $stmtDeparture->execute();
+        $stmtInsertDeparture->execute();
 
 
-        $tripsCriadas++;
+        $tripsRecebidas[
+            $novoTripId
+        ] = true;
+
+
+        $criadas++;
     }
 
 
 
     /*
     |--------------------------------------------------------------------------
-    | FINALIZA TRANSAÇÃO
+    | 9. EXCLUI SOMENTE AS TRIPS QUE SAÍRAM DA LISTA
     |--------------------------------------------------------------------------
     */
 
-    mysqli_commit(
+    $stmtDeleteTrip =
+        $conexao->prepare("
+            DELETE FROM trips
+            WHERE trip_id = ?
+              AND pattern_id = ?
+              AND service_id = ?
+        ");
+
+
+    foreach (
+        $tripsExistentes as
+        $tripExistenteId => $_
+    ) {
+
+        if (
+            isset(
+                $tripsRecebidas[
+                    $tripExistenteId
+                ]
+            )
+        ) {
+
+            continue;
+        }
+
+
+        $stmtDeleteTrip->bind_param(
+            "iis",
+            $tripExistenteId,
+            $pattern_id,
+            $service_id
+        );
+
+
+        $stmtDeleteTrip->execute();
+
+
+        if (
+            $stmtDeleteTrip->affected_rows > 0
+        ) {
+
+            $excluidas++;
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | 10. GERA STOP_TIMES AUTOMATICAMENTE
+    |--------------------------------------------------------------------------
+    */
+
+    $totalStopTimes =
+        gerarStopTimes(
+            $conexao,
+            $pattern_id,
+            $service_id
+        );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | 11. COMMIT
+    |--------------------------------------------------------------------------
+    */
+
+        mysqli_commit(
         $conexao
     );
 
 
     echo json_encode([
-        "status" => "ok",
+
+        "status" =>
+            "ok",
+
         "message" =>
-            $tripsCriadas
-            . " horário(s) salvo(s) com sucesso.",
-        "trips_criadas" =>
-            $tripsCriadas
+            "Horários salvos e stop_times gerados com sucesso.",
+
+        "criadas" =>
+            $criadas,
+
+        "atualizadas" =>
+            $atualizadas,
+
+        "excluidas" =>
+            $excluidas,
+
+        "stop_times_gerados" =>
+            $totalStopTimes
+
     ]);
 
 
-}
-catch (Throwable $e) {
+    }
+    catch (
+        Throwable $e
+    ) {
+
+        mysqli_rollback(
+            $conexao
+        );
 
 
-    mysqli_rollback(
-        $conexao
-    );
+        echo json_encode([
+            "status" =>
+                "erro",
 
-
-    echo json_encode([
-        "status" => "erro",
-        "message" =>
-            $e->getMessage()
-    ]);
-}
+            "message" =>
+                $e->getMessage()
+        ]);
+    }
